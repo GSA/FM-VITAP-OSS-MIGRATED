@@ -251,5 +251,5 @@ ModelManifest.xml
 
 # Visual Studio Configuration file
 Web.config
-Web.Debug
-Web.Release
+Web.Debug.config
+Web.Release.config
