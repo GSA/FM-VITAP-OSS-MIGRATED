@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VITAP.Library", "VITAP.Library\VITAP.Library.csproj", "{8544B38E-5C73-4BDB-8D46-FF9F52C79000}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VITAP.Data", "VitapData\VITAP.Data.csproj", "{309DAFAB-97AA-4F39-AF37-F38ED59156C1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VITAP", "Vitap\VITAP.csproj", "{EB7758C3-F433-47E3-B8C6-0CCD8199AD46}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8544B38E-5C73-4BDB-8D46-FF9F52C79000}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8544B38E-5C73-4BDB-8D46-FF9F52C79000}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8544B38E-5C73-4BDB-8D46-FF9F52C79000}.Debug|x86.ActiveCfg = Debug|x86
+		{8544B38E-5C73-4BDB-8D46-FF9F52C79000}.Debug|x86.Build.0 = Debug|x86
+		{8544B38E-5C73-4BDB-8D46-FF9F52C79000}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8544B38E-5C73-4BDB-8D46-FF9F52C79000}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8544B38E-5C73-4BDB-8D46-FF9F52C79000}.Release|x86.ActiveCfg = Release|Any CPU
+		{8544B38E-5C73-4BDB-8D46-FF9F52C79000}.Release|x86.Build.0 = Release|Any CPU
+		{309DAFAB-97AA-4F39-AF37-F38ED59156C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{309DAFAB-97AA-4F39-AF37-F38ED59156C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{309DAFAB-97AA-4F39-AF37-F38ED59156C1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{309DAFAB-97AA-4F39-AF37-F38ED59156C1}.Debug|x86.Build.0 = Debug|Any CPU
+		{309DAFAB-97AA-4F39-AF37-F38ED59156C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{309DAFAB-97AA-4F39-AF37-F38ED59156C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{309DAFAB-97AA-4F39-AF37-F38ED59156C1}.Release|x86.ActiveCfg = Release|Any CPU
+		{309DAFAB-97AA-4F39-AF37-F38ED59156C1}.Release|x86.Build.0 = Release|Any CPU
+		{EB7758C3-F433-47E3-B8C6-0CCD8199AD46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB7758C3-F433-47E3-B8C6-0CCD8199AD46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB7758C3-F433-47E3-B8C6-0CCD8199AD46}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EB7758C3-F433-47E3-B8C6-0CCD8199AD46}.Debug|x86.Build.0 = Debug|Any CPU
+		{EB7758C3-F433-47E3-B8C6-0CCD8199AD46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB7758C3-F433-47E3-B8C6-0CCD8199AD46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB7758C3-F433-47E3-B8C6-0CCD8199AD46}.Release|x86.ActiveCfg = Release|Any CPU
+		{EB7758C3-F433-47E3-B8C6-0CCD8199AD46}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

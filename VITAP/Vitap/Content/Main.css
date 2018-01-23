@@ -1,0 +1,571 @@
+﻿body {    
+    font-family: Segoe UI, Arial, Helvetica, Sans-Serif;
+    color: #212445;
+    background: #c6d2e2; /* For browsers that do not support gradients */
+    margin: 0;
+    padding: 0;        
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #000;
+    font-family: Segoe UI, Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    font-size: 1.2em;
+}
+
+h2 {
+    font-size: 1.1em;
+}
+
+h3 {
+    font-size: 1.02em;
+    color: Navy;
+    margin-bottom: .3em;
+}
+
+li {
+    height: 30px;
+    line-height: 30px;
+    display: block;
+}
+
+#wrapper {
+    width: 90%;
+    margin: auto;
+    background-color: #FFF;
+}
+
+#header {
+}
+
+#redBar {
+    width: 100%;
+    height: 10px;
+    background-color: #cc0000;
+}
+
+#wrapper2 {
+    background-color: #15266c;
+}
+
+#banner {
+    background-image: url('../Images/flagbanner.gif');
+    width: 743px;
+    height: 58px;
+    background-repeat: no-repeat;
+}
+
+#appTitle {
+    width: 100%;
+    font-family: Segoe UI, Arial, Helvetica, sans-serif;
+    font-size: 1.5em;
+    padding-left: 10px;
+    padding: 10px 0 10px 10px;
+    clear: both;
+}
+
+#naviWrapper {
+    background-color: #c6d2e2;
+    height: 2em;
+    font-family: Segoe UI, Arial, Helvetica, sans-serif;
+    margin-bottom: -6px;
+    font-variant: small-caps;
+    clear: both;
+}
+
+    #naviWrapper .k-link {
+        font-weight: bold;
+    }
+
+
+#loggedInUser {
+    width: 30%;
+    font-size: 1em;
+    text-align: right;
+    float: right;
+    padding-top: 4px;
+    padding-right: 6px;
+}
+
+.bar {
+    clear: both;
+    border: 2px solid #cc0000;
+    margin-top: 14px;
+}
+
+#content {
+    padding: 2px 4px 2px 6px;
+    min-height: 250px;
+}
+
+#footer {
+    clear: both;
+    width: 100%;
+    text-align: center;
+    font-family: Segoe UI, Arial, Helvetica, sans-serif;
+    font-size: .8em;
+    margin-top: 1px;
+}
+
+    #footer p {
+        margin: 0;
+        padding: 3px 0 8px 0;
+    }
+
+input[type="submit"], input[type="button"], button[type=submit] {
+    color: #13688c;
+    font-size: 1em;
+    background-color: #daecf4;
+    border: 1px solid #7bd2f6;
+    padding: 3px 12px 3px 12px;    
+}
+
+    input[type="submit"]:hover, input[type="button"]:hover, button[type=submit]:hover {
+        color: #003f59;
+        background-color: #7bd2f6;
+        border: 1px solid #7bd2f6;
+    }
+
+.loginWarning {
+    color: #cc0000;
+    text-align: center;
+    font-family: Segoe UI, Arial, Helvetica, sans-serif;
+    font-size: .8em;
+    font-weight: bold;
+}
+
+.generalContainer {
+    width: 100%;
+    border: 1px solid #7bd2f6;
+    clear: both;
+    float: left;
+    margin-bottom: 6px;
+}
+
+.form {
+    font-size: 1em;
+    font-family: Segoe UI, Arial, Helvetica, Sans-Serif;
+    padding: 8px 18px 12px 18px;
+    margin: 0px 2px 2px 2px;
+    clear: both;
+}
+
+    .form label {
+        float: left;
+        width: 42%;
+        text-align: right;
+        clear: left;
+        margin-right: 2%;
+        margin-bottom: 4px;
+    }
+
+    .form .fieldValue {
+        font-weight: bold;
+        font-family: Arial, Helvetica, Sans-Serif;
+    }
+
+    .form br, .form hr, .formLeft br, .formRight br {
+        line-height: 1em;
+        clear: both;
+    }
+
+    .form input, .form select {
+        margin-top: -2px;
+        margin-bottom: 8px;
+    }
+
+        .form input[type="submit"], .form input[type="button"] {
+        }
+
+    .form .exception {
+        margin-left: 245px;
+    }
+
+.searchForm {
+    font-size: .9em;
+    font-family: Arial, Helvetica, Sans-Serif;
+    margin: 0;
+    padding: 10px 4px 10px 2px;
+}
+
+    .searchForm .firstCol {
+        width: 63px;
+        float: left;
+        text-align: right;
+        margin-top: 5px;
+        margin-right: 4px;
+    }
+
+
+    .searchForm .secondCol {
+        width: 22px;
+        text-align: right;
+        margin-top: 5px;
+        margin-right: 4px;
+    }
+
+    .searchForm .thirdCol {
+        margin-left: 65px;
+    }
+
+    .searchForm select {
+        height: 1.8em;
+        width: 156px;
+        margin-left: 1px;
+    }
+
+    .searchForm label, .searchForm input, .searchForm select {
+        margin-bottom: 4px;
+    }
+
+.details {
+    font-size: .9em;
+    font-family: Helvetica, Sans-Serif;
+    margin: 0;
+    padding: 2px 12px 2px 12px;
+    width: 90%;
+}
+
+    .details .label {
+        width: 16%;
+        float: left;
+        text-align: right;
+        margin-right: 15px;
+    }
+
+    .details .value {
+        width: 16%;
+    }
+
+
+.textBoxS {
+}
+
+.textBoxM {
+}
+
+.textBoxL {
+}
+
+table {
+    font-size: .94em;
+    font-family: Arial, Helvetica, Sans-Serif;
+    border: 1px solid #7bd2f6;
+    width: 100%;
+}
+
+    table th {
+        padding: 4px 2px 4px 2px;
+        text-align: center;
+        color: #13688c;
+        background-color: #daecf4;
+    }
+
+    table td {
+        font-size: .84em;
+        padding: 2px;
+    }
+
+        table td .comments {
+            width: 100px;
+        }
+
+.controls {
+    margin-top: .5em;
+    margin-bottom: .5em;
+    padding: 8px 0 4px 4px;
+    font-variant: small-caps;
+}
+
+    .controls input[type="submit"], .controls input[type="button"], .controls button[type="submit"] {
+        font-size: .75em;
+        border: 1px solid #7bd2f6;
+        width: 70px;
+    }
+
+.pager {
+    color: #000;
+    background-color: #E1E0DB;
+    padding: 0;
+    margin: 0;
+}
+
+    .pager table {
+        width: auto;
+        border: 0;
+        font-family: Segoe UI, Arial, Helvetica, Sans-Serif;
+        font-size: 1em;
+        font-weight: bold;
+        margin: -6px 0 -6px 0;
+        padding: 0 2px 0 2px;
+    }
+
+    .pager a {
+        background-color: #E1E0DB;
+    }
+
+.textCentered {
+    text-align: center;
+}
+
+.validationWarning {
+    color: #cc0000;
+    text-align: left;
+    font-family: Segoe UI, Arial, Helvetica, sans-serif;
+    font-size: .8em;
+    font-weight: bold;
+}
+
+.disabledColumn {
+    color: #808080;
+}
+
+.updateFeedback {
+    color: #cc0000;
+    margin-left: 40px;
+    font-family: Segoe UI, Arial, Helvetica, sans-serif;
+    font-size: .8em;
+    font-weight: bold;
+}
+
+.legalStatement {
+    color: #cc0000;
+    text-align: left;
+    font-family: Segoe UI, Arial, Helvetica, sans-serif;
+    font-size: .9em;
+    font-weight: bold;
+    padding-left: 10px;
+    padding-bottom: 0;
+}
+
+.btn-fixed-width {
+    width: 125px;
+    max-width:100%;
+}
+
+.btn-fixed-width-large {
+    width: 150px;
+    max-width:100%;
+}
+
+.btn-fixed-width-small {
+    width: 112px;
+    max-width:100%;
+}
+
+/*
+    This one makes combox small and paging control unaligned
+*/
+/*
+    .k-animation-container, .k-widget, .k-widget *, .k-animation-container *, .k-widget *:before, .k-animation-container *:after, .k-block .k-header, .k-list-container {
+    box-sizing: inherit;
+}*/
+
+
+.k-window {
+    position: absolute;
+    width: 30%;
+    left: 33%;
+    top: 20%;
+    z-index: 10000;
+}
+
+/*
+    This one makes menu and combo box big.
+    So I commented out
+*/
+/*.k-header {
+    padding: 10px 0px 30px 10px;
+}*/
+
+
+/*.k-link {
+    font-size: 14px;
+}*/
+
+/*
+    The font size is alreay set in table tag, which is .94em
+*/
+/*.k-grid-content td {
+    font-size: 14px;
+}*/
+
+.k-pager-wrap .k-dropdown {
+    width: 5.5em;
+}
+
+#windowMandMemoText {
+    width: 100%;
+    max-width: 100%;
+}
+
+.padBottom20 {
+    padding-bottom: 20px;
+}
+
+.pad20 {
+    padding: 20px;
+}
+
+.padBottom10 {
+    padding-bottom: 10px;
+}
+
+.pad10 {
+    padding: 10px;
+}
+
+input, select, textarea {
+    max-width: 100%;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.textAreaElastic {
+    width: 100%;
+    max-width: 100%;
+}
+
+.po-mod-border {
+    border: 1px solid lightgrey;
+    padding-top: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-bottom: 1px;
+    margin-bottom: 10px;
+}
+
+.btn-exception-type, button[type=button] {
+    margin-top: 15px;
+    min-width: 90px;
+    font-size: .9em;    
+    color: #13688c;
+    background-color: #daecf4;
+    border: 1px solid #7bd2f6;
+    padding: 3px 12px 3px 12px;    
+    cursor: pointer;
+}
+
+    .btn-exception-type.chosen {
+        color: #fff;
+        background-color: #1e395b;
+        border: 1px solid #c6d2e2;
+    }
+
+    .btn-exception-type, button[type=button]:hover {
+        color: #fff;
+        background-color: #1e395b;
+        border: 1px solid #c6d2e2;
+    }
+
+.btn-exception-type, button[disabled] {
+    cursor: default;
+    background-color: #cacaca;
+    color: #4c4a4a;
+}
+
+    .btn-exception-type, button[disabled]:hover {
+        border: 1px solid #000;
+        background-color: #cacaca;
+        color: #4c4a4a;
+    }
+
+.peg-main-ex {
+}
+
+    .peg-main-ex input {
+        max-width: 100%;
+    }
+
+    .peg-main-ex select {
+        max-width: 100%;
+    }
+
+    .peg-main-ex textarea {
+        width: 100%;
+        max-width: initial;
+        resize: none;
+    }
+
+    .peg-main-ex label {
+        display: inline;
+        /*float: left;*/
+        margin-right: 4px;
+        vertical-align: top;
+    }
+
+.text-right {
+    text-align: right;
+}
+
+.label-right-60 {
+    text-align: right;
+    min-width: 60px;
+}
+
+.no-buffer {
+    margin: 0px;
+    padding: 0px;
+}
+
+.sm-buffer {
+    margin: 2px;
+    padding: 2px;
+}
+
+.md-buffer {
+    margin: 5px;
+    padding: 5px;
+}
+.col-hdr {
+    font-weight: bold;
+    vertical-align: middle;
+}
+
+/* iFrame container for viewing invoice TIF images. */
+.tiff-container {
+    position: relative;
+    padding-bottom: 130%;
+    height: 0;
+    overflow: hidden;
+}
+
+    .tiff-container iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+#contactFields label {
+    width: 100px;
+    text-align: right;    
+    margin-right: 6px;
+}
+
+.btn-info.disabled,
+.btn-info[disabled],
+fieldset[disabled] .btn-info,
+.btn-info.disabled:hover,
+.btn-info[disabled]:hover,
+fieldset[disabled] .btn-info:hover,
+.btn-info.disabled:focus,
+.btn-info[disabled]:focus,
+fieldset[disabled] .btn-info:focus,
+.btn-info.disabled:active,
+.btn-info[disabled]:active,
+fieldset[disabled] .btn-info:active,
+.btn-info.disabled.active,
+.btn-info[disabled].active,
+fieldset[disabled] .btn-info.active {
+  background-color: #eee;
+  border-color: #7bd2f6;
+}

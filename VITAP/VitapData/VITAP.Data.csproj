@@ -1,0 +1,685 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{309DAFAB-97AA-4F39-AF37-F38ED59156C1}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>VITAP.Data</RootNamespace>
+    <AssemblyName>VITAP.Data</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="GSA.R7BD.Utility, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GSA.GSAIT.CorporateITServices.Utility.2.1.0\lib\net461\GSA.R7BD.Utility.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Oracle.ManagedDataAccess, Version=4.121.2.0, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=MSIL">
+      <HintPath>..\packages\Oracle.ManagedDataAccess.12.1.2400\lib\net40\Oracle.ManagedDataAccess.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Oracle.ManagedDataAccess.EntityFramework, Version=6.121.2.0, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=MSIL">
+      <HintPath>..\packages\Oracle.ManagedDataAccess.EntityFramework.12.1.2400\lib\net45\Oracle.ManagedDataAccess.EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Data.OracleClient" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Mvc">
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.0\lib\net45\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Managers\AgedExceptionsManager.cs" />
+    <Compile Include="Managers\Buttons\ButtonExceptionManager.cs" />
+    <Compile Include="Managers\ConfigManager.cs" />
+    <Compile Include="Managers\ContactManager.cs" />
+    <Compile Include="Managers\DataEntryProductivityReportManager.cs" />
+    <Compile Include="Managers\DiscAvailReportManager.cs" />
+    <Compile Include="Managers\ExceptionHist.cs" />
+    <Compile Include="Managers\Exceptions.cs" />
+    <Compile Include="Managers\MF_II.cs" />
+    <Compile Include="Managers\PaymentAuthManager.cs" />
+    <Compile Include="Managers\ImageListHistManager.cs" />
+    <Compile Include="Managers\ImageListManager.cs" />
+    <Compile Include="Managers\ImageTransHistManager.cs" />
+    <Compile Include="Managers\ExpenseAccrualManager.cs" />
+    <Compile Include="Managers\ListEAManager.cs" />
+    <Compile Include="Managers\ListInvManager.cs" />
+    <Compile Include="Managers\ListPOManager.cs" />
+    <Compile Include="Managers\LoginManager.cs" />
+    <Compile Include="Managers\MfDocTypeManager.cs" />
+    <Compile Include="Managers\MfRefInfoManager.cs" />
+    <Compile Include="Managers\NotificationExceptionsManager.cs" />
+    <Compile Include="Managers\NotificationsManager.cs" />
+    <Compile Include="Managers\NotesContact.cs" />
+    <Compile Include="Managers\ButtonReasons.cs" />
+    <Compile Include="Managers\MfDocTypeData.cs" />
+    <Compile Include="Managers\OutboxManager.cs" />
+    <Compile Include="Managers\OverviewPO.cs" />
+    <Compile Include="Managers\OverviewRR.cs" />
+    <Compile Include="Managers\PegasysMainExceptionsManager.cs" />
+    <Compile Include="Managers\RREdiManager.cs" />
+    <Compile Include="Managers\ReportPoListingManager.cs" />
+    <Compile Include="Managers\U066Manager.cs" />
+    <Compile Include="Managers\V299Manager.cs" />
+    <Compile Include="Managers\PegasysAEManager.cs" />
+    <Compile Include="Managers\PegasysKeyedExceptionManager.cs" />
+    <Compile Include="Managers\PegasysPAManager.cs" />
+    <Compile Include="Managers\P202Manager.cs" />
+    <Compile Include="Managers\P039Manager.cs" />
+    <Compile Include="Managers\POEDIManager.cs" />
+    <Compile Include="Managers\PoQueryAcctNotes.cs" />
+    <Compile Include="Managers\POVendAddrManager.cs" />
+    <Compile Include="Managers\ReceivingReport.cs" />
+    <Compile Include="Managers\ReceivingReportAccounting.cs" />
+    <Compile Include="Managers\RecurringMasterManager.cs" />
+    <Compile Include="Managers\RolesManager.cs" />
+    <Compile Include="Managers\RRQueryNotes.cs" />
+    <Compile Include="Managers\PoQueryNotes.cs" />
+    <Compile Include="Managers\ReportManager.cs" />
+    <Compile Include="Managers\Shared\PoActGFields.cs" />
+    <Compile Include="Managers\TransHistPODataManager.cs" />
+    <Compile Include="Managers\TransHistVendorInfoManager.cs" />
+    <Compile Include="Managers\VendorManager.cs" />
+    <Compile Include="Models\Exceptions\Main\OIQueryResult.cs" />
+    <Compile Include="Models\Exceptions\NotificationExceptions\NotificationExceptionUpdateModel.cs" />
+    <Compile Include="Models\Exceptions\P039\MRC2QueryResult.cs" />
+    <Compile Include="Models\Exceptions\R200\R200ListInv.cs" />
+    <Compile Include="Models\Home\HomeModel.cs" />
+    <Compile Include="Models\MF_IO_ADO.cs" />
+    <Compile Include="Models\Reports\Report_PoListing\Report_PoListingOrgCodeFixRecord.cs" />
+    <Compile Include="Models\TransHist\PaymentAuthorizationVendorResultModel.cs" />
+    <Compile Include="Models\TransHist\PaymentAuthorizationStatusResultModel.cs" />
+    <Compile Include="Models\TransHist\ReceivingReport\PegasysRRAccountingDetail.cs" />
+    <Compile Include="Models\TransHist\ReceivingReport\PegasysRRDetailModel.cs" />
+    <Compile Include="Models\TransHist\ReceivingReport\PegasysRRAccountingModel.cs" />
+    <Compile Include="Models\TransHist\ReceivingReport\PegasysRREdiModel.cs" />
+    <Compile Include="Models\TransHist\ReceivingReport\PegasysRRModel.cs" />
+    <Compile Include="Models\TransHist\TransHistViewModel.cs" />
+    <Compile Include="PegasysEntities\MF_CX.cs" />
+    <Compile Include="PegasysEntities\MF_CX_AWTG_RCON.cs" />
+    <Compile Include="PegasysEntities\MF_CX_FRM.cs" />
+    <Compile Include="PegasysEntities\MF_CX_FRM_LN.cs" />
+    <Compile Include="PegasysEntities\MF_CX_LINE.cs" />
+    <Compile Include="Models\Exceptions\U066\U066SearchRequest.cs" />
+    <Compile Include="Models\Reports\DiscountAvailability\DiscountAvailabilitySearch.cs" />
+    <Compile Include="Models\TransHist\ListPOModel.cs" />
+    <Compile Include="Models\TransHist\ListRR_ORA.cs" />
+    <Compile Include="Models\TransHist\PaymentAuthorizationPegasysModel.cs" />
+    <Compile Include="Models\TransHist\PurchaseOrderListImageModel.cs" />
+    <Compile Include="Models\TransHist\PurchaseOrderListModel.cs" />
+    <Compile Include="Models\TransHist\ViewPOIOModel.cs" />
+    <Compile Include="Managers\TransHistViewPOManager.cs" />
+    <Compile Include="Models\TransHist\ViewPOModel.cs" />
+    <Compile Include="PegasysEntities\MF_LEAS_AM.cs" />
+    <Compile Include="Models\AddressValuesModel.cs" />
+    <Compile Include="Models\Exceptions\Keyed\ExceptionKeyedModel.cs" />
+    <Compile Include="Models\Exceptions\Keyed\KeyedRecord.cs" />
+    <Compile Include="Models\Exceptions\Keyed\Mf_Ii_Lite.cs" />
+    <Compile Include="Models\Exceptions\Keyed\Mf_Io_Lite.cs" />
+    <Compile Include="Models\Exceptions\Main\MainExceptionButton.cs" />
+    <Compile Include="Models\Exceptions\Main\MainExceptionModel.cs" />
+    <Compile Include="Models\Exceptions\Main\MainExExpenseAccrualAccountInfoModel.cs" />
+    <Compile Include="Models\Exceptions\Main\MainExExpenseAccrualTabModel.cs" />
+    <Compile Include="Models\Exceptions\Main\MainExInvoiceModel.cs" />
+    <Compile Include="Models\Exceptions\Main\MainExInvoiceTabModel.cs" />
+    <Compile Include="Models\Exceptions\Main\MainExMainTabModel.cs" />
+    <Compile Include="Models\Exceptions\Main\MainExPaymentAuthAccountInfoModel.cs" />
+    <Compile Include="Models\Exceptions\Main\MainExMemoModel.cs" />
+    <Compile Include="Models\Exceptions\Main\MainExPaymentAuthTabModel.cs" />
+    <Compile Include="Models\Exceptions\Main\MainExPOTabModel.cs" />
+    <Compile Include="Models\Exceptions\Main\MainExRRAccountInfoModel.cs" />
+    <Compile Include="Models\Exceptions\Main\MainExRRTabModel.cs" />
+    <Compile Include="Models\Exceptions\Main\MainExTabRRAmountModel.cs" />
+    <Compile Include="Models\Exceptions\MandMemoModel.cs" />
+    <Compile Include="Models\Exceptions\P039\RRChoiceModel.cs" />
+    <Compile Include="Models\Exceptions\P202\P202RRQueryData.cs" />
+    <Compile Include="Models\Exceptions\R200\R200InvoiceModel.cs" />
+    <Compile Include="Models\Exceptions\R200\R200Search.cs" />
+    <Compile Include="Models\Exceptions\R200\X200Model.cs" />
+    <Compile Include="Models\Exceptions\V299\DggtInfoQueryResult.cs" />
+    <Compile Include="Models\Exceptions\V299\CCRInfoQueryResult.cs" />
+    <Compile Include="Models\Exceptions\V299\PegPoAcctQueryResult.cs" />
+    <Compile Include="Models\Exceptions\V299\PoQueryResult.cs" />
+    <Compile Include="Models\Exceptions\V299\V299SearchRequest.cs" />
+    <Compile Include="Models\Exceptions\V299\V299SearchResult.cs" />
+    <Compile Include="Models\Exceptions\VendorModel.cs" />
+    <Compile Include="Models\Message.cs" />
+    <Compile Include="Models\MiscValuesModel.cs" />
+    <Compile Include="Models\Pegasys\PegasysPOandFrm.cs" />
+    <Compile Include="Models\Reports\PegasysDaysOldInvoice\ContactInfo.cs" />
+    <Compile Include="Models\Reports\PegasysDaysOldInvoice\DaysOldInvoiceModel.cs" />
+    <Compile Include="Models\Reports\PegasysDaysOldInvoice\DaysOldQueryResult.cs" />
+    <Compile Include="Models\Reports\PegasysDaysOldInvoice\All442POS.cs" />
+    <Compile Include="Models\Reports\PreparerCodeProductivity\PreparerCodeProductivity.cs" />
+    <Compile Include="Models\Reports\PreparerCodeProductivity\PreparerCodeProductivityModel.cs" />
+    <Compile Include="Models\Reports\PreparerCodeProductivity\PrepCodeProdQueryResult.cs" />
+    <Compile Include="Models\Reports\PreparerCodeProductivity\PrepCodeProdTempTable.cs" />
+    <Compile Include="Models\Reports\ExceptionCleared\ExceptionClearedModel.cs" />
+    <Compile Include="Models\Reports\ExceptionCleared\ExceptionClearedQueryResult.cs" />
+    <Compile Include="Models\Reports\ExceptionCleared\ExceptionInfo.cs" />
+    <Compile Include="Models\RoleListModel.cs" />
+    <Compile Include="Models\Sequence.cs" />
+    <Compile Include="Models\TransHist.cs" />
+    <Compile Include="Models\TransHist\Contact.cs" />
+    <Compile Include="Models\TransHist\InboxPermRRDetail.cs" />
+    <Compile Include="Models\TransHist\InboxPermRRHModel.cs" />
+    <Compile Include="Models\TransHist\InvoiceItemizedDocumentModel.cs" />
+    <Compile Include="Models\TransHist\InvoiceListModel.cs" />
+    <Compile Include="Models\TransHist\RecurringMaster\RecurringMasterDocTemplateModel.cs" />
+    <Compile Include="Models\TransHist\RecurringMaster\RecurringMasterLeaseAmountModel.cs" />
+    <Compile Include="Models\TransHist\RecurringMaster\RecurringMasterLeaseChainModel.cs" />
+    <Compile Include="Models\TransHist\RecurringMaster\RecurringMasterMainModel.cs" />
+    <Compile Include="Models\TransHist\TjModel.cs" />
+    <Compile Include="Models\Reports\AssociateProductivity\AssoProdLegacyUser.cs" />
+    <Compile Include="Models\Reports\AssociateProductivity\AssoProdTempTable.cs" />
+    <Compile Include="Models\Reports\CommonModels\LegacyUserInfo.cs" />
+    <Compile Include="Models\Reports\ExceptionsWorkedByPreparerCode\ExceptionPrepCodeModel.cs" />
+    <Compile Include="Models\Reports\ExceptionsWorkedByPreparerCode\ExceptionPrepCodeQueryResult.cs" />
+    <Compile Include="Models\Reports\ExceptionsWorkedByPreparerCode\ExceptionPrepCodeTempTable.cs" />
+    <Compile Include="Models\Reports\ExceptionsWorkedByPreparerCode\WgtScore.cs" />
+    <Compile Include="Models\Exceptions\P039\NoRRArray.cs" />
+    <Compile Include="Models\Exceptions\P039\P039POAcctQueryData.cs" />
+    <Compile Include="Models\Exceptions\P039\P039PoQueryData.cs" />
+    <Compile Include="Models\TransHist\TransHistPOData.cs" />
+    <Compile Include="Models\DataEntry\AddInvoiceViewModel.cs" />
+    <Compile Include="Models\TransHist\TransHistVendorInfo.cs" />
+    <Compile Include="PegasysEntities\MF_DOC_TYPE.cs" />
+    <Compile Include="PegasysEntities\MF_IC_ITMZ_LN.cs" />
+    <Compile Include="PegasysEntities\MF_IC_FRM_ITMZ_LN.cs" />
+    <Compile Include="PegasysEntities\MF_IV_HDAL.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\USER_ACCESS_VIEW.cs" />
+    <Compile Include="VitapEntities\MATCHRRINV.cs" />
+    <Compile Include="Models\Exceptions\Other\NotesResult.cs" />
+    <Compile Include="Models\Exceptions\UserException\PicklistModel.cs" />
+    <Compile Include="Models\Login\LoginModel.cs" />
+    <Compile Include="Models\MainNav\MainNavModel.cs" />
+    <Compile Include="Models\Reports\AssociateProductivity\AssoProdQueryResult.cs" />
+    <Compile Include="Models\TransHist\ExpenseAccrualModel.cs" />
+    <Compile Include="Models\TransHist\InboxPermPOAModel.cs" />
+    <Compile Include="Models\TransHist\InboxPermPOHModel.cs" />
+    <Compile Include="Models\TransHist\OfficeAddress.cs" />
+    <Compile Include="Models\TransHist\PoEdiMfIoModel.cs" />
+    <Compile Include="Models\TransHist\ReceivingReport\ReceivingReportEdiDetailModel.cs" />
+    <Compile Include="Models\TransHist\ReceivingReport\ReceivingReportEdiHeaderModel.cs" />
+    <Compile Include="Models\TransHist\ReceivingReport\ReceivingReportEdiModel.cs" />
+    <Compile Include="Models\TransHist\VendorInfo.cs" />
+    <Compile Include="VitapEntities\MULTRR.cs" />
+    <Compile Include="PegasysEntities\MF_ADDR_LEVL_OFFC.cs" />
+    <Compile Include="PegasysEntities\MF_ADDR_LEVL_VEND.cs" />
+    <Compile Include="PegasysEntities\MF_AGRE.cs" />
+    <Compile Include="PegasysEntities\MF_AI_HDAL.cs" />
+    <Compile Include="PegasysEntities\MF_AI_HDAL_FRM.cs" />
+    <Compile Include="PegasysEntities\MF_AJ.cs" />
+    <Compile Include="PegasysEntities\MF_BDOB.cs" />
+    <Compile Include="PegasysEntities\MF_CMPD_MTCH_SUMR.cs" />
+    <Compile Include="PegasysEntities\MF_EXTD_DSCR.cs" />
+    <Compile Include="PegasysEntities\MF_FUND.cs" />
+    <Compile Include="PegasysEntities\MF_IC.cs" />
+    <Compile Include="PegasysEntities\MF_IC_FRM.cs" />
+    <Compile Include="PegasysEntities\MF_IC_HDAL.cs" />
+    <Compile Include="PegasysEntities\MF_II.cs" />
+    <Compile Include="PegasysEntities\MF_II_ACTG_LN.cs" />
+    <Compile Include="PegasysEntities\MF_II_FRM.cs" />
+    <Compile Include="PegasysEntities\MF_II_HDAL.cs" />
+    <Compile Include="PegasysEntities\MF_IO.cs" />
+    <Compile Include="PegasysEntities\MF_IO_AMD.cs" />
+    <Compile Include="PegasysEntities\MF_IO_FRM.cs" />
+    <Compile Include="PegasysEntities\MF_IO_HDAL.cs" />
+    <Compile Include="PegasysEntities\MF_IO_ITMZ_LN.cs" />
+    <Compile Include="PegasysEntities\MF_IP.cs" />
+    <Compile Include="PegasysEntities\MF_IP_ACTG_LN.cs" />
+    <Compile Include="PegasysEntities\MF_IP_ITMZ_LN.cs" />
+    <Compile Include="PegasysEntities\MF_IT_HDAL.cs" />
+    <Compile Include="PegasysEntities\MF_IV.cs" />
+    <Compile Include="PegasysEntities\MF_LEAS_CHN.cs" />
+    <Compile Include="PegasysEntities\MF_LEAS_DOC_JN.cs" />
+    <Compile Include="PegasysEntities\MF_LEAS_DOC_TMPL.cs" />
+    <Compile Include="PegasysEntities\MF_LEAS_FREQ.cs" />
+    <Compile Include="PegasysEntities\MF_LEAS_PFIL.cs" />
+    <Compile Include="PegasysEntities\MF_LEAS_VEND.cs" />
+    <Compile Include="PegasysEntities\MF_MEMO.cs" />
+    <Compile Include="PegasysEntities\MF_NVT_ASE_HST.cs" />
+    <Compile Include="PegasysEntities\MF_NVT_ASE_HST_AMD.cs" />
+    <Compile Include="PegasysEntities\MF_NVT_VND_HST.cs" />
+    <Compile Include="PegasysEntities\MF_NVT_VND_HST_AMD.cs" />
+    <Compile Include="PegasysEntities\MF_OFFC_DOC_JN.cs" />
+    <Compile Include="PegasysEntities\MF_ORD_ACTG_LN.cs" />
+    <Compile Include="PegasysEntities\MF_ORGN.cs" />
+    <Compile Include="PegasysEntities\MF_PROG.cs" />
+    <Compile Include="PegasysEntities\MF_PROJ.cs" />
+    <Compile Include="PegasysEntities\MF_PYFD_ACTG_LN.cs" />
+    <Compile Include="PegasysEntities\MF_PY_DISB_HST.cs" />
+    <Compile Include="PegasysEntities\MF_RCT_ACTG_LN.cs" />
+    <Compile Include="PegasysEntities\MF_REF_INFO.cs" />
+    <Compile Include="PegasysEntities\MF_RLAT_EDIT.cs" />
+    <Compile Include="PegasysEntities\MF_RLAT_VALS.cs" />
+    <Compile Include="PegasysEntities\MF_TG.cs" />
+    <Compile Include="PegasysEntities\MF_TG_FRM.cs" />
+    <Compile Include="PegasysEntities\MF_TJ.cs" />
+    <Compile Include="PegasysEntities\MF_USER_DM1.cs" />
+    <Compile Include="PegasysEntities\MF_USER_DM2.cs" />
+    <Compile Include="PegasysEntities\MF_VEND.cs" />
+    <Compile Include="PegasysEntities\MF_VEND_ADDR.cs" />
+    <Compile Include="OraclePegasysContext.cs" />
+    <Compile Include="VitapEntities\ACCT2INV.cs" />
+    <Compile Include="VitapEntities\ACTIVE_LEASES.cs" />
+    <Compile Include="AdoNetCalls.cs" />
+    <Compile Include="VitapEntities\BARCODELIST.cs" />
+    <Compile Include="ConnectionString.cs" />
+    <Compile Include="VitapEntities\BTCHFILE.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\CGAC_CROSSWALK.cs" />
+    <Compile Include="VitapEntities\CONTACT.cs" />
+    <Compile Include="DataTableExtensions.cs" />
+    <Compile Include="VitapEntities\DBO_FINANCE.cs" />
+    <Compile Include="VitapEntities\DODAAC_AAA.cs" />
+    <Compile Include="VitapEntities\DODAAC_ACCESS.cs" />
+    <Compile Include="VitapEntities\DOINFO.cs" />
+    <Compile Include="VitapEntities\EMAIL_IN.cs" />
+    <Compile Include="VitapEntities\ERRDEF.cs" />
+    <Compile Include="VitapEntities\EXCEPTION.cs" />
+    <Compile Include="VitapEntities\FEEDERINFO.cs" />
+    <Compile Include="VitapEntities\FFERROR.cs" />
+    <Compile Include="VitapEntities\FILEHEADERINFO.cs" />
+    <Compile Include="VitapEntities\FILETRAC.cs" />
+    <Compile Include="VitapEntities\FILETRAILERINFO.cs" />
+    <Compile Include="OracleVitapInboxContext.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\GAM_APPLICATION.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\GAM_APP_ROLE.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\GAM_APP_USER.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\GAM_APP_USER_TYPE.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\GAM_AUDIT_LOG.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\GAM_GROUP.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\GAM_GROUP_APP_ROLE.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\GAM_GROUP_USER.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\GAM_PREPCODE.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\GAM_PREPCODE_REQUIRED.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\GAM_REGION.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\GAM_ROLE.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\GAM_SERVICE.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\GAM_STATUS.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\GAM_SYMBOL.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\GAM_USER.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\GAM_USER_APP_ROLE.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\GAM_USER_PREPCODE.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\GAM_USER_SERVICE.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\GAM_USER_TYPE.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\LEGACY_USER_AUTH.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\LEGACY_USER_AUTH_HIST_REC.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\ONEFUND_CROSSWALK.cs" />
+    <Compile Include="OracleVitapBdrReportContext.cs" />
+    <Compile Include="VitapEntities\POC.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\PREP_CODE_AUTH.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\SOD_ROLES.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\SYS_ACCOUNT_MAINTENANCE.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\SYS_APP_CONFIG.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\SYS_AUDIT_COLUMN.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\SYS_AUDIT_COLUMN_TEMP.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\SYS_DATA_AUDIT.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\SYS_FILE_LOAD.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\SYS_USE_AUDIT.cs" />
+    <Compile Include="VitapEntities\Test.cs" />
+    <Compile Include="ExceptionHist.cs" />
+    <Compile Include="VitapEntities\FTSOIRECON.cs" />
+    <Compile Include="VitapEntities\FTSRECON_DETAIL.cs" />
+    <Compile Include="VitapEntities\HAVA_BANK.cs" />
+    <Compile Include="VitapEntities\HAVA_LOG.cs" />
+    <Compile Include="VitapEntities\HAVA_PASSWORD.cs" />
+    <Compile Include="VitapEntities\HAVA_STATEABBREVIATION.cs" />
+    <Compile Include="VitapEntities\HOLIDAYSLIST.cs" />
+    <Compile Include="VitapEntities\IMAGELIST.cs" />
+    <Compile Include="VitapEntities\IMAGELISTHIST.cs" />
+    <Compile Include="VitapEntities\IMAGELIST_NEWSCAN.cs" />
+    <Compile Include="VitapEntities\IMAGELIST_NEWSCAN_HIST.cs" />
+    <Compile Include="VitapEntities\IMAGETRANSHIST.cs" />
+    <Compile Include="VitapEntities\INTERESTRATE.cs" />
+    <Compile Include="VitapEntities\KCOIRECON.cs" />
+    <Compile Include="VitapEntities\KCRECON_DETAIL.cs" />
+    <Compile Include="VitapEntities\KCRECON_NOTES.cs" />
+    <Compile Include="VitapEntities\KFX_DOC.cs" />
+    <Compile Include="VitapEntities\LEASES_ACCRUALS.cs" />
+    <Compile Include="VitapEntities\LEASES_ACCRUALS_HIST.cs" />
+    <Compile Include="VitapEntities\MAILDIR.cs" />
+    <Compile Include="VitapEntities\MAILLIST.cs" />
+    <Compile Include="Models\TransHist\ContactPegPo.cs" />
+    <Compile Include="Managers\ContactPegPoManager.cs" />
+    <Compile Include="Models\TransHist\ContactPO.cs" />
+    <Compile Include="Managers\ContactPOManager.cs" />
+    <Compile Include="Managers\MiscDocs.cs" />
+    <Compile Include="Managers\MiscDocsManager.cs" />
+    <Compile Include="Managers\OverviewPOManager.cs" />
+    <Compile Include="Managers\OverviewRRManager.cs" />
+    <Compile Include="Managers\PegasysInvoice.cs" />
+    <Compile Include="Managers\PegasysInvoiceManager.cs" />
+    <Compile Include="Managers\PegasysPO.cs" />
+    <Compile Include="Managers\PegasysPOManager.cs" />
+    <Compile Include="Managers\PegasysPO_Frm.cs" />
+    <Compile Include="Managers\PegasysPO_FrmManager.cs" />
+    <Compile Include="Managers\PegDocKeyIndManager.cs" />
+    <Compile Include="Models\TransHist\SummaryNote.cs" />
+    <Compile Include="Managers\SummaryNoteManager.cs" />
+    <Compile Include="Managers\TransHistOpenItem.cs" />
+    <Compile Include="Managers\TransHistOpenItemManager.cs" />
+    <Compile Include="Managers\TransHistTj.cs" />
+    <Compile Include="Managers\TransHistTjManager.cs" />
+    <Compile Include="Managers\VitapControlsManager.cs" />
+    <Compile Include="Models\Contacts\ContactListing.cs" />
+    <Compile Include="Models\Contacts\ContactModel.cs" />
+    <Compile Include="Models\DataEntryPegInv.cs" />
+    <Compile Include="Models\DaysOld.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="Managers\PegPOManager.cs" />
+    <Compile Include="Managers\POManager.cs" />
+    <Compile Include="Managers\UPPSWIPManager.cs" />
+    <Compile Include="Managers\VitapExceptionManager.cs" />
+    <Compile Include="Models\ExceptionListSearchCriteria.cs" />
+    <Compile Include="Models\Reports\ExceptionsWorkedByPreparerCode\ExceptionPreparerCode.cs" />
+    <Compile Include="Models\Exceptions\UserException\E052Record.cs" />
+    <Compile Include="Models\Exceptions\UserException\UserExceptionModel.cs" />
+    <Compile Include="Models\Exceptions\ExceptionListSearch.cs" />
+    <Compile Include="Models\Exceptions\ExceptionListModel.cs" />
+    <Compile Include="Models\Exceptions\Other\FaxNotesModel.cs" />
+    <Compile Include="Models\Exceptions\Other\InputModel.cs" />
+    <Compile Include="Models\Exceptions\Other\InvEditModel.cs" />
+    <Compile Include="Models\Exceptions\Other\NotesModel.cs" />
+    <Compile Include="Models\Exceptions\Other\PickListModel.cs" />
+    <Compile Include="Models\Exceptions\P039\ExceptionP039Model.cs" />
+    <Compile Include="Models\Exceptions\P039\P039InvoiceTabModel.cs" />
+    <Compile Include="Models\Exceptions\P039\P039MainTabRRAmountModel.cs" />
+    <Compile Include="Models\Exceptions\P039\P039POTabModel.cs" />
+    <Compile Include="Models\Exceptions\P039\P039ReceiptsTabModel.cs" />
+    <Compile Include="Models\Exceptions\NotificationExceptions\NotificationExceptionsModel.cs" />
+    <Compile Include="Models\Exceptions\NotificationExceptions\P040Record.cs" />
+    <Compile Include="Models\Exceptions\P140\ExceptionP140Model.cs" />
+    <Compile Include="Models\Exceptions\P140\P140Record.cs" />
+    <Compile Include="Models\Exceptions\P200\ExceptionP200Model.cs" />
+    <Compile Include="Models\Exceptions\P200\P200Document.cs" />
+    <Compile Include="Models\Exceptions\P202\ExceptionP202Model.cs" />
+    <Compile Include="Models\Exceptions\R200\ExceptionR200Model.cs" />
+    <Compile Include="Models\Exceptions\R200\R200Record.cs" />
+    <Compile Include="Models\Exceptions\U066\ExceptionU066Model.cs" />
+    <Compile Include="Models\Exceptions\U066\U066Record.cs" />
+    <Compile Include="Models\Exceptions\V299\ExceptionV299Model.cs" />
+    <Compile Include="Models\Exceptions\V299\RegisterTabRecord.cs" />
+    <Compile Include="Models\Exceptions\V299\V299InvoiceTabModel.cs" />
+    <Compile Include="Models\Exceptions\V299\V299POTabModel.cs" />
+    <Compile Include="Models\Exceptions\V299\V299RegisterTabModel.cs" />
+    <Compile Include="Models\Pegasys\Address.cs" />
+    <Compile Include="Models\Pegasys\PegasysMemo.cs" />
+    <Compile Include="Models\Pegasys\PegasysMemoModel.cs" />
+    <Compile Include="Models\Pegasys\PegasysPO.cs" />
+    <Compile Include="Models\Pegasys\PegasysPOEdiModel.cs" />
+    <Compile Include="Models\Pegasys\VendorInfo.cs" />
+    <Compile Include="Models\PegDocKeyed.cs" />
+    <Compile Include="Models\PegPO.cs" />
+    <Compile Include="Models\PO.cs" />
+    <Compile Include="Models\ReportCriteria.cs" />
+    <Compile Include="Models\Reports\AgedExceptions\AgedExceptionDetail.cs" />
+    <Compile Include="Models\Reports\AgedExceptions\AgedExceptionSummary.cs" />
+    <Compile Include="Models\Reports\AgedExceptions\AgedExceptionsModel.cs" />
+    <Compile Include="Models\Reports\AgedExceptions\AgedExceptionTotal.cs" />
+    <Compile Include="Models\Reports\AssociateProductivity\AssociateProductivity.cs" />
+    <Compile Include="Models\Reports\ContactReport\ContactReportModel.cs" />
+    <Compile Include="Models\Reports\DataEntryProductivityReport\DataEntryProductivityReportRecord.cs" />
+    <Compile Include="Models\Reports\DataEntryProductivityReport\DataEntryProductivityReportModel.cs" />
+    <Compile Include="Models\Reports\DiscountAvailability\DiscountAvailabilityListing.cs" />
+    <Compile Include="Models\Reports\DiscountAvailability\DiscountAvailabilityModel.cs" />
+    <Compile Include="Models\Reports\ExceptionCleared\ExceptionCleared.cs" />
+    <Compile Include="Models\Reports\AssociateProductivity\AssoProdModel.cs" />
+    <Compile Include="Models\Reports\PegasysDaysOldInvoice\DaysOldInvoice.cs" />
+    <Compile Include="Models\Reports\PegasysDocumentsKeyedIndexed\PegasysDocumentsKeyedIndexed.cs" />
+    <Compile Include="Models\Reports\PreparerCode\PreparerCodeProductivityItem.cs" />
+    <Compile Include="Models\Reports\PreparerCode\PreparerCodeProductivitySearch.cs" />
+    <Compile Include="Models\Reports\Report_PoListing\Report_PoListingRecord.cs" />
+    <Compile Include="Models\Reports\Report_PoListing\Report_PoListingModel.cs" />
+    <Compile Include="Models\Reports\User\DaysOldModel.cs" />
+    <Compile Include="Models\SelectItem.cs" />
+    <Compile Include="Models\TransHist\EDIInvoiceDescriptionModel.cs" />
+    <Compile Include="Models\TransHist\EDIInvoiceDetailModel.cs" />
+    <Compile Include="Models\TransHist\EDIInvoiceModel.cs" />
+    <Compile Include="Models\TransHist\EstimatedAccrualAEAccountingModel.cs" />
+    <Compile Include="Models\TransHist\EstimatedAccrualAEDetailModel.cs" />
+    <Compile Include="Models\TransHist\EstimatedAccrualModel.cs" />
+    <Compile Include="Models\TransHist\EstimatedAccrualOtherInformationModel.cs" />
+    <Compile Include="Models\TransHist\ExpenseAccrualEDIInformationModel.cs" />
+    <Compile Include="Models\TransHist\ExpenseAccrualEDIInformationRecordModel.cs" />
+    <Compile Include="Models\TransHist\InvoiceAccountingModel.cs" />
+    <Compile Include="Models\TransHist\InvoiceDescriptionModel.cs" />
+    <Compile Include="Models\TransHist\InvoiceItemModel.cs" />
+    <Compile Include="Models\TransHist\InvoiceModel.cs" />
+    <Compile Include="Models\TransHist\NovationHistoryDesignatedAgentModel.cs" />
+    <Compile Include="Models\TransHist\NovationHistoryModel.cs" />
+    <Compile Include="Models\TransHist\NovationHistoryVendorModel.cs" />
+    <Compile Include="Models\TransHist\PaymentAuthorizationDisbursementAccountingLineModel.cs" />
+    <Compile Include="Models\TransHist\PaymentAuthorizationDisbursementDescriptionModel.cs" />
+    <Compile Include="Models\TransHist\PaymentAuthorizationDisbursementSummaryModel.cs" />
+    <Compile Include="Models\TransHist\PaymentAuthorizationModel.cs" />
+    <Compile Include="Models\TransHist\RecurringMaster\RecurringMasterDesignatedInfoModel.cs" />
+    <Compile Include="Models\TransHist\RecurringMaster\RecurringMasterDocumentModel.cs" />
+    <Compile Include="Models\TransHist\RecurringMaster\RecurringMasterFrequencyModel.cs" />
+    <Compile Include="Models\TransHist\RecurringMaster\RecurringMasterModel.cs" />
+    <Compile Include="Models\TransHist\RecurringMaster\RecurringMasterRemitanceInfoModel.cs" />
+    <Compile Include="Models\TransHist\RecurringMaster\RecurringMasterVendorInfoModel.cs" />
+    <Compile Include="Models\TransPeriod.cs" />
+    <Compile Include="Models\UPPSWIP.cs" />
+    <Compile Include="Models\VitapPurchaseOrder.cs" />
+    <Compile Include="Models\VitapPayment.cs" />
+    <Compile Include="Models\VitapInvoice.cs" />
+    <Compile Include="Models\VitapAccrual.cs" />
+    <Compile Include="Models\ReceivingReport.cs" />
+    <Compile Include="Managers\ReceivingReportManager.cs" />
+    <Compile Include="Models\PegInvoice.cs" />
+    <Compile Include="VitapEntities\NEW_PBSOIRECON.cs" />
+    <Compile Include="VitapEntities\NEW_PBSRECON_DETAIL.cs" />
+    <Compile Include="VitapEntities\NEW_PBSRECON_NOTES.cs" />
+    <Compile Include="VitapEntities\NOTIFICATION.cs" />
+    <Compile Include="VitapEntities\NOTIFICATIONSHIST.cs" />
+    <Compile Include="VitapEntities\OB51_AE_FRM.cs" />
+    <Compile Include="VitapEntities\OB51_II_FRM_1487.cs" />
+    <Compile Include="VitapEntities\OB51_MI_FRM_1499.cs" />
+    <Compile Include="VitapEntities\OB51_PO_FRM_1444.cs" />
+    <Compile Include="VitapEntities\OB51_PO_FRM_1444_AMD.cs" />
+    <Compile Include="VitapEntities\OB51_RC_FRM_1450.cs" />
+    <Compile Include="VitapEntities\OB51_UPPS_AE_FRM.cs" />
+    <Compile Include="VitapEntities\OB51_UPPS_PA_FRM.cs" />
+    <Compile Include="VitapEntities\OB_APHD_AS_FRM_LN.cs" />
+    <Compile Include="VitapEntities\OB_APHD_AS_FRM_LN_JN.cs" />
+    <Compile Include="VitapEntities\OB_FTPLOG.cs" />
+    <Compile Include="VitapEntities\OB_LY_FRM.cs" />
+    <Compile Include="VitapEntities\OB_PEHD_AS_FRM_LN.cs" />
+    <Compile Include="VitapEntities\OB_PEHD_AS_FRM_LN_JN.cs" />
+    <Compile Include="OracleVitapContext.cs" />
+    <Compile Include="VitapEntities\PAYMENTS_LOG.cs" />
+    <Compile Include="VitapEntities\PBSOIRECON.cs" />
+    <Compile Include="VitapEntities\PBSRECON_DETAIL.cs" />
+    <Compile Include="VitapEntities\PBSRECON_NOTES.cs" />
+    <Compile Include="VitapEntities\PEGASYSAE.cs" />
+    <Compile Include="VitapEntities\PEGASYSAEACCT.cs" />
+    <Compile Include="VitapEntities\PEGASYSAEACCT_FRM.cs" />
+    <Compile Include="VitapEntities\PEGASYSAE_FRM.cs" />
+    <Compile Include="VitapEntities\PEGASYSFORMDELETE.cs" />
+    <Compile Include="VitapEntities\PEGASYSINVOICE.cs" />
+    <Compile Include="VitapEntities\PEGASYSINVOICEACCT.cs" />
+    <Compile Include="VitapEntities\PEGASYSINVOICEDET.cs" />
+    <Compile Include="VitapEntities\PEGASYSPAACCT_FRM.cs" />
+    <Compile Include="VitapEntities\PEGASYSPA_FRM.cs" />
+    <Compile Include="VitapEntities\PEGASYSPO.cs" />
+    <Compile Include="VitapEntities\PEGASYSPOACCT_AMD_HIST.cs" />
+    <Compile Include="VitapEntities\PEGASYSPOACCT_FRM.cs" />
+    <Compile Include="VitapEntities\PEGASYSPOOFFC_AMD_HIST.cs" />
+    <Compile Include="VitapEntities\PEGASYSPOOFFC_FRM.cs" />
+    <Compile Include="VitapEntities\PEGASYSPO_AMD_HIST.cs" />
+    <Compile Include="VitapEntities\PEGASYSPO_FRM.cs" />
+    <Compile Include="VitapEntities\PEGASYSRR.cs" />
+    <Compile Include="VitapEntities\PEGASYSRRACCT_FRM.cs" />
+    <Compile Include="VitapEntities\PEGASYSRR_FRM.cs" />
+    <Compile Include="PegInvoiceManager.cs" />
+    <Compile Include="VitapEntities\PEGOIREVDETAILHIST.cs" />
+    <Compile Include="VitapEntities\PEGOIREVIEW.cs" />
+    <Compile Include="VitapEntities\PEGOIREVIEWDETAIL.cs" />
+    <Compile Include="VitapEntities\PEGOIREVIEWHIST.cs" />
+    <Compile Include="VitapEntities\PENDINGUSER.cs" />
+    <Compile Include="VitapEntities\PMT_2013.cs" />
+    <Compile Include="VitapEntities\PMT_AGENCY_GOAL_2013.cs" />
+    <Compile Include="VitapEntities\PMT_DETAIL_2003.cs" />
+    <Compile Include="VitapEntities\PMT_DETAIL_2013.cs" />
+    <Compile Include="VitapEntities\PMT_MASTER_2003.cs" />
+    <Compile Include="VitapEntities\PMT_MASTER_2013.cs" />
+    <Compile Include="VitapEntities\PMT_MULT_UNIT_GOAL.cs" />
+    <Compile Include="VitapEntities\PMT_SCORECARD_2003.cs" />
+    <Compile Include="VitapEntities\PMT_SCORECARD_2013.cs" />
+    <Compile Include="VitapEntities\PMT_SCORECARD_BO.cs" />
+    <Compile Include="VitapEntities\PMT_TRANSACTION.cs" />
+    <Compile Include="VitapEntities\PMT_UNITS_2013.cs" />
+    <Compile Include="VitapEntities\PMT_UNIT_GOAL_2013.cs" />
+    <Compile Include="VitapEntities\PMT_ZONES_2013.cs" />
+    <Compile Include="VitapEntities\PODOCTYPE.cs" />
+    <Compile Include="VitapEntities\POVENDADDR.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Managers\TransHistManager.cs" />
+    <Compile Include="Models\VitapException.cs" />
+    <Compile Include="Models\ExceptionHist.cs" />
+    <Compile Include="Managers\ExceptionHistManager.cs" />
+    <Compile Include="Models\Exceptions\Exception.cs" />
+    <Compile Include="Managers\ExceptionsManager.cs" />
+    <Compile Include="Models\TransHist\ListRR.cs" />
+    <Compile Include="Managers\ListRRManager.cs" />
+    <Compile Include="Models\PegasysRR.cs" />
+    <Compile Include="Managers\PegasysRRManager.cs" />
+    <Compile Include="Models\ReceivingReportAccounting.cs" />
+    <Compile Include="Managers\ReceivingReportAccountingManager.cs" />
+    <Compile Include="Queries.cs" />
+    <Compile Include="Query.cs" />
+    <Compile Include="VitapEntities\REGIONFUNDINFO.cs" />
+    <Compile Include="VitapEntities\RPT_INV_ON_HAND.cs" />
+    <Compile Include="VitapEntities\SECVEND.cs" />
+    <Compile Include="VitapEntities\SUMMARYNOTE.cs" />
+    <Compile Include="VitapEntities\TEMP_MATCHRRS2.cs" />
+    <Compile Include="VitapEntities\TOPSDEOB.cs" />
+    <Compile Include="VitapEntities\TRANSHIST.cs" />
+    <Compile Include="VitapEntities\USERLOG.cs" />
+    <Compile Include="VitapEntities\BdrReportsDb\USER_ACCOUNT_MAINTENANCE.cs" />
+    <Compile Include="VitapEntities\V003_PERMAAH.cs" />
+    <Compile Include="VitapEntities\V003_PERMEAH.cs" />
+    <Compile Include="VitapEntities\V004_PERMACH.cs" />
+    <Compile Include="VitapEntities\V005_PERMEAH.cs" />
+    <Compile Include="VitapEntities\V005_PERMIND.cs" />
+    <Compile Include="VitapEntities\V005_PERMINH.cs" />
+    <Compile Include="VitapEntities\V005_PERMPOA.cs" />
+    <Compile Include="VitapEntities\V005_PERMPOH.cs" />
+    <Compile Include="VitapEntities\V005_TEMPIND.cs" />
+    <Compile Include="VitapEntities\V005_TEMPINH.cs" />
+    <Compile Include="VitapEntities\V006_PERMPOA.cs" />
+    <Compile Include="VitapEntities\V006_PERMPOD.cs" />
+    <Compile Include="VitapEntities\V006_PERMPOH.cs" />
+    <Compile Include="VitapEntities\V007_PERMPOA.cs" />
+    <Compile Include="VitapEntities\V007_PERMPOD.cs" />
+    <Compile Include="VitapEntities\V007_PERMPOH.cs" />
+    <Compile Include="VitapEntities\V007_PERMRRA.cs" />
+    <Compile Include="VitapEntities\V007_PERMRRH.cs" />
+    <Compile Include="VitapEntities\V008_PERMRRD.cs" />
+    <Compile Include="VitapEntities\V008_PERMRRH.cs" />
+    <Compile Include="VitapEntities\V009_PERMRRD.cs" />
+    <Compile Include="VitapEntities\V009_PERMRRH.cs" />
+    <Compile Include="VitapEntities\VCACCRUALQUEUE.cs" />
+    <Compile Include="VitapEntities\VCACCRUALQUEUEHIST.cs" />
+    <Compile Include="VitapEntities\VCACCRUALQUEUE_ACCT.cs" />
+    <Compile Include="VitapEntities\VCACCRUALS_ACCT.cs" />
+    <Compile Include="VitapEntities\VENDORUSER.cs" />
+    <Compile Include="VitapEntities\VENDORUSER_ADDRESS.cs" />
+    <Compile Include="VitapEntities\VENDOR_EMAIL_HIST.cs" />
+    <Compile Include="VitapEntities\VND_UPLOADEDDOC.cs" />
+    <Compile Include="VitapEntities\VND_VENDLOG.cs" />
+    <Compile Include="VitapEntities\VND_WEBINVOICE.cs" />
+    <Compile Include="VitapEntities\VND_WEBINVOICEDET.cs" />
+    <Compile Include="VitapEntities\VND_WEBTXHST.cs" />
+    <Compile Include="VitapEntities\WEBVENDOR.cs" />
+    <Compile Include="VitapEntities\WEB_LOG.cs" />
+    <Compile Include="VitapEntities\WEB_USERS.cs" />
+    <Compile Include="VitapEntities\WEB_USERS_PMT_SCORECARD_2003.cs" />
+    <Compile Include="VitapEntities\WEB_USERS_PMT_SCORECARD_2013.cs" />
+    <Compile Include="XmlSerializationUtility.cs" />
+    <Compile Include="VitapEntities\ZAP_AUDIT_TEMP.cs" />
+    <Compile Include="VitapEntities\ZAP_BACKUPINVOICE.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\VITAP.Library\VITAP.Library.csproj">
+      <Project>{8544b38e-5c73-4bdb-8d46-ff9f52c79000}</Project>
+      <Name>VITAP.Library</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="bin\Debug\" />
+    <Folder Include="bin\Release\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
