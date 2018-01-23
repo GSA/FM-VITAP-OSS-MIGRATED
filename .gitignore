@@ -248,4 +248,8 @@ ModelManifest.xml
 *.cs
 /VITAP/Vitap/App_Data
 *.nuspec
+
+# Visual Studio Configuration file
 Web.config
+Web.Debug
+Web.Release
