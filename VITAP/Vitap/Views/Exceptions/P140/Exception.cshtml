@@ -1,0 +1,276 @@
+﻿@model VITAP.Data.Models.Exceptions.ExceptionP140ViewModel
+
+@{
+    ViewBag.Title = "Pegasys Exception (" + Model.Err_Code + " - " + Model.Memo;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("P140Exception", "Exception", FormMethod.Post))
+{
+
+    <div class="container-fluid">
+        <br />
+        <h1 style="font-weight: bold">@string.Format("{0} | Pegasys Exception ({1}) - {2}", Model.Inv_Key_Id, Model.Err_Code, Model.Memo)</h1>
+        <br />
+        <div class="row panel-body">
+            <div class="col-md-12">
+                <div class="row panel">
+                    <div class="col-md-2">
+                        <label class="fill">
+                            @Html.LabelFor(x => x.Inv_Key_Id) <br />
+                            @Html.TextBoxFor(x => x.Inv_Key_Id, new { @class = "fill", @readonly = "readonly", @disabled = "" })
+                        </label>
+                        <label class="fill">
+                            @Html.LabelFor(x => x.PDocNo) <br />
+                            @Html.TextBoxFor(x => x.PDocNo, new { @class = "fill", @readonly = "readonly", @disabled = "" })
+                        </label>
+                        <label class="fill">
+                            @Html.LabelFor(x => x.Act) <br />
+                            @Html.TextBoxFor(x => x.Act, new { @class = "fill", @readonly = "readonly", @disabled = "" })
+                        </label>
+                        <label class="fill">
+                            @Html.LabelFor(x => x.Amount, new { style = "text-align:right;" }) <br />
+                            @Html.TextBoxFor(x => x.Amount, new { @class = "fill", @readonly = "readonly", @disabled = "", style = "text-align:right;" })
+                        </label>
+                    </div>
+                    <div class="col-md-10">
+                        <label>
+                            <b>Matching PO's</b><br />
+                        </label>
+
+                        @{  Html.Kendo().Grid(Model.RRChoice)
+                                .Name("P140Grid")
+                                .Selectable(s => s.Mode(GridSelectionMode.Single))
+                                .Events(events => events.Change("grdP140Change"))
+                                .DataSource(dataSource => dataSource
+                                    .Ajax()
+                                    .PageSize(10)
+                                    .ServerOperation(false)
+                                )
+                                .Columns(columns =>
+                                {
+                                    //  example
+                                    //	columns.Bound(x => x.ExceptionCode).Width(120).HeaderHtmlAttributes(headerAttr).ClientFooterTemplate("<div class='grid-footer'>Totals</div>");
+                                    columns.Command(c => c.Custom("Select").Click("P140GridSelect")).Width(100).Title("Action").HeaderHtmlAttributes(new { style = "text-weight:bold;" });
+                                    columns.Bound(x => x.INPEG).HeaderHtmlAttributes(new { style = "text-align:center;" });
+                                    columns.Bound(x => x.RR_ID).HeaderHtmlAttributes(new { style = "text-align:center;" });
+                                    columns.Bound(x => x.AMOUNT).HtmlAttributes(new { style = "text-align:right;" }).Format("{0:N2}").HeaderHtmlAttributes(new { style = "text-align:center;" }).Title("Amount");
+                                    columns.Bound(x => x.INVOICE).HeaderHtmlAttributes(new { style = "text-align:center;" }).Title("Invoice");
+                                    columns.Bound(x => x.STATUS).HeaderHtmlAttributes(new { style = "text-align:center;" }).Title("Status");
+                                })
+                                .ToolBar(tools => tools.Excel())
+                                .Excel(excel => excel
+                                    .FileName("P140MatchingPOList_" + DateTime.Today.ToString("yyyy-MM-dd") + ".xlsx")
+                                    .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+                                    .AllPages(true)
+                                )
+                                .Pageable(pageable => pageable
+                                    .Input(true)
+                                    .Numeric(false)
+                                    .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                                )
+                                .Render();
+                        }
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-md-6">
+                        <label class="fill">
+                            @Html.LabelFor(x => x.Invoice) <br />
+                            @Html.TextBoxFor(x => x.Invoice, new { @class = "fill", @readonly = "readonly", @disabled = "" })
+                        </label>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="fill">
+                            @Html.LabelFor(x => x.Rr_Id) <br />
+                            @Html.TextBoxFor(x => x.Rr_Id, new { @class = "fill", id = "txtRrId", @readonly = "readonly" })
+                            <button type="button" id="btnViewRR" class="btn btn-info" style="margin-bottom:20px" onclick="ViewRR()">View RR</button>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-7">
+                        <button type="button" id="btnViewInv" class="btn btn-info" onclick="ViewInv()">View Inv</button>
+                        <button type="button" class="btn btn-info" onclick="ViewPO()">View PO</button>
+                        <button type="button" class="btn btn-info" onclick="TransHist()">TransHist</button>
+                        <button type="button" id="btnViewEdiInv" class="btn btn-info" onclick="ViewEdiInv()" disabled>View EDI Inv</button>
+                        <button type="button" id="btnEdiPo" class="btn btn-info" onclick="ViewEdiPo()" disabled>View EDI PO</button>
+                    </div>
+                    <div class="col-md-5">
+                        <button type="button" class="btn btn-info" onclick="NotThisOne()">Not This One</button>
+                        <button type="button" class="btn btn-info" onclick="Reject()">Reject</button>
+                        <button type="button" class="btn btn-info" onclick="Skip()">Skip</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            //var model = @Model;
+            if ('@Model.ButtonViewEdiPOEnabled' == 'True')
+            {
+                document.getElementById("btnEdiPo").disabled = false;
+            }
+           
+            if ('@Model.ButtonViewEDIInvoiceEnabled' == 'True')
+            {
+                document.getElementById("btnViewEdiInv").disabled = false;
+            }
+            
+
+            var rrchoice = '@Model.RRChoice';
+            if (rrchoice == '') {
+                document.getElementById("btnViewRR").disabled = true;
+            }
+
+            var grdP140List = $("#P140Grid").data("kendoGrid");  // Get Grid itself
+            if (grdP140List != null) {
+                var p140ListGridId = "P140Grid";                 // Get Grid Id
+                ConfigureKendoGridPaginationControlsFor508(p140ListGridId);
+                MakeKendoGridScrollable(p140ListGridId, "300px");
+                //grdP140List.element.find('tbody tr:first').addClass('k-state-selected');
+                //grdP140Change();
+            }
+            document.getElementById("txtRrId").disabled = true;
+            document.getElementById("btnViewRR").disabled = true;
+
+        })
+
+        function P140GridSelect(e) {
+            e.preventDefault();
+            $("#P140Grid table tr").removeClass('k-state-selected');
+            var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+            var grdP140 = $("#P140Grid").data("kendoGrid");
+            grdP140.dataSource.fetch(function () {
+                if (grdP140.dataSource.total() > 0) {
+                    $(e.currentTarget).closest("tr").addClass('k-state-selected');
+                    $("#txtRrId").val(dataItem.RR_ID);
+                }
+            });
+            document.getElementById("btnViewRR").disabled = false;
+        }
+
+        function ViewInv() {
+            var InvKeyId = "@Model.Inv_Key_Id";
+            var url = '@Url.Action("ViewInvoice", "TransHist")';
+            url = url + "?inv_Key_Id=" + InvKeyId + "&";
+            location = url;
+        }
+
+        function ViewEdiInv() {
+            var InvKeyId = "@Model.Inv_Key_Id";
+            if (InvKeyId == null)
+            {
+                alert("No Invoice Key was found!");
+                return;
+            }
+            var url = '@Url.Action("ViewEdiInvoice", "TransHist")';
+            url = url + "?id=" + InvKeyId + "&";
+            location = url;
+        }
+
+        function ViewEdiPo() {
+            var Act = "@Model.Act";
+            var Pdocno = "@Model.PDocNo";
+            var poId = "@Model.Po_Id";
+            if (poId.indexOf("&") >= 0) {
+                strModNum = poId.substring(0, 4);
+            }
+            else
+            {
+                strModNum = " ";
+            }
+
+            var ModNo = "@Model.ModNo";
+
+            if (poId.length == 0)
+            {
+                poId = Pdocno;
+            }
+
+            var url = '@Url.Action("ViewEdiPO", "TransHist")';
+            url = url + "?Act=" + Act + "&Po_Id=" + poId.encodeUriComponent();
+            location = url;
+        }
+
+        function ViewPO() {
+            var PDocNo = "@Model.PDocNo";
+            if (PDocNo == null) {
+                alert("No PO ID was found!");
+                return;
+            }
+            var url = '@Url.Action("ViewPO", "TransHist")';
+            url = url + "?po_Id=" + PDocNo.encodeUriComponent() + "&";
+            location = url;
+        }
+
+        function TransHist() {
+            var url = '@Url.Action("Index", "TransHist")';
+            var Act = "@Model.Act";
+            var Pdocno = "@Model.PDocNo";
+            var InvKeyId = "@Model.Inv_Key_Id";
+            if (Act != null && Act != "") {
+                url = url + '?searchFor=' + Act + '&searchIn=ACT&searchShow=ALL&searchFY=ALL&id=' +
+                    InvKeyId + '&act=' + Act + '&pDocNo=' + Pdocno + '&searchedBy=&';
+            }
+            else {
+                url = (url + '?searchFor=' + Pdocno.encodeUriComponent() + '&searchIn=PDocNo&searchShow=ALL&searchFY=ALL&id=' +
+                    InvKeyId + '&act=' + Act + '&pDocNo=' + Pdocno.encodeUriComponent() + '&searchedBy=&');
+            }
+
+            window.open(url, "_blank");
+        }
+
+        function NotThisOne() {
+            var Pdocno = "@Model.PDocNo";
+
+            var url = '@Url.Action("NotThisOne", "Exceptions")';
+            url = url + "?Pdocno=" + Pdocno.encodeUriComponent() + "&";
+            location = url;
+        }
+
+        function Reject() {
+            var Pdocno = "@Model.PDocNo";
+
+            var url = '@Url.Action("Reject", "Exceptions")';
+            url = url + "?Pdocno=" + Pdocno.encodeUriComponent() + "&";
+            location = url;
+        }
+
+        function Skip() {
+            var Pdocno = "@Model.PDocNo";
+            var exId = "@Model.Ex_Id";
+            var url = '@Url.Action("Skip", "Exceptions")';
+            url = url + "?exceptionId=" + exId.encodeUriComponent() + "&Pdocno=" + Pdocno.encodeUriComponent() + "&";
+            location = url;
+        }
+
+        function ViewRR() {
+            //var grid = $('#P140Grid').data('kendoGrid');
+            //var row = grid.select();
+            //var dataItem = grid.dataItem(row);
+            var rrId = $("#txtRrId").val();
+            var url = '@Url.Action("ViewRR", "TransHist")';
+            url = url + "?rr_Id=" + rrId.encodeUriComponent() + "&";
+            location = url;
+        }
+
+        function grdP140Change() {
+            var grid = $('#P140Grid').data('kendoGrid');
+            var row = grid.select();
+            var dataItem = grid.dataItem(row);
+            document.getElementById("txtRrId").disabled = false;
+            document.getElementById("btnViewRR").disabled = false;
+            $("#txtRrId").val(dataItem.RR_ID);
+        }
+
+        function btnSearchOnClick() {
+            $('#P140Grid').data("kendoGrid").dataSource.read();
+        }
+    </script>
+
+}

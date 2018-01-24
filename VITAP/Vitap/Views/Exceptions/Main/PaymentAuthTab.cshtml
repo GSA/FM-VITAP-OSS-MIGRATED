@@ -1,0 +1,113 @@
+﻿@model VITAP.Data.Models.Exceptions.MainExPaymentAuthTabModel
+@*@using (Html.BeginForm())*@
+
+@{
+    var attrHeader = new { @style = "font-weight:bold;" };
+    var attrTextAlignRight = new { @style = "text-align:right;" };
+}
+
+<div class="container-fluid peg-main-ex">
+    <div class="row">
+        <div class="col-xs-9">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-xs-3">
+                        @Html.LabelFor(m => m.ActNumber)<br />
+                        @Html.TextBoxFor(m => m.ActNumber)
+                    </div>
+                    <div class="col-xs-3">
+                        @Html.LabelFor(m => m.PaymentAuthDocumentNumber)<br />
+                        @Html.TextBoxFor(m => m.PaymentAuthDocumentNumber)
+                    </div>
+                    <div class="col-xs-3">
+                        @Html.LabelFor(m => m.DisbursedAmount)<br />
+                        @Html.TextBoxFor(m => m.DisbursedAmount)
+                    </div>
+                    <div class="col-xs-3">
+                        @Html.LabelFor(m => m.PADocumentStatus)<br />
+                        @Html.TextBoxFor(m => m.PADocumentStatus)
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-3">
+                        <label>
+                            <br />
+                            @Html.CheckBoxFor(m => m.PaymentCancelled, new { @class = "check-box" })&nbsp;Payment Cancelled
+                        </label>
+                    </div>
+                    <div class="col-xs-3">
+                        @Html.LabelFor(m => m.N7DocumentNumber)<br />
+                        @Html.TextBoxFor(m => m.N7DocumentNumber)
+                    </div>
+                    <div class="col-xs-6">
+                        @Html.LabelFor(m => m.CancellationNotes)<br />
+                        @Html.TextAreaFor(m => m.CancellationNotes, 3, 0, null)
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-3">
+            <label style="min-width:280px; margin-left: 20px">
+                Period of Performance<br />
+            </label>
+            @Html.LabelFor(m => m.PopStartDate, new { @style = "min-width: 90px" })
+            @Html.LabelFor(m => m.PopEndDate, new { @style = "min-width: 90px" })<br />
+            @Html.TextBoxFor(m => m.PopStartDate, new { @style = "width: 90px" })
+            @Html.TextBoxFor(m => m.PopEndDate, new { @style = "width: 90px" })
+            <label style="margin-top:60px">
+                <input type="submit" id="btnViewUE" value="View UE" class="btn" style="width:110px;" />
+                <input type="submit" id="btnViewPA" value="View PA" class="btn" style="width:110px;" />
+            </label>
+        </div>
+    </div>
+    <div class="row no-buffer">
+        <div class="col-xs-12 no-buffer">
+            <br />
+            @{
+                Html.Kendo().Grid(Model.AccountingInfo)
+                    .Name("grdPaymentAuthAccountInfo")
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .PageSize(25)
+                        .ServerOperation(false)
+                        .Model(model => model.Id(m => m.Lnum))
+                        )
+                    .Columns(columns =>
+                    {
+                        columns.Bound(x => x.PaymentAuthId).Width(140).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.PaymentAuthId).Width(140).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.Lnum).Width(100).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.MDL).Width(80).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.Fund).Width(90).HeaderHtmlAttributes(attrHeader).HtmlAttributes(attrTextAlignRight);
+                        columns.Bound(x => x.OrgCode).Width(120).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.BA).Width(80).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.FC).Width(80).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.CE).Width(80).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.ProjectId).Width(80).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.CostA).Width(120).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.CostB).Width(120).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.WorkItem).Width(120).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.AntcDisbTA).Width(140).HeaderHtmlAttributes(attrHeader);
+                    })
+                    .ToolBar(tools => tools.Excel())
+                    .Excel(excel => excel
+                        .FileName("Memos-" + DateTime.Today.ToString("yyyy-MM-dd") + ".xlsx")
+                        .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase"))
+                        .AllPages(true)
+                    )
+                    .Pageable(p => p.PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 }))
+                    .Render();
+            }
+        </div>
+    </div>
+    </div>
+
+<script type="text/javascript">
+        $().ready(function () {
+            ConfigureKendoGridPaginationControlsFor508('grdPaymentAuthAccountInfo');
+            MakeKendoGridScrollable('grdPaymentAuthAccountInfo', "120px");
+            $('input').attr('disabled', 'disabled');
+            $('#CancellationNotes').attr('disabled', 'disabled');
+            $("input.check-box").attr("disabled", true);
+        });
+</script>

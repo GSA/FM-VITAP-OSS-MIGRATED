@@ -1,0 +1,95 @@
+﻿@using VITAP.Models.Reports
+@model Report_PoListingModel
+
+@{
+    ViewBag.Title = "List of PO's - Vendor Code vs Remit Vendor Code";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style type="text/css">
+    #content {
+        margin-top: 27px;
+    }
+
+    p {
+        padding-top: 5px;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="row panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <label style="font: bold; font-size: large">Report for POs - Vendor Code vs Remit Vendor Code</label>
+            </div>
+        </div>
+
+        <div class="col-sm-2">
+            <p class="pull-right">Select Region for the Report</p>
+        </div>
+        <div class="col-sm-1">
+            @Html.DropDownListFor(
+                x => Model.SelectedRegion,
+                new SelectList(Model.Regions, "Id", "Text"),
+                new Dictionary<string, object> { { "class", "form-control" } }
+            )
+        </div>
+        <div class="col-sm-1">
+            <p>@Model.Report_PoListingRecords.Count PO'S found.</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            @{
+                Html.Kendo().Grid<Report_PoListingRecord>(Model.Report_PoListingRecords)
+                    .Name("Grid")
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .ServerOperation(false)
+                     )
+                    .Columns(c => {
+                        c.Bound(x => x.OrgCode).Width(100);
+                        c.Bound(x => x.doc_num).Width(150);
+                        c.Bound(x => x.Act).Width(100);
+                        c.Bound(x => x.VendCD).Width(100);
+                        c.Bound(x => x.vendaddcd).Width(150);
+                        c.Bound(x => x.VendorName).Width(100);
+                        c.Bound(x => x.VendDuns).Width(100);
+                        c.Bound(x => x.rmitvendcd).Width(150);
+                        c.Bound(x => x.rmitvendaddcd).Width(200);
+                        c.Bound(x => x.rmitvendname).Width(150);
+                        c.Bound(x => x.rmitduns).Width(150);
+                    })
+                    .ToolBar(tools => tools.Excel())
+                                   .Excel(excel => excel
+                        .FileName("Report_PoListing.xlsx")
+                        .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+                        .AllPages(true)
+                    )
+                    .Pageable(pageable => pageable
+                                .Input(true)
+                                .Numeric(false)
+                                .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                             )
+                    .Render();
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        
+        $("#SelectedRegion").change(function () {
+            var selectedRegion = $("#SelectedRegion").val();
+
+            var url = '@Url.Action("Report_PoListing", "Reports")';
+            window.location = url + '?selectedRegion=' + selectedRegion;
+        });
+
+       
+        ConfigureKendoGridPaginationControlsFor508("Grid");
+        MakeKendoGridScrollable("Grid", "500px");
+       
+    });
+</script>

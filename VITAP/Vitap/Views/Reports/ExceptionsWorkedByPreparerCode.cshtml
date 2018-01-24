@@ -1,0 +1,186 @@
+﻿@using VITAP.ViewModels.Reports
+
+@{
+    var textAttr = new Dictionary<string, object> { { "style", "width:140px" }, { "disabled", "" } };
+    var headerAttr = new { @style = "font-weight:bold" };
+    var alignRight = new { style = "text-align: right" };
+}
+
+@Html.AntiForgeryToken()
+<style>
+    label {
+        display: inline;
+        float: left;
+        margin-right: 4px;
+        vertical-align: top;
+    }
+
+    div.grid-footer {
+        text-align: right;
+        font-size: 10pt;
+    }
+</style>
+
+<br />
+<h1 style="font-weight:bold">Exceptions Worked By Preparer Code Report</h1>
+<br />
+<div class="container-fluid" style="float:left">
+    
+    <div style="float: left;">
+        
+        <div style="float: left;width:100%;">
+            @*@Html.Label("Search Criteria: ")*@
+            <Label style="width: 200px;">
+                Search Criteria:
+                @Html.Kendo().TextBox().Name("txtSearch")
+
+                @(Html.Kendo().DropDownList()
+            .Name("ddlSearch")
+            .DataTextField("Text")
+            .DataValueField("Value")
+            .BindTo(new List<SelectListItem>() {
+                new SelectListItem{ Text = "Prep Code", Value="PrepCode"},
+                new SelectListItem{ Text = "Cor Symbol", Value="CorSymbol"},
+
+            })
+                )
+                </Label>
+
+               @* @Html.Label("Sort By: ")*@
+            <Label style="width: 200px;">
+                Sort By:
+                @(Html.Kendo().DropDownList()
+            .Name("ddlSort")
+            .DataTextField("Text")
+            .DataValueField("Value")
+            .BindTo(new List<SelectListItem>() {
+                        new SelectListItem { Text = "Name", Value = "Name" },
+                        new SelectListItem { Text = "Prep Code", Value = "PrepCode" },
+                        new SelectListItem { Text = "WGT Score", Value = "WGTScore" },
+                        new SelectListItem { Text = "Cor Symbol", Value = "CorSymbol" }
+                        })
+                )
+                </Label>
+
+            
+            </div>
+        </div>
+    <div style="clear: left;">
+        <div style="float: left;">
+            <Label style="width: 200px;">
+                Transactions for Period:
+                <select id="Period" onchange="OnChangePeriod();">
+                    <option selected="selected" value="All">All</option>
+                    <option value="Today">Today</option>
+                    <option value="7">&gt;= 7 days old</option>
+                    <option value="30">&gt;= 30 days old</option>
+                    <option value="Range">Range</option>
+                </select>
+            </Label>
+        </div>
+        <div id="SearchDates" style="float: left; display: none; ">
+            <Label>
+                Date From<br />
+                @(Html.Kendo().DatePicker().Name("DateFrom").HtmlAttributes(new
+            {
+                id = "DateFrom",
+                style = "width: 115px; height: 22px;"
+            })
+                )
+            </Label>
+            <Label>
+                Date To<br />
+                @(Html.Kendo().DatePicker().Name("DateTo").HtmlAttributes(new
+            {
+                id = "DateTo",
+                style = "width: 115px; height: 22px;"
+            })
+                )
+            </Label>
+        </div>
+
+
+    </div>
+
+    <div style="clear: left;">
+        <div id="Buttons" style="float: left;min-width: 55%;">
+            <br />
+            <button type="button" class="btn btn-primary btn-default" onclick="btnSearchOnClick();" style="margin-left: 20px">Search</button>
+            <button type="button" class="btn btn-info" style="margin-left: 20px">Save to File</button>
+            <button type="button" class="btn btn-info" style="margin-left: 20px">Print</button>
+            <button type="button" class="btn btn-info" style="margin-left: 20px; margin-right: 20px">Cancel</button>
+        </div>
+    </div>
+
+    <div style="clear: left;">
+        <br />
+        @{
+            Html.Kendo().Grid<ExceptionsWorkedByPCItem>()
+                .Name("gridExceptionsWorkedByPC")
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .Read(r => r
+                        .Action("AssociateProductivity", "Reports")
+                        .Data("GetSearchParameters")
+                    )
+                )
+                .Columns(columns =>
+                {
+                    columns.Bound(v => v.NAME).Title("NAME").Width(70).HeaderHtmlAttributes(headerAttr);
+                    columns.Bound(v => v.PREPCODE).Title("PREPCODE").Width(70).HeaderHtmlAttributes(headerAttr);
+                    columns.Bound(v => v.CORSYMB).Title("CORSYMB").Width(70).HeaderHtmlAttributes(headerAttr);
+                    columns.Bound(v => v.CLEARED).Title("CLEARED").Width(70).HeaderHtmlAttributes(headerAttr);
+                    columns.Bound(v => v.TOTAL_WORKED).Title("TOTAL_WORKED").Width(88).HeaderHtmlAttributes(headerAttr);
+                    columns.Bound(v => v.REJECT).Title("REJECT").Width(92).HeaderHtmlAttributes(headerAttr);
+                    columns.Bound(v => v.ACCEPT).Title("ACCEPT").Width(88).HeaderHtmlAttributes(headerAttr);
+                    columns.Bound(v => v.SKIPPED).Title("SKIPPED").Width(128).HeaderHtmlAttributes(headerAttr);
+                    columns.Bound(v => v.NEXT_DAY).Title("NEXT_DAY").Width(90).HeaderHtmlAttributes(headerAttr);
+                    columns.Bound(v => v.DOC_REQ).Title("DOC_REQ").Width(90).HeaderHtmlAttributes(headerAttr);
+                    columns.Bound(v => v.CHANGED).Title("CHANGED").Width(90).HeaderHtmlAttributes(headerAttr);
+                    columns.Bound(v => v.OTHER).Title("OTHER").Width(90).HeaderHtmlAttributes(headerAttr);
+                })
+                .AutoBind(false)
+                .HtmlAttributes(new { style = "width: 1000px" })
+                .Scrollable(s => s.Height(150))
+                .Sortable()
+                .Filterable()
+                .Pageable(pageable => pageable
+                    .Input(true)
+                    .Numeric(false)
+                    .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                )
+                .Render();
+        }
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        OnChangePeriod();
+        // Without this, the navigation bar at the bottom of the grid is way too tall.
+        $('.k-pager-wrap').css('height', '45px');
+    }
+    )
+
+    function OnChangePeriod() {
+        var isRange = $("#Period").val() == "Range";
+        if (isRange)
+            $("#SearchDates").show();
+        else
+            $("#SearchDates").hide();
+    }
+
+    function GetSearchParameters() {
+        // Reserved property names
+        // used by DataSourceRequest: sort, page, pageSize, group, filter
+        return {
+            Period: $("#Period").val(),
+            DateFrom: $("#DateFrom").val(),
+            DateTo: $("#DateTo").val()
+        };
+    }
+
+    function btnSearchOnClick() {
+        $('#gridExceptionsWorkedByPC').data("kendoGrid").dataSource.read();
+    }
+</script>

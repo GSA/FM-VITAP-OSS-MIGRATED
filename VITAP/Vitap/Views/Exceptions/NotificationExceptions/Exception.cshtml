@@ -1,0 +1,470 @@
+﻿@model VITAP.Data.Models.Exceptions.NotificationExceptionsModel
+
+@{
+    ViewBag.Title = "Pegasys Exception (" + Model.ErrorCode + " - " + Model.Memo;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .btn-fixed-width {
+        width:125px
+    }
+
+</style>
+
+<div class="container-fluid">
+    <br />
+    <h1 style="font-weight: bold">@string.Format("{0} | Pegasys Exception ({1}) - {2}", Model.InvKeyId, Model.ErrorCode, Model.Memo)</h1>
+    <br />
+    <div class="row panel-body">
+        <div class="col-md-12">
+            @Html.TextBoxFor(x => x.ErrorCode, new Dictionary < string, object > { { "style", "height: 35px; width: 130px;" } })
+            @Html.TextBoxFor(x => x.Memo, new Dictionary<string, object> { { "style", "max-width: 91%; width: 100%;" } })
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <label>
+                ACT
+                @Html.TextBoxFor(x => x.Act)
+            </label>
+
+            <div class="row">
+                <div class="col-md-6">
+                    &nbsp;
+                </div>
+                <div class="col-md-6">
+                    <button id="ediPoBtn" onclick="EdiPo()" type="button" class="btn btn-fixed-width btn-fixed-width">View EDI PO</button>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <button id="viewPoImgBtn" data-imagetype="po" data-tiffid="@Model.PoId" type="button" class="btn btn-fixed-width btn-fixed-width btn-img">View PO Image</button>
+                </div>
+                <div class="col-md-6">
+                    <button id="viewPoBtn" onclick="viewPo()" type="button" class="btn btn-fixed-width">View PO</button>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <button id="viewInvImgBtn" data-imagetype="inv" data-tiffid="@Model.InvKeyId" type="button" class="btn btn-fixed-width btn-img">View Inv Image</button>
+                </div>
+                <div class="col-md-6">
+                    <button id="viewInvBtn" onclick="viewInv()" type="button" class="btn btn-fixed-width">View INV</button>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <button id="viewRRImgBtn" data-imagetype="rr" data-tiffid="@Model.RrId" type="button" class="btn btn-fixed-width btn-img">View RR Image</button>
+                </div>
+                <div class="col-md-6">
+                    <button id ="viewRRBtn" onclick="viewRr()" type="button" class="btn btn-fixed-width">View RR</button>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <button id="listRRBtn" onclick="listRr()" type="button" class="btn btn-fixed-width">List RRs</button>
+                </div>
+                <div class="col-md-6">
+                    <button id ="viewEABtn" onclick="ViewEAClick()" type="button" class="btn btn-fixed-width">View EA</button>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <button id="listExBtn" onclick="ListExceptions()" type="button" class="btn btn-fixed-width">@Model.ExListLabel</button>
+                </div>
+                <div class="col-md-6">
+                    <button onclick="TransHist()" type="button" class="btn btn-fixed-width">TransHist</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            @{
+                Html.Kendo().Grid(Model.P040Recs)
+                .Name("P040Grid")
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .ServerOperation(false)
+                )
+                .Pageable(pageable => pageable
+                    .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                )
+                .ToolBar(tools => tools.Excel())
+                .Excel(excel => excel
+                    .FileName("Export.xlsx")
+                    .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+                    .AllPages(true)
+                )
+                .Render();
+            }
+        </div>
+    </div>
+    <div class="row panel-body">
+        <div class="col-md-4">
+            Current Fax Note in Exception:<br />
+            @Html.TextAreaFor(x => x.ExceptionFaxNotes, new Dictionary<string, object> { { "style", "margin: 0px; height: 136px; width: 100%; max-width:100%;" }, { "disabled", "disabled" } })
+        </div>
+        <div class="col-md-4" id="notFaxNotes">
+            Current Fax Note in Notification:<br />
+            @Html.TextAreaFor(x => x.NotificationFaxNotes, new Dictionary<string, object> { { "style", "margin: 0px; height: 136px; width: 100%; max-width:100%" }, { "disabled", "disabled" } })
+        </div>
+        <div class="col-md-4" id="newFaxNotes">
+            New/Update Notification Fax Note:<br />
+            @Html.TextAreaFor(x => x.NewFaxNotes, new Dictionary<string, object> { { "style", "margin: 0px; height: 136px; width: 100%; max-width:100%" } })
+        </div>
+    </div>
+    <div class="row panel-body">
+        <div class="col-md-8">
+            Additional Contact Name(s) (for emailed requests):<br />
+            @Html.TextBoxFor(x => x.ContactNames, new Dictionary < string, object > { { "style", "margin-left: 20px; width: 75%; max-width:75%" } }) 
+            <button id="btnUpdate" type="button" class="btn btn-info">Update</button>
+        </div>
+        <div class="col-md-4">
+            <br />
+            <button id="btnRoute" type="button" class="btn btn-fixed-width">Route</button>
+            <button id="btnRecycle" type="button" class="btn btn-fixed-width">Recycle</button>
+            <button id="btnSendASAP" type="button" class="btn btn-fixed-width">Send ASAP</button>
+        </div>
+    </div>
+</div>
+
+@section ModalControls
+{
+    <div id="dialog"></div>
+    <div id="picklist"></div>
+
+    @Html.Partial("ConfirmYesNoModal")
+}
+
+<script type="text/javascript">
+
+    function EdiPo() {
+        window.location = "@Html.Raw(Url.Action("ViewEDIPO", "transhist", new
+            {
+                Act = Model.Act,
+                Po_Id = String.IsNullOrEmpty(Model.PoId) ? Model.PDocNo : Model.PoId
+            }
+        ))";
+    }
+
+    function viewPo() {
+        window.location.href = '@Url.Action("ViewPO", "TransHist", new { po_Id = Model.PoId}, null)';
+    }
+
+    function viewInv() {
+        window.location.href = '@Url.Action("ViewInvoice", "TransHist", new { inv_Key_Id = Model.InvKeyId}, null)'
+    }
+
+    function viewRr() {
+        window.location.href = '@Url.Action("ViewRR", "TransHist", new { rr_Id = Model.RrId}, null)'
+    }
+
+    function listRr() {
+        window.location.href = '@Html.Raw(Url.Action("ListRR", "TransHist", new { recur_Id = "", act = Model.Act, pDocNo = Model.PDocNo}, null))';
+    }
+
+    $('.btn-img').click(function () {
+        var window = $("#dialog");
+        if (window.data("kendoWindow")) {
+            $("#dialog").data("kendoWindow").open();
+        }
+        else {
+            $("#dialog").kendoWindow();
+        }
+        var dialog = $("#dialog").data("kendoWindow");
+        dialog.setOptions({
+            width: 800,
+            height: 800
+        });
+
+        @{
+        var url = string.Format("{0}://{1}{2}", Request.Url.Scheme, Request.Url.Authority, Url.Action("UserTiffViewer", "Exceptions"));
+    }
+        dialog.refresh({
+            url: "@url" + "?Type=" + $(this).data("imagetype") + "&TypeId=" + $(this).data("tiffid")
+        });
+    })
+
+    $("#btnRoute").on("click", function () {
+        var url = '@Url.Action("Route", "Exceptions", new { ExId = Model.ExId }, null)';
+        window.location = url;
+    });
+
+    $("#btnRecycle").on("click", function () {
+        var url = '@Url.Action("Recycle", "Exceptions", new { ExId = Model.ExId }, null)';
+        window.location = url;
+    });
+
+    $("#btnUpdate").on("click", function () {
+
+        var contact_id = "@Model.Contact_Id";
+        var act = "@Model.Act";
+        var ex_id = "@Html.Raw(Model.ExId)";
+        var not_key_id = "@Html.Raw(Model.NotKeyId)";
+
+        var originalContactNames = '@Model.ContactNames';
+        var newContactNames = $("#ContactNames").val();
+
+        if (originalContactNames == newContactNames)
+        {
+            alert("Additional Contact Names have not been changed...");
+            return;
+        }
+
+        var notificationsExist = '@Model.NotificationsExist';
+        if (notificationsExist == 'False')
+        {
+            alert("Notification not found. Please Recycle");
+            return false;
+        }
+
+        $.ajax({
+            async: false,
+            type: "POST",
+            data: { ContactNames: newContactNames, contact_id: contact_id, act: act, ex_id: ex_id, not_key_id: not_key_id },
+            url: '@Url.Action("NotificationExceptionsUpdate", "Exceptions")',
+            success: function (data) {
+                alert("Additional Contact Names have been updated...");
+            }
+        });
+
+    });
+
+    function confirmSaveCallback(data) {
+        $('#btnUpdate').click();
+    }
+
+    function cancelSaveCallback(data) {
+    }
+
+    function confirmFaxNotesAddCallback(data) {
+        return;
+    }
+
+    function cancelFaxNotesAddCallback(data) {
+        alert("No notification sent!");
+    }
+
+    function getNewNotes() {
+        var notFaxNotes = $('#NewFaxNotes').val(),
+            newNotes = '',
+            prepCode = '@Model.PREPCODE',
+            dt = new Date(),
+            dateTime = dt.getFullYear() + '-' + (dt.getMonth() + 1) + '-' + dt.getDate() + ' ' + dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
+
+        newNotes = '(' + dateTime + ' ' + prepCode + ')' + '(' + notFaxNotes + ')' + '\r\n';
+
+        return newNotes;
+    }
+
+    function confirmFaxNotesUpdateCallback(data) {
+        var contact_id = "@Model.Contact_Id",
+            act = "@Model.Act",
+            ex_id = "@Html.Raw(Model.ExId)",
+            not_key_id = "@Html.Raw(Model.NotKeyId)",
+            fax_notes = "@HttpUtility.JavaScriptStringEncode(Model.NotificationFaxNotes)",
+            yn = 'y',
+            pdocno = '@Model.PDocNo',
+            po_id = '@Model.PoId',
+            rr_id = '@Model.RrId',
+            inv_key_id = '@Model.InvKeyId',
+            prepcode = '@Model.PREPCODE',
+            err_code = '@Model.ErrorCode',
+            ae_id = '@Model.AeId',
+            newNotes = getNewNotes();
+
+        $.ajax({
+            async: false,
+            type: "POST",
+            data: {
+                ContactNames: '', contact_id: contact_id, act: act, ex_id: ex_id, not_key_id: not_key_id,
+                faxNotes: fax_notes, yn: yn, pdocno: pdocno, po_id: po_id, rr_id: rr_id, inv_key_id: inv_key_id,
+                prepcode: prepcode, err_code: err_code, ae_id: ae_id, newNotes: newNotes
+            },
+            url: '@Url.Action("NotificationSendAsapUpdate", "Exceptions")',
+            success: function (data) {
+                alert("Notification Updated");
+            }
+        });
+    }
+
+    function cancelFaxNotesUpdateCallback(data) {
+        var contact_id = "@Model.Contact_Id",
+            act = "@Model.Act",
+            ex_id = "@Model.ExId",
+            not_key_id = "@Model.NotKeyId",
+            fax_notes = "@HttpUtility.JavaScriptStringEncode(Model.NotificationFaxNotes)",
+            yn = 'n',
+            pdocno = '@Model.PDocNo',
+            po_id = '@Model.PoId',
+            rr_id = '@Model.RrId',
+            inv_key_id = '@Model.InvKeyId',
+            prepcode = '@Model.PREPCODE',
+            err_code = '@Model.ErrorCode',
+            ae_id = '@Model.AeId',
+            newnotes = getNewNotes();
+
+
+
+        $.ajax({
+            async: false,
+            type: "POST",
+            data: {
+                ContactNames: '', contact_id: contact_id, act: act, ex_id: ex_id, not_key_id: not_key_id,
+                faxNotes: fax_notes, yn: yn, pdocno: pdocno, po_id: po_id, rr_id: rr_id, inv_key_id: inv_key_id,
+                prepcode: prepcode, err_code: err_code, ae_id: ae_id, newNotes: newNotes
+            },
+            url: '@Url.Action("NotificationSendAsapUpdate", "Exceptions")',
+            success: function (data) {
+                alert("Notification Updated");
+            }
+        });
+    }
+
+    $("#btnSendASAP").on("click", function () {
+        var originalContactNames = '@Model.ContactNames',
+            newContactNames = $("#ContactNames").val(),
+            notFaxNotes = $('#notFaxNotes').val(),
+            newFaxNotes = $('#newFaxNotes').val(),
+            newNotes = getNewNotes(),
+            prepCode = '@Model.PREPCODE',
+            contactId = '@Model.Contact_Id',
+            pdocno = '@Model.PDocNo',
+            po_id = '@Model.PoId',
+            rr_id = '@Model.RrId',
+            inv_key_id = '@Model.InvKeyId',
+            err_code = '@Model.ErrorCode',
+            ae_id = '@Model.AeId',
+            notificationsExist = '@Model.NotificationsExist';
+
+        if (notificationsExist == 'False')
+        {
+            alert("Notification not found. Please Recycle");
+            return false;
+        }
+
+
+        if (originalContactNames != newContactNames) {
+            showConfirmYesNoModal(confirmSaveCallback, cancelFaxNotesAddCallback, 'Send ASAP', 'Additional Contact Names have been changed. Do you want to update?');
+        }
+
+        if (notFaxNotes == '' && newFaxNotes == '') {
+            showConfirmYesNoModal(confirmFaxNotesAddCallback, cancelFaxNotesAddCallback, 'Empty Fax Notes', 'The fax note is empty, do you need to add?');
+        }
+
+        if (notFaxNotes != newFaxNotes || notFaxNotes.length != newFaxNotes.length || true) {
+            showConfirmYesNoModal(confirmFaxNotesUpdateCallback, cancelFaxNotesUpdateCallback, 'Update Fax Notes', 'Change Notification Fax Note?"');
+        }
+        else {
+            // slightly different than true case callbacks
+            var contact_id = "@Model.Contact_Id",
+                act = "@Model.Act",
+                ex_id = "@Model.ExId",
+                not_key_id = "@Model.NotKeyId",
+                fax_notes = "@HttpUtility.JavaScriptStringEncode(Model.NotificationFaxNotes)",
+                yn = 'other';
+
+            $.ajax({
+                async: false,
+                type: "POST",
+                data: {
+                    ContactNames: '', contact_id: contact_id, act: act, ex_id: ex_id, not_key_id: not_key_id,
+                    faxNotes: fax_notes, yn: yn, pdocno: pdocno, po_id: po_id, rr_id: rr_id, inv_key_id: inv_key_id,
+                    prepcode: prepcode, err_code: err_code, ae_id: ae_id, newNotes: newNotes
+                },
+                url: '@Url.Action("NotificationSendAsapUpdate", "Exceptions")',
+                success: function (data) {
+                    alert("Notification Updated");
+                },
+                error: function () {
+                }
+            });
+        }
+
+    });
+
+    function ViewEAClick() {
+        var selectedAC_ID = '@Model.AeId';
+
+        if (selectedAC_ID != null) {
+            location = '@Url.Action("ViewEstimatedAccrual", "Transhist")' +
+           '?ae_Id=' + selectedAC_ID;
+        }
+    }
+
+    function ListExceptions()
+    {
+        window.location.href = '@Url.Action("List", "Exceptions")'
+    }
+
+    function TransHist() {
+        var url = '@Url.Action("Index", "TransHist")';
+        var Act = "@Model.Act";
+        var Pdocno = "@Model.PDocNo";
+        var InvKeyId = "@Model.InvKeyId";
+        if (Act != null && Act != "") {
+            url = url + '?searchFor=' + Act + '&searchIn=ACT&searchShow=ALL&searchFY=ALL&id=' +
+                InvKeyId + '&act=' + Act + '&pDocNo=' + Pdocno + '&searchedBy=&';
+        }
+        else {
+            url = (url + '?searchFor=' + Pdocno.encodeUriComponent() + '&searchIn=PDocNo&searchShow=ALL&searchFY=ALL&id=' +
+                InvKeyId + '&act=' + Act + '&pDocNo=' + Pdocno.encodeUriComponent() + '&searchedBy=&');
+        }
+
+        window.open(url, "_blank");
+    }
+
+    function buttonsInit() {
+        var routeBtn = $("#btnRoute"),
+            err_code = '@Model.ErrorCode',
+            ediBtnEnabled = @Json.Encode(Model.ViewEdiPOEnabled),
+            viewPoBtnEnabled = @Json.Encode(Model.ViewPOEnabled),
+            viewPOImgEnabled = @Json.Encode(Model.ViewPOImgEnabled),
+            viewInvEnabled = @Json.Encode(Model.ViewInvEnabled),
+            viewInvImgEnabled = @Json.Encode(Model.ViewInvImgEnabled),
+            viewRREnabled = @Json.Encode(Model.ViewRREnabled),
+            viewRRImgEnabled = @Json.Encode(Model.ViewRRImgEnabled),
+            viewEAEnabled = @Json.Encode(Model.ViewEAEnabled),
+            listRREnabled = @Json.Encode(Model.ListRREnabled),
+            listExEnabled = @Json.Encode(Model.ExListEnabled);
+
+        if(err_code.slice(-3) != '041') {
+            routeBtn.prop("disabled", true);
+        }
+
+        // Edi
+        $('#ediPoBtn').prop("disabled", ediBtnEnabled ? false : true);
+        //PO
+        $('#viewPoBtn').prop("disabled", viewPoBtnEnabled ? false : true);
+        $('#viewPoImgBtn').prop("disabled", viewPOImgEnabled ? false : true);
+        //Inv
+        $('#viewInvBtn').prop("disabled", viewInvEnabled ? false : true);
+        $('#viewInvImgBtn').prop("disabled", viewInvImgEnabled ? false : true);
+        //RR
+        $('#viewRRBtn').prop("disabled", viewRREnabled ? false : true);
+        $('#viewRRImgBtn').prop("disabled", viewRRImgEnabled ? false : true);
+        //EA
+        $('#viewEABtn').prop("disabled", viewEAEnabled ? false : true);
+        //List RR
+        $('#listRRBtn').prop("disabled", listRREnabled ? false : true);
+        //List Exceptions
+        $('#listExBtn').prop("disabled", listExEnabled ? false : true);
+
+        if(listExEnabled) {
+            $('#listExBtn').show();
+        }
+        else {
+            $('#listExBtn').hide();
+        }
+    }
+
+    $(document).ready(function () {
+        ConfigureKendoGridPaginationControlsFor508("P040Grid");
+        MakeKendoGridScrollable("P040Grid", "250px");
+        buttonsInit();
+    });
+</script>

@@ -1,0 +1,108 @@
+﻿@* REJECT ADD INVOICE MODAL *@
+<style type="text/css">
+    select {
+        max-width: 100%;
+    }
+</style>
+
+@(Html.Kendo().Window()
+    .Name("windowRejectAddInvoice")
+    .Title("Reject Reasons - Invoice")
+    .Content(@<text>
+        <div class="container-fluid">
+            <div style="padding:10px">
+                <div class="row panel">
+                    <div class="col-sm-12">
+                        Reject Reason:<br />
+                        @(Html.Kendo().RadioButton().Name("rejectAddOption1").Checked(true)
+                        .HtmlAttributes(new { @name = "rejectAddOpt" }).Value("1").Label("Incorrect Indexing Information"))
+                        <br />
+                        @(Html.Kendo().RadioButton().Name("rejectAddOption2")
+                        .HtmlAttributes(new { @name = "rejectAddOpt" }).Value("2").Label("Image Not Readable"))
+                        <br />
+                        @(Html.Kendo().RadioButton().Name("rejectAddOption3")
+                        .HtmlAttributes(new { @name = "rejectAddOpt" }).Value("3").Label("Other"))
+
+                        <br />
+                        <br />
+
+                        <div style="width:90%;">
+                            Notes (maximum 900 characters):<br />
+                            @Html.TextArea("rejectAddNotes", "", new { maxlength = 900, rows = 20, @class = "k-textbox textAreaElastic" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row panel">
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-info btn-fixed-width pull-right" style="margin-right: 50px;"id="cancelRejectAddInvoice">Cancel</button>
+                        <button type="button" class="btn btn-info btn-fixed-width pull-right" id="okRejectAddInvoice" disabled="disabled">Finish</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </text>)
+    .Draggable()
+    .Resizable()
+    .Width(600)
+    .Modal(true)
+    .Visible(false)
+    .Actions(actions => actions.Pin().Minimize().Maximize().Close())
+    .Events(ev => ev.Close("onRejectAddClose"))
+)
+
+<script type="text/javascript">
+    var rejectNotesOldVal = "";
+    $(document).ready(function () {
+        $('#rejectAddNotes').on("change keyup paste", function () {
+            var currentVal = $(this).val();
+            if (currentVal == rejectNotesOldVal) return;
+
+            rejectNotesOldVal = currentVal;
+            if (rejectNotesOldVal == "") {
+                $('#okRejectAddInvoice').prop("disabled", true);
+            } else {
+                $('#okRejectAddInvoice').prop("disabled", false);
+            }
+        });
+
+		$('#cancelRejectAddInvoice').click(function () {
+		    window.itemClicked = 'cancel';
+		    $('#rejectAddNotes').val("");
+		    $('#okRejectAddInvoice').prop("disabled", true);
+			$("#windowRejectAddInvoice").data("kendoWindow").close();
+		});
+
+		$('#okRejectAddInvoice').click(function () {
+			window.itemClicked = 'OK';
+			$("#windowRejectAddInvoice").data("kendoWindow").close();
+		});
+	});
+
+	var confirmRejectAddCallback, cancelRejectAddCallback;
+
+	function onRejectAddClose() {
+	    var optionId = $('input[name=rejectAddOpt]:checked').attr("id");
+	    var optionText = $("label[for='"+optionId+"']").text();
+	    var descriptionText = $('#rejectAddNotes').val();
+		if (confirmRejectAddCallback && window.itemClicked == 'OK') {
+			confirmRejectAddCallback(optionText, descriptionText);
+		}
+
+		if (cancelRejectAddCallback && window.itemClicked == 'cancel') {
+			cancelRejectAddCallback(inputValue);
+		}
+	}
+
+	function showWindowRejectAddInvoice(confirmMethod, cancelMethod, titleText) {
+		if (titleText) {
+			$('.k-window-title').html(titleText);
+		}
+
+		$("#windowRejectAddInvoice").data("kendoWindow").open().center();
+		confirmRejectAddCallback = confirmMethod;
+		cancelRejectAddCallback = cancelMethod;
+	}
+
+</script>

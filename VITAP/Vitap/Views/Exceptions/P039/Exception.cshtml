@@ -1,0 +1,130 @@
+﻿@model VITAP.Data.Models.Exceptions.ExceptionP039Model
+
+@{
+    ViewBag.Title = "Pegasys Exception (" + Model.ErrorCode + " - " + Model.Memo;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var headerAttr = new { @style = "font-weight:bold" };
+}
+
+
+@using (Html.BeginForm("P039Accept", "Exceptions", FormMethod.Post))
+{
+
+@Html.HiddenFor(x => x.PDOCNO)
+@Html.HiddenFor(x => x.PrepCode)
+@Html.HiddenFor(x => x.ExId)
+@Html.HiddenFor(x => x.InvKeyId)
+@Html.HiddenFor(x => x.YesRRArrayJson)
+
+<div class="container-fluid">
+    <br />
+    <h1 style="font-weight: bold">@string.Format("{0} | Pegasys Exception ({1}) - {2}", Model.InvKeyId, Model.ErrorCode, Model.Memo)</h1>
+    <br />
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            @Html.TextAreaFor(x => x.TextArea1, new Dictionary<string, object> { { "style", "height:200px;width: 100%;max-width: initial;resize: none;margin-bottom: 10px;" } })
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            @{
+                Html.Kendo().TabStrip()
+                    .Name("tsTabs")
+                    .Items(items =>
+                    {
+                        items.Add().Text("Receipts").HtmlAttributes(headerAttr)
+                            .Content(Html.Partial("P039/ReceiptsTab", Model.ReceiptsTab).ToHtmlString());
+
+                        items.Add().Text("Purchase Order").HtmlAttributes(headerAttr)
+                            .Content(Html.Partial("P039/PurchaseOrderTab", Model.POTab).ToHtmlString());
+
+                        items.Add().Text("Invoice").HtmlAttributes(headerAttr)
+                            .Content(Html.Partial("P039/InvoiceTab", Model.InvoiceTab).ToHtmlString());
+                    })
+                    .SelectedIndex(0)
+                    .Render();
+            }
+        </div>
+    </div>
+    <div class="row panel-body">
+        <div class="col-md-10 col-md-offset-4">
+            <button id="btnListRRs" type="button" class="btn btn-info">List RRs</button>
+            <button type="button" class="btn btn-info" onclick = "TransHist()">TRANSHIST</button>
+            <button onclick="accept()" type="submit" class="btn btn-info btn-exception-type"  @(Model.AcceptButtonEnabled == false ? "disabled" : "")>Accept</button>
+            <button id="btnRRREquest" type="button" class="btn btn-info">RR Request</button>
+            <button onclick="notThisOne()" type="button" class="btn btn-info">Not This One</button>
+            <button onclick="skip()" type="button" class="btn btn-info">Skip</button>
+            <button id="btnReject" type="button" class="btn btn-info">Reject</button>
+        </div>
+    </div>
+</div>
+}
+
+
+@section Scripts
+{
+    <script>
+        $(document).ready(function () {
+            $('input').attr('disabled', 'disabled');
+            $('textarea').attr('disabled', 'disabled');
+            $("input[type='hidden']").attr('disabled', false);
+
+            SetupButtonListRR('@Model.InvoiceTab.ActNum', '@Model.PDOCNO');
+        });
+
+        function SetupButtonListRR(act, pDocNo) {
+            var url = '@Html.Raw(@Url.Action("ListRR", "TransHist"))' + '?act=' + act + '&pDocNo=' + pDocNo;
+            $("#btnListRRs").click(function () {
+                location = url;
+            });
+        }
+
+        function notThisOne() {
+
+            location = '@Url.Action("P039NotThisOne", "Exceptions")';
+        }
+
+         function skip() {
+            var Pdocno = "@Model.PDOCNO";
+            var exId = "@Model.ExId";
+            var url = '@Url.Action("Skip", "Exceptions")';
+            url = url + "?exceptionId=" + exId.encodeUriComponent() + "&Pdocno=" + Pdocno.encodeUriComponent() + "&";
+            location = url;
+        }
+
+        function accept() {
+            var yesRRArray = $("#grid2").data("kendoGrid").dataSource.data();
+
+            $("#YesRRArrayJson").val(JSON.stringify(yesRRArray));
+        }
+
+        $("#btnRRREquest").on("click", function (e) {
+            var url = '@Url.Action("RRRequest", "Exceptions")';
+            window.location = url;
+        });
+
+        $("#btnReject").on("click", function (e) {
+            var url = '@Url.Action("Reject", "Exceptions", new { PDocNo = @Model.PDOCNO })';
+            window.location = url;
+        });
+
+        function TransHist() {
+            var url = '@Url.Action("Index", "TransHist")';
+            var Act = "@Model.Act";
+            var Pdocno = "@Model.PDOCNO";
+            var InvKeyId = "@Model.InvKeyId";
+            if (Act != null && Act != "") {
+                url = url + '?searchFor=' + Act + '&searchIn=ACT&searchShow=ALL&searchFY=ALL&id=' +
+                    InvKeyId + '&act=' + Act + '&pDocNo=' + Pdocno + '&searchedBy=&';
+            }
+            else {
+                url = (url + '?searchFor=' + Pdocno.encodeUriComponent() + '&searchIn=PDocNo&searchShow=ALL&searchFY=ALL&id=' +
+                    InvKeyId + '&act=' + Act + '&pDocNo=' + Pdocno.encodeUriComponent() + '&searchedBy=&');
+            }
+
+            window.open(url, "_blank");
+        }
+    </script>
+
+}

@@ -1,0 +1,202 @@
+﻿@model Vitap.Data.Models.TransHist.InboxPermPOHModel
+
+@{
+    ViewBag.Title = "Pegasys EDI Purchase Order";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using (Html.BeginForm())
+{
+    <script type="text/javascript">
+		$(document).ready(function () {
+
+		});
+    </script>
+
+    <div class="container">
+        @if (!String.IsNullOrEmpty(Model.DataMessage))
+        {
+            <div class="row padBottom20">
+                <div class="col-sm-9" style="font-weight:bold; width:800px;">
+                    <div class="row panel" style="width:800px">
+                        <div class="col-sm-4" style="width:800px;">
+                            <h2 style="color:red; font-weight:bold;">@Model.DataMessage</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        
+
+        <br />
+        <h1 class="bold padBottom20">Pegasys EDI Purchase Order</h1>
+        <div class="row padBottom20">
+            <div class="col-sm-9" style="font-size:12px">
+                <div class="row panel">
+                    <div class="col-sm-4" style="width:200px">
+                        <label for="DocNum">PO Doc #</label><br />
+                        @Html.TextBoxFor(x => x.Doc_Num, new { @disabled = "", style = "width:100px; font-weight:bold;", id = "DocNum" })
+                    </div>
+                    <div class="col-sm-4" style="width:200px">
+                        <label for="Type">Type</label><br />
+                        @Html.TextBoxFor(x => x.Doc_Type, new { @disabled = "", style = "width:100px; font-weight:bold;", id = "Type" })
+                    </div>
+                    <div class="col-sm-4" style="width:200px">
+                        <label for="DlvryOrdr">Delivery Order #</label><br />
+                        @Html.TextBoxFor(x => x.PoNum, new { @disabled = "", style = "width:150px; font-weight:bold;", id = "DlvryOrdr" })
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-4" style="width:200px">
+                        <label for="ACT">ACT</label><br />
+                        @Html.TextBoxFor(x => x.ActNum, new { @disabled = "", style = "width:100px; font-weight:bold;", id = "ACT" })
+                    </div>
+                    <div class="col-sm-4" style="width:150px">
+                        <label for="ModNum">Mod #</label><br />
+                        @Html.TextBoxFor(x => x.ModNum, new { @disabled = "", style = "width:100px; font-weight:bold;", id = "ModNum" })
+                    </div>
+                    <div class="col-sm-4" style="width:100px">
+                        <label for="ModInd">Mod Ind</label><br />
+                        @Html.TextBoxFor(x => x.ModInd, new { @disabled = "", style = "width:100px; font-weight:bold;", id = "ModInd" })
+                    </div>
+                    <div class="col-sm-4" style="width:200px">
+                        <label for="Contract">Contract #</label><br />
+                        @Html.TextBoxFor(x => x.ContNum, new { @disabled = "", style = "width:150px; font-weight:bold;", id = "Contract" })
+                    </div>
+                    <div class="col-sm-4" style="width:100px">
+                        <label for="POAmount">PO Amount</label><br />
+                        @Html.TextBoxFor(x => x.PoTotl, new { @disabled = "", style = "width:100px; font-weight:bold; text-align:right", id = "POAmount", Value = String.Format("{0:#,###.##}", Model.PoTotl) })
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-4" style="width:400px">
+                        <label for="ContOffc">Contracting Officer</label><br />
+                        @Html.TextBoxFor(x => x.ContName, new { @disabled = "", style = "width:400px; font-weight:bold;", id = "ContOffc" })
+                    </div>
+                    <div class="col-sm-4" style="width:200px">
+                        <label for="ContOffcPhn">Contracting Officer Phone</label><br />
+                        @Html.TextBoxFor(x => x.ContPhn, new { @disabled = "", style = "width:100px; font-weight:bold;", id = "ContOffcPhn" })
+                    </div>
+                    <div class="col-sm-4" style="width:200px">
+                        <label for="DocDate">Document Date</label><br />
+                        @Html.TextBoxFor(x => x.OrdDdate, new { @disabled = "", style = "width:100px; font-weight:bold;", id = "DocDate" })
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-4" style="width:400px">
+                        <label for="RcvOffc">Receiving Officer</label><br />
+                        @Html.TextBoxFor(x => x.RcvrName, new { @disabled = "", style = "width:400px; font-weight:bold;", id = "RcvOffc" })
+                    </div>
+                    <div class="col-sm-4" style="width:200px">
+                        <label for="RcvOffcPhn">Receiving Officer Phone</label><br />
+                        @Html.TextBoxFor(x => x.RcvrPhn, new { @disabled = "", style = "width:100px; font-weight:bold;", id = "RcvOffcPhn" })
+                    </div>
+                    <div class="col-sm-4" style="width:200px">
+                        <label for="RctDate">Finance Receipt Date</label><br />
+                        @Html.TextBoxFor(x => x.FinanceDate, new { @disabled = "", style = "width:100px; font-weight:bold;", id = "RctDate" })
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-4" style="width:150px">
+                        <label for="NetDays">Net Days</label><br />
+                        @Html.TextBoxFor(x => x.NetDays, new { @disabled = "", style = "width:100px; font-weight:bold;", id = "NetDays" })
+                    </div>
+                    <div class="col-sm-4" style="width:150px">
+                        <label for="DiscDays">Discount Days</label><br />
+                        @Html.TextBoxFor(x => x.DiscDay, new { @disabled = "", style = "width:100px; font-weight:bold;", id = "DiscDays" })
+                    </div>
+                    <div class="col-sm-4" style="width:150px">
+                        <label for="DiscPerc">Discount %</label><br />
+                        @Html.TextBoxFor(x => x.DiscPer, new { @disabled = "", style = "width:50px; font-weight:bold;", id = "DiscPerc" })
+                    </div>
+                    <div class="col-sm-4" style="width:150px">
+                        <label for="TarInd">Tariff Indicator</label><br />
+                        @Html.TextBoxFor(x => x.TariffInd, new { @disabled = "", style = "width:50px; font-weight:bold;", id = "TarInd" })
+                    </div>
+                    <div class="col-sm-4" style="width:150px">
+                        <label for="TaxPmntInd">Tax Payment Indicator</label><br />
+                        @Html.TextBoxFor(x => x.TaxPymtInd, new { @disabled = "", style = "width:50px; font-weight:bold;", id = "TaxPmntInd" })
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-12" style="width:400px">
+                        <label for="DunsNum">DUNS #</label><br />
+                        <label for="DunsNum4" class="control-label sr-only">DUNS Plus 4</label>
+                        @Html.TextBoxFor(x => x.DunsNum, new { @disabled = "", style = "width:200px; font-weight:bold;", id = "DunsNum" })
+                        @Html.TextBoxFor(x => x.DunsNum4, new { @disabled = "", style = "width:50px; font-weight:bold;", id = "DunsNum4" })
+                    </div>
+                    <div class="col-sm-4">
+                        <label for="FOB">FOB:</label> @Html.TextBoxFor(x => x.FobInd, new { @disabled = "", style = "width:200px; font-weight:bold;", id = "FOB" })
+                    </div>
+                    <div class="col-sm-4">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-3" style="font-size:12px">
+                <div class="row panel">
+                    <div class="bold col-sm-12">
+                        <br />
+                        <h1 class="bold">Remit Vendor</h1>
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-12">
+                        <label for="TIN">TIN</label><br />
+                        @Html.TextBoxFor(x => x.TaxId, new { @disabled = "", style = "width:100px; font-weight:bold;", id = "TIN" })
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-12">
+                        <label for="Name">Name</label><br />
+                        @Html.TextBoxFor(x => x.RemitName, new { @disabled = "", style = "width:350px; font-weight:bold;", id = "Name" })
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-12">
+                        <label for="Address">Address</label><br />
+                        @Html.TextAreaFor(x => x.RemitAddress, new { @disabled = "disabled", @style = "width: 350px; font-weight:bold; height:75px;", id = "Address" })
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row padBottom20">
+            <div class="col-sm-12" style="font-size:12px">
+                @{Html.Kendo().TabStrip()
+                    .Name("tsTabs")
+                    .Items(items =>
+                    {
+                        items.Add().Text("PO Accounting")
+                            .Content(Html.Partial("ViewEDIPurchaseOrderAccountingTab", Model.PODetail).ToHtmlString());
+
+                        items.Add().Text("PO Office Address")
+                            .Content(Html.Partial("ViewEDIPurchaseOrderOfficeAddressTab", Model.OfficeAddress).ToHtmlString());
+
+                        items.Add().Text("Vendor Information")
+                            .Content(Html.Partial("ViewEDIPurchaseOrderVendorInfoTab", Model.VendorInfo).ToHtmlString());
+
+                    })
+                    .SelectedIndex(0)
+                    .Render();
+                }
+            </div>
+        </div>
+        <div class="row" style="width:600px;">
+            <div class="col-sm-12" style="width:150px;">
+                <Label for="Status">Status:</Label>
+            </div>
+            <div class="col-sm-12" style="width:800px;">
+                @Html.TextBoxFor(x => x.Status, new { @disabled = "disabled", @readonly = true, style = "width:500px; font-weight:bold;", id = "Status" })<br />
+            </div>
+        </div>
+        <div class="row" style="width:600px;">
+            <div class="col-sm-12" style="width:150px;">
+                <Label for="Reason">Reason:</Label>
+            </div>
+            <div class="col-sm-12" style="width:800px;">
+                @Html.TextBoxFor(x => x.Reason, new { @disabled = "disabled", @readonly = true, style = "width:500px; font-weight:bold;", id = "Reason" })
+            </div>
+        </div>
+    </div>
+}
+

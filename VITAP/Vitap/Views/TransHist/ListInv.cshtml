@@ -1,0 +1,349 @@
+﻿@model IEnumerable<VITAP.ViewModels.TransHist.InvoiceListModel>
+@{
+    var textAttr = new Dictionary<string, object> { { "style", "width:140px" }, { "disabled", "" } };
+    var headerAttr = new { @style = "font-weight:bold" };
+    var alignRight = new { style = "text-align: right" };
+    var alignLeft = new { style = "text-align: lef" };
+    //
+    //  URL query string to call this View -- /TransHist/ListInv?recurring_id=&pdocno=2B21240357&actNumber=21240357&inv_key_id=
+    // the parameters to pass in are recurring_id, pdocno, act and inv_key_id in the Query String
+
+    var CurrentInvoiceGridTitle = "";
+    if (ViewBag.CurrentInvoiceList.Count > 0)
+    {
+        CurrentInvoiceGridTitle = "Current Inv";
+    }
+}
+
+@Html.AntiForgeryToken()
+<style>
+    label {
+        display: inline;
+        float: left;
+        margin-right: 4px;
+        vertical-align: top;
+    }
+
+    div.grid-footer {
+        text-align: right;
+        font-size: 10pt;
+    }
+</style>
+
+<br />
+<h1 style="font-weight:bold">@ViewBag.Title</h1>
+
+<div class="container-fluid" style="float:left">
+    <div style="float: left;">
+
+    </div>
+
+    <div style="clear: left;">
+        <br />
+        @CurrentInvoiceGridTitle
+        <br />
+        @(Html.Kendo().Grid((IEnumerable<VITAP.ViewModels.TransHist.InvoiceListModel>)ViewBag.CurrentInvoiceList) //Bind the grid to ViewBag.CurrentInvoiceList
+                .Name("grdCurrentInvoice")
+                .DataSource(dataSource => dataSource
+                                    .Ajax()
+                                    .PageSize(20)
+                                    .ServerOperation(false)
+                                )
+                .Columns(columns =>
+                {
+                 
+                    columns.Bound(curInvoice => curInvoice.ACT).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(curInvoice => curInvoice.INV_KEY_ID).HeaderHtmlAttributes(headerAttr).Width(100).HtmlAttributes(alignRight);
+                    columns.Bound(curInvoice => curInvoice.INVOICE).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(curInvoice => curInvoice.AMOUNT).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Format("{0:0.00}");
+                    columns.Bound(curInvoice => curInvoice.PAY_AMT).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Format("{0:0.00}");
+                    columns.Bound(curInvoice => curInvoice.INVDATE).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Format("{0:MM/dd/yyyy}");
+                    columns.Bound(curInvoice => curInvoice.INV_STATUS).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(curInvoice => curInvoice.ERR_CODE).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(curInvoice => curInvoice.PRIORITY).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(curInvoice => curInvoice.IMAGEID).Width(450).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignLeft);
+                    columns.Bound(curInvoice => curInvoice.IMAGEBATCH).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                })
+                .Pageable() //Enable the paging.
+                .Sortable() //Enable the sorting.
+                .ToolBar(tools => tools.Excel())
+                .Excel(excel => excel
+                    .FileName("ListInv-" + DateTime.Today.ToString("yyyy-MM-dd") + ".xlsx")
+                    .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+                    .AllPages(true)
+                    )
+                .HtmlAttributes(new { style = "width: 1000px" })
+                .Pageable(pageable => pageable
+                    .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                )
+                .Resizable(resize => resize.Columns(true))
+                .Events(events => events.Change("grdCurrentInvoiceChanged"))
+        )
+        All Invs. 
+        @(Html.Kendo().Grid((IEnumerable<VITAP.ViewModels.TransHist.InvoiceListModel>)ViewBag.AllInvoiceList) //Bind the grid to ViewBag.AllInvoiceList
+            .Name("grdAllInvoice")
+                                .DataSource(dataSource => dataSource
+                                .Ajax()
+                                .PageSize(20)
+                                .ServerOperation(false)
+                            )
+            .Columns(columns =>
+            {
+                columns.Command(v => v.Custom("Select").Click("grdAllInvoiceSelected")).Title("Action").HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                columns.Bound(allInvoice => allInvoice.ACT).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                columns.Bound(allInvoice => allInvoice.INV_KEY_ID).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                columns.Bound(allInvoice => allInvoice.INVOICE).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                columns.Bound(allInvoice => allInvoice.AMOUNT).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Format("{0:0.00}");
+                columns.Bound(allInvoice => allInvoice.PAY_AMT).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Format("{0:0.00}");
+                columns.Bound(allInvoice => allInvoice.INVDATE).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Format("{0:MM/dd/yyyy}");
+                columns.Bound(allInvoice => allInvoice.INV_STATUS).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                columns.Bound(allInvoice => allInvoice.ERR_CODE).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                columns.Bound(allInvoice => allInvoice.PRIORITY).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                columns.Bound(allInvoice => allInvoice.IMAGEID).Width(450).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignLeft).Title("Image ID");
+                columns.Bound(allInvoice => allInvoice.IMAGEBATCH).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("Image Batch");
+            })
+            .Pageable() //Enable the paging.
+            .Sortable() //Enable the sorting.
+            .ToolBar(tools => tools.Excel())
+            .Excel(excel => excel
+                .FileName("ListAllInv-" + DateTime.Today.ToString("yyyy-MM-dd") + ".xlsx")
+                .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+                .AllPages(true)
+                )
+              .Selectable()
+            .HtmlAttributes(new { style = "width: 1000px" })
+            .Pageable(pageable => pageable
+                    .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                )
+            .Resizable(resize => resize.Columns(true))
+            .Events(events => events.Change("grdAllInvoiceChanged"))
+        )
+    </div>
+    @{
+        <div id="Buttons" style="float: left;min-width: 55%;">
+            <br />
+
+            <button type="button" id="btnViewTransHist" class="btn btn-info" onclick="TransHistClick()">View TransHist</button>
+            <button type="button" id="btnViewInv"  class="btn btn-info" onclick="ViewINVClick()">View INV</button>
+            <button type="button" id="btnViewImage" class="btn btn-info" onclick="ViewImageClick()">View Image</button>
+        </div>
+    }
+
+</div>
+
+@section ModalControls
+    {
+    <div id="dialog"></div>
+}
+
+@section Scripts
+    {
+        <script type="text/javascript">
+            $(document).ready(function () {
+                var currentInvCount = $("#grdCurrentInvoice").data("kendoGrid").dataSource.total()
+                var allInvoiceCount = $("#grdAllInvoice").data("kendoGrid").dataSource.total()
+            
+       
+
+                if (allInvoiceCount > 0)
+                {                  
+                    var grdInv = $("#grdAllInvoice").data("kendoGrid");
+                    if (grdInv != null)
+                    {
+                        grdInv.element.find('tbody tr:first').addClass('k-state-selected');
+                        var invListGridID = "grdAllInvoice"; // get grid ID
+                        if (grdInv.dataSource._data[0].IMAGEID==null)
+                        {
+                            $("#btnViewImage").prop("disabled", true);
+                        }
+                        else
+                        {
+                            $("#btnViewImage").prop("disabled", false);
+                        }
+                        ConfigureKendoGridPaginationControlsFor508(invListGridID);
+                        MakeKendoGridScrollable(invListGridID, "300px");
+                    }
+                    //var selectedRow = grdInv.dataItem(grdInv.select());
+                }
+                else
+                {
+                    $("#btnViewImage").prop("disabled", true);
+                    $("#btnViewInv").prop("disabled", true);
+                }
+
+                if (currentInvCount > 0)
+                {                 
+                    var grdInv = $("#grdCurrentInvoice").data("kendoGrid");
+                    if (grdInv != null)
+                    {
+                        var invListGridID = "grdCurrentInvoice"; // get grid ID
+                        ConfigureKendoGridPaginationControlsFor508(invListGridID);
+                        MakeKendoGridScrollable(invListGridID, "300px");
+                    }
+                }
+            });
+
+            // Global variables for Current Invoice List Count
+            // and All Invoice List Count
+            var currentInvoiceCount = @(ViewBag.CurrentInvoiceList.Count) ;
+            var allInvoiceCount = (@ViewBag.AllInvoiceList.Count) ;
+
+            $(document).ready(function () {
+                var currentPOCount = $("#grdCurrentInvoice").data("kendoGrid").dataSource.total()
+
+                if (currentPOCount == 0)
+                    $("#grdCurrentInvoice").hide();
+            });
+
+
+            function ViewINVClick() {
+
+                if (allInvoiceCount > 0)
+                {
+                    var selectedGrid = GetSelectedAllInvoiceKeyID();
+                    var selectedInvoiceKeyID = selectedGrid.inv_key_id;
+                }
+
+                if (selectedInvoiceKeyID != null) {
+                    location = '@Url.Action("ViewInvoice", "Transhist")' +
+                '?inv_Key_Id=' + selectedInvoiceKeyID;
+                }
+                else {
+                    alert("Select a line in the All Invoice grid before clicking on View INV button.");
+                }
+            }
+
+            function TransHistClick(){
+                // Check Invoice List count and decide which Grid to get the selected row
+                
+                if (allInvoiceCount > 0)
+                {
+                    var selectedGrid = GetSelectedAllInvoiceKeyID();
+                    var selectedInvoiceKeyID = selectedGrid.inv_key_id;                    
+                    window.open("@Url.Action("OraTwo")" + "?searchFor=" + selectedInvoiceKeyID.encodeUriComponent() + "&searchIn=INV_KEY_ID", '_blank');
+                }
+
+             
+            }
+            function ViewImageClick() {
+
+                if (allInvoiceCount > 0)
+                {
+                    var selectedImageID = GetSelectedAllInvoiceKeyID().imageid;
+                }
+
+                //alert(selectedImageID);
+                if (selectedImageID != null)
+                {
+                    //ViewTiffImage('#dialog', 'Exceptions', 'UserTiffViewer', 'inv', selectedImageID);
+                    url = '@Url.Action("ViewImageByImageID", "Exceptions")';
+                    window.location = url + '?docID=' + selectedImageID;
+                }
+                else {
+                    alert("Select a line in the All Invoice grid before clicking on View Image button.");
+                }
+            }
+
+            function GetSelectedCurrentInvoiceKeyID()
+            {
+                /// This function is to find the selected row's
+                /// Invoice Keyd ID and ImageID
+                var grid = $('#grdCurrentInvoice').data('kendoGrid');
+                var selectedRows = grid.select();
+                var selected = $.map(selectedRows, function (item) {
+                    var checked = $(item).find('.check-box').attr('checked');
+                    return {
+                        actNumber: $(item).find(':nth-child(2)').text(),
+                        INV_KEY_ID: $(item).find(':nth-child(3)').text(),
+                        imageID: $(item).find(':nth-child(11)').text()
+                    };
+                });
+
+
+                return {inv_key_id: selected[0].INV_KEY_ID,
+                    imageid: selected[0].imageID     };
+            }
+
+            function GetSelectedAllInvoiceKeyID() {
+                /// This function is to find the selected row's
+                /// Invoice Keyd ID and ImageID
+                var grid = $('#grdAllInvoice').data('kendoGrid');
+                var selectedRows = grid.select();
+                var selected = $.map(selectedRows, function (item) {
+                    var checked = $(item).find('.check-box').attr('checked');
+                    return {
+                        actNumber: $(item).find(':nth-child(2)').text(),
+                        INV_KEY_ID: $(item).find(':nth-child(3)').text(),
+                        imageID: $(item).find(':nth-child(11)').text()
+                    };
+                });
+
+                return {
+                    inv_key_id: selected[0].INV_KEY_ID,
+                    imageid: selected[0].imageID
+                };
+            }
+
+            function grdCurrentInvoiceChanged() {
+                var grid = $("#grdCurrentInvoice").data("kendoGrid");
+                var row = grid.select();
+                var dataItem = grid.dataItem(row);
+                grdCurrentInvoiceSelecting(dataItem);
+            }
+
+            function grdCurrentInvoiceSelected(e) {
+
+                // Highlight the row when "Select" button clicked
+                $("#grdCurrentInvoice table tr").removeClass('k-state-selected');
+                $(e.currentTarget).closest("tr").addClass('k-state-selected');
+
+                // Get the data from the current row
+                var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+                grdCurrentInvoiceSelecting(dataItem);
+            }
+
+            function grdCurrentInvoiceSelecting(dataItem)
+            {
+                var imageId = $.trim(dataItem.IMAGEID);
+
+                if (imageId.length > 0) {
+                    $("#btnViewImage").prop("disabled", false);
+                }
+                else {
+                    $("#btnViewImage").prop("disabled", true);
+                }
+
+            }
+
+            function grdAllInvoiceChanged() {
+                var grid = $("#grdAllInvoice").data("kendoGrid");
+                var row = grid.select();
+                var dataItem = grid.dataItem(row);
+                grdAllInvoiceSelecting(dataItem);
+            }
+
+            function grdAllInvoiceSelected(e) {
+
+                // Highlight the row when "Select" button clicked
+                $("#grdAllInvoice table tr").removeClass('k-state-selected');
+                $(e.currentTarget).closest("tr").addClass('k-state-selected');
+
+                // Get the data from the current row
+                var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+                grdAllInvoiceSelecting(dataItem);
+            }
+
+            function grdAllInvoiceSelecting(dataItem) {
+                var imageId = $.trim(dataItem.IMAGEID);
+
+                if (imageId.length > 0) {
+                    $("#btnViewImage").prop("disabled", false);
+                }
+                else
+                {
+                    $("#btnViewImage").prop("disabled", true);
+                }
+            }
+
+        </script>
+    }

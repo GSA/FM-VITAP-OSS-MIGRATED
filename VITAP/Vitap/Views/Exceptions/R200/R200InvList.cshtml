@@ -1,0 +1,59 @@
+﻿@model VITAP.Data.Models.Exceptions.R200ListInv
+@{
+    ViewBag.Title = "R200InvList";
+    var headerAttr = new { @style = "font-weight:bold" };
+    var headerAttrAlignRight = new { @style = "font-weight:bold; text-align: right" };
+}
+
+<h2>@Html.DisplayFor(m => m.Title)</h2>
+
+@using (Html.BeginForm())
+{
+    <div class="pad10" style="width:50%">
+        @{
+            Html.Kendo().Grid(Model.R200List)
+                .Name("gridR200InvList")
+                .DataSource(dataSource => dataSource
+                .Ajax()
+                .Aggregates(aggr =>
+                {
+                    //example
+                    //aggr.Add(p => p.Reject).Sum();
+                }
+                )
+                .Read(r => r
+                    .Action("R200InvList", "Exceptions")
+                )
+            )
+            .Columns(columns =>
+            {
+                columns.Bound(m => m.INV_KEY_ID).Width(120).HeaderHtmlAttributes(headerAttr);
+                columns.Bound(m => m.INVOICE).Width(120).HeaderHtmlAttributes(headerAttr).Title("Invoice");
+                columns.Bound(m => m.AMOUNT).Width(120).Format("{0:n2}").HeaderHtmlAttributes(headerAttrAlignRight).HtmlAttributes(headerAttrAlignRight).Title("Amount");
+            })
+            .ToolBar(tools => tools.Excel())
+            .Excel(excel => excel
+                .FileName("R200InvoiceList_" + DateTime.Today.ToString("yyyy-MM-dd") + ".xlsx")
+                .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+                .AllPages(true)
+            )
+            .Pageable(pageable => pageable
+                .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+            )
+            .Render();
+        }
+
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var grdR200InvList = $("#gridR200InvList").data("kendoGrid");  // Get Grid itself
+            if (grdR200InvList != null) {
+                var r200InvListGridId = "gridR200InvList";                 // Get Grid Id
+                ConfigureKendoGridPaginationControlsFor508(r200InvListGridId);
+                MakeKendoGridScrollable(r200InvListGridId, "300px");
+            }
+        });
+
+    </script>
+}
+

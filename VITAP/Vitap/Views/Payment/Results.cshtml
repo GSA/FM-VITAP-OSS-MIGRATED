@@ -1,0 +1,83 @@
+﻿@model IEnumerable<VITAP.Data.Models.UPPSWIP>
+@{
+    ViewBag.Title = "Results";
+    //Layout = "~/Views/Shared/_NaviBar.cshtml";
+}
+
+<fieldset class="searchForm">
+    <legend>DCAR UPPS Search</legend>
+    @using (Html.BeginForm("Results", "Payments", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        <div class="container-fluid">
+            <div class="col-md-12">
+                <div class="row  panel-body">
+                    <div class="row">
+                        <div class="col-md-3 ">
+                            <label for="lblAct">ACT:</label>
+                            @Html.Kendo().TextBox().Name("txtACT")
+                        </div>
+                        <div class="col-md-3 ">
+                            <label for="lblAct">INVOICE:</label>
+                            @Html.Kendo().TextBox().Name("txtInvoice")
+                        </div>
+                        <div class="col-md-3 ">
+                            <label for="lblAct">VEND NO:</label>
+                            @Html.Kendo().TextBox().Name("txtVendNo")
+                        </div>
+                        <div class="col-md-3 ">
+                            @(Html.Kendo().Button()
+                    .Name("Search")
+                    .Content("Search")
+                    .HtmlAttributes(new { style = "margin-left: 8px; width: 8em;" }))
+                        </div>
+                    </div>
+                    <div class="row">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</fieldset>
+
+@{
+    Html.Kendo().Grid
+    <VITAP.Data.Models.UPPSWIP>
+        (Model)
+        .Name("grdUPPSWIP")
+        .Columns(columns =>
+        {
+            columns.Bound(v => v.ACT).Title("ACT").Width(50);
+            columns.Bound(v => v.VENDNO).Title("VENDNO").Width(70);
+            columns.Bound(v => v.INVOICE).Title("INVOICE").Width(70);
+            columns.Bound(v => v.AMOUNT).Title("AMOUNT").Width(50);
+            columns.Bound(v => v.ACCOUNT).Title("ACCOUNT").Width(70);
+            columns.Bound(v => v.KEYDATE).Title("KEYDATE").Width(70);
+            columns.Bound(v => v.BATCHID).Title("BATCHID").Width(50);
+            columns.Bound(v => v.SUBJUL).Title("SUBJUL").Width(50);
+        })
+        .Scrollable()
+        .Sortable()
+        .Pageable()
+        .Render();
+}
+<br />
+<br />
+@(Html.Kendo().Button()
+.Name("Image")
+.Content("View Image")
+.HtmlAttributes(new { style = "margin-left: 8px; width: 8em;" })
+)
+@(Html.Kendo().Button()
+.Name("Save")
+.Content("Save To File")
+.HtmlAttributes(new { style = "margin-left: 8px; width: 8em;" })
+)
+@(Html.Kendo().Button()
+.Name("Close")
+.Content("Close")
+.HtmlAttributes(new { style = "margin-left: 8px; width: 8em;" })
+)
+
+

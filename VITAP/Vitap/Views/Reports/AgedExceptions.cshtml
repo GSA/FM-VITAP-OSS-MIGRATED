@@ -1,0 +1,397 @@
+﻿@using VITAP.Models.Reports
+@model AgedExceptionsViewModel
+@using VITAP.Library.Strings;
+
+@{
+    ViewBag.Title = "Aged Exceptions User Report";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var headerAttr = new { @style = "font-weight:bold; overflow: visible; white-space: normal;" };
+    var rightAlignAttr = new { @style = "text-align:right" };
+    var h2Style = "float: left; margin-top: 10px; margin-bottom: 10px";
+}
+
+<style>
+    .errorCodeClicked {
+        color: blue;
+        text-decoration: underline;
+    }
+</style>
+
+@using (Html.BeginForm((Model.IsManager ? "AgedExceptions" : "AgedExceptionsUser"), "Reports", FormMethod.Post))
+{
+    <div class="container-fluid">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <label style="font: bold; font-size: large">Aged Exceptions User Report - @(Model.IsManager ? "Management" : "Users")</label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label>
+                                Search Prepcode:
+                            </label>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label for="PrepCode">
+                                    Please enter prepcode below
+                                </label>
+                                @(Html.Kendo().TextBoxFor(m => m.PrepCode)
+                            .HtmlAttributes(new { @class = "form-control" })
+                            .Enable(Model.IsManager))
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="DateFrom">
+                                    Date From:
+                                </label>
+                                @(Html.Kendo().DatePickerFor(m => m.DateFrom)
+                    .HtmlAttributes(new { @class = "form-control", @style = "width: 110px" })
+                    .Format("MM/dd/yyyy")
+                                )
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="DateTo">
+                                    Date To:
+                                </label>
+                                @(Html.Kendo().DatePickerFor(m => m.DateTo)
+                    .HtmlAttributes(new { @class = "form-control", @style = "width: 110px" })
+                    .Format("MM/dd/yyyy")
+                                )
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-info" name="btnSearchValidate" id="btnSearchValidate" style="margin-top: 25px;" onclick="return searchValidate()">Search</button>
+                    <button type="submit" name="btnSearch" id="btnSearch" hidden="hidden"></button>
+                    <button type="button" class="btn btn-info" name="btnShowPrint" id="btnShowPrint" style="width:auto; margin-top:25px;" @((Model.AgedExceptionSummaries.Count() != 0) ? "" : "readonly disabled")>Show / Print Summary</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <h2 style="@h2Style">Totals</h2>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    @{
+                        Html.Kendo().Grid(Model.AgedExceptionTotals)
+                            .Columns(c =>
+                            {
+                                c.Bound(x => x.PrepCode).Width(80).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.Exception).Width(100).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.RecentCount).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                c.Bound(x => x.RecentPercentage).Width(100).HeaderHtmlAttributes(headerAttr).Format("{0:0.00}").HtmlAttributes(rightAlignAttr);
+                                c.Bound(x => x.OldCount).Width(120).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                c.Bound(x => x.OldPercentage).Width(110).HeaderHtmlAttributes(headerAttr).Format("{0:0.00}").HtmlAttributes(rightAlignAttr);
+                            })
+                            .Name("gridTotals")
+                            .Render();
+                    }
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <h2 style="@h2Style">Summary level</h2>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    @{
+                        Html.Kendo().Grid(Model.AgedExceptionSummaries)
+                            .Name("gridSummary")
+                            .DataSource(dataSource => dataSource
+                                .Ajax()
+                                .PageSize(10)
+                                .ServerOperation(false)
+                            )
+                            .Columns(c =>
+                            {
+                                c.Command(x => x.Custom("Select").Click("grdExceptionCodeSelected")).Title("Action").Width(50).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.PrepCode).Width(80).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.Exception).Width(100).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.Total).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                c.Bound(x => x.RecentCount).Width(120).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                c.Bound(x => x.RecentPercentage).Width(120).HeaderHtmlAttributes(headerAttr).Format("{0:0.00}").HtmlAttributes(rightAlignAttr);
+                                c.Bound(x => x.OldCount).Width(120).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                c.Bound(x => x.OldPercentage).Width(120).HeaderHtmlAttributes(headerAttr).Format("{0:0.00}").HtmlAttributes(rightAlignAttr);
+                            })
+                            .Pageable(pageable => pageable
+                                .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                            )
+                            .Selectable()
+                            .Render();
+                    }
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <h2 style="@h2Style">Details for over 4 Days</h2>
+                    <button type="button" class="btn btn-info pull-right" id="btnAddZeroThree" onclick="return AddZeroThreeOnClick();" readonly disabled>Add 0-3</button>
+                    <button type="submit" class="btn btn-info pull-right" style="margin-right: 5px; margin-top: 13px;" id="btnSaveToFile" @((Model.AgedExceptionSummaries.Count() != 0) ? "" : "readonly disabled")>Save to Excel for 4 and over</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    @{
+                        Html.Kendo().Grid(Model.AgedExceptionDetails)
+                            .Name("gridDetail")
+                            .DataSource(dataSource => dataSource
+                                .Ajax()
+                                .Events(events => events.Change("GridChanged"))
+                                .PageSize(10)
+                                .Read(r => r
+                                    .Action("AgedExceptionsDetail", "Reports")
+                                    .Data("GetSearchParametersAgedExceptionsDetail")
+                                )
+                            )
+                            .Columns(c =>
+                            {
+                                c.Bound(x => x.DAYSOLD).Width(45).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                c.Bound(x => x.EX_DATE).Format("{0:MM/dd/yyyy}").Width(70).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.CLEARED_DATE).Format("{0:MM/dd/yyyy}").Width(70).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.ACT).Width(50).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.PDOCNOPO).Width(80).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.ERR_CODE).Width(80).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.REFDOCNO).Width(120).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.VEND).Width(80).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.INVOICE_NO).Width(80).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.INV_AMT).Format("{0:c}").Width(60).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                c.Bound(x => x.SDATE).Width(70).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.ORG).Width(70).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.EX_FUND).Width(50).HeaderHtmlAttributes(headerAttr);
+                            })
+                            .Pageable(pageable => pageable
+                                .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                            )
+                            .Render();
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    @Html.HiddenFor(m => m.IsManager);
+                                @Html.HiddenFor(m => m.ErrCode);
+                            @Html.HiddenFor(m => m.AddZeroThree);
+                                    @Html.HiddenFor(m => m.SaveToFile);
+                        }
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#DateFrom").change(function () {
+            dateChanged(this);
+        });
+        $("#DateTo").change(function () {
+            dateChanged(this);
+        });
+
+        $("#btnShowPrint").click(function (e) {
+            printGrid();
+        });
+
+        $("#btnSaveToFile").click(function () {
+            $("#SaveToFile").val("true");
+            return true;
+        });
+
+        ConfigureKendoGridPaginationControlsFor508('gridSummary');
+        MakeKendoGridScrollable('gridSummary', "300px");
+        ConfigureKendoGridPaginationControlsFor508('gridDetail');
+        MakeKendoGridScrollable('gridDetail', "300px");
+    });
+
+    function grdExceptionCodeSelected(e) {
+    debugger
+        // Highlight the row when "Select" button clicked
+        $("#gridSummary table tr").removeClass('k-state-selected');
+        $(e.currentTarget).closest("tr").addClass('k-state-selected');
+
+        // Get the data from the current row
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        $("#ErrCode").val(dataItem.Exception);
+        //$("#ErrCode").val($(this).text());
+
+        // Enable the Add03 button.
+        $("#AddZeroThree").val("");
+        var button = $('#btnAddZeroThree');
+        button.prop('disabled', false);
+
+        // Reload the detail grid based on this code.
+        $('#gridDetail').data("kendoGrid").dataSource.read();
+    }
+
+    function dateChanged(e) {
+        // If date is specified, it must be valid.
+        if (e.value) {
+            var result = true;
+            var message = "";
+            var date = kendo.parseDate(e.value);
+            if (!date) {
+                result = false;
+                message = e.value + " is an invalid date."
+            }
+            if (!result) {
+                kendoAlert(message, "Verify Date");
+            }
+        }
+    }
+
+    function searchValidate(event) {
+        $('#ErrCode').val("");
+        $('#SaveToFile').val("");
+        $("#btnSearch").click();
+        return false;
+    }
+
+    function GetSearchParametersAgedExceptionsDetail() {
+        return {
+                PrepCode: $("#PrepCode").val(),
+                DateFrom: $("#DateFrom").val(),
+                DateTo: $("#DateTo").val(),
+                ErrCode: $("#ErrCode").val(),
+                AddZeroThree: $("#AddZeroThree").val()
+            }
+    }
+
+    GridChanged = function (e) {
+        var grid = $("#gridDetail").data("kendoGrid");
+        var count = grid.dataSource.total();
+
+        var button = $('#btnSaveToFile');
+        if (count > 0) {
+            button.prop('disabled', false);
+        }
+        else {
+            button.prop('disabled', true);
+        }
+    }
+
+    function AddZeroThreeOnClick() {
+        $("#AddZeroThree").val("true");
+
+        // Reload the detail grid.
+        $('#gridDetail').data("kendoGrid").dataSource.read();
+    }
+
+    function printGrid() {
+        var gridElementTotals = $('#gridTotals'), gridElementSummary = $('#gridSummary'),
+            printableContentTotals = '<h2>Totals</h2>', printableContentSummary = '<h2>Summary</h2>'
+            win = window.open('', '', 'width=1000, height=500, resizable=1, scrollbars=1'),
+            doc = win.document.open();
+
+            var htmlStart =
+                    '<!DOCTYPE html>' +
+                    '<html>' +
+                    '<head>' +
+                    '<meta charset="utf-8" />' +
+                    '<title>@(ViewBag.Title)</title>' +
+                    '<link href="http://kendo.cdn.telerik.com/' + kendo.version + '/styles/kendo.common.min.css" rel="stylesheet" /> ' +
+                    '<style>' +
+                    'html { font: 11pt sans-serif; }' +
+                    '.k-grid { border-top-width: 0; }' +
+                    '.k-grid, .k-grid-content { height: auto !important; }' +
+                    '.k-grid-content { overflow: visible !important; }' +
+                    'div.k-grid table { table-layout: auto; width: 100% !important; }' +
+                    '.k-grid .k-grid-header th { border-top: 1px solid; }' +
+                    '.k-grouping-header, .k-grid-toolbar, .k-grid-pager > .k-link { display: none; }' +
+                    // '.k-grid-pager { display: none; }' + // optional: hide the whole pager
+                    '</style>' +
+                    '</head>' +
+                    '<body><h1>@(ViewBag.Title)</h1>' +
+                    '<h2>Report for PrepCode: @Model.PrepCode</h2><h2>For Date Range: @Model.DateFrom to @Model.DateTo</h2>';
+
+        var htmlEnd =
+                '</body>' +
+                '</html>';
+
+        var totalsData = $('#gridTotals td').map(function () {
+            return $(this).text();
+        });
+        var printableContent = "";
+        if (totalsData.length == 6) {
+        // Totals
+            printableContent =  "<table style='border-collapse: collapse;'><tr style='border-bottom: 1px solid black;'><th>Total Exceptions per search:</th><th>" + totalsData[1] + "</th>";
+            printableContent += "<th>cleared:</th><th>" + totalsData[2] + "</th>";
+            printableContent += "<th>in 0-3 days which is</th><th>" + totalsData[3] + "</th>";
+            printableContent += "<th>cleared:</th><th>" + totalsData[4] + "</th>";
+            printableContent += "<th>greater than 3 days</th><th>" + totalsData[5] + "</th></tr>";
+
+            // Summary headers.
+            printableContent += "<tr style='border-bottom: 2px solid black;'><td>err_code</td><td>total count</td><td></td><td>0-3</td><td></td><td>0-3%</td><td></td><td>Over 3</td><td></td><td>Over 3%</td></tr>";
+
+            // Summary content.
+            var summaryRows = $('#gridSummary tr');
+            $.each(summaryRows, function (index, row) {
+                if (index != 0) {
+                    var rowData = $(row).find('td').map(function () {
+                        return $(this).text();
+                    });
+                    printableContent += "<tr><td>" + rowData[1] + "</td>";
+                    printableContent += "<td style='text-align: right;'>" + rowData[2] + "</td>";
+                    printableContent += "<td></td><td style='text-align: right;'>" + rowData[3] + "</td>";
+                    printableContent += "<td></td><td>" + rowData[4].replace('%', '') + "</td>";
+                    printableContent += "<td></td><td style='text-align: right;'>" + rowData[5] + "</td>";
+                    printableContent += "<td></td><td>" + rowData[6].replace('%', '') + "</td></tr>";
+                }
+            });
+
+            printableContent += "</table>";
+        }
+
+        var gridHeader = gridElementTotals.children('.k-grid-header');
+        if (gridHeader[0]) {
+            var thead = gridHeader.find('thead').clone().addClass('k-grid-header');
+            printableContentTotals += gridElementTotals
+                .clone()
+                    .children('.k-grid-header').remove()
+                .end()
+                    .children('.k-grid-content')
+                        .find('table')
+                            .first()
+                                .children('tbody').before(thead)
+                            .end()
+                        .end()
+                    .end()
+                .end()[0].outerHTML;
+        } else {
+            printableContentTotals += gridElementTotals.clone()[0].outerHTML;
+        }
+        gridHeader = gridElementSummary.children('.k-grid-header');
+        if (gridHeader[0]) {
+            var thead = gridHeader.find('thead').clone().addClass('k-grid-header');
+            printableContentSummary += gridElementSummary
+                .clone()
+                    .children('.k-grid-header').remove()
+                .end()
+                    .children('.k-grid-content')
+                        .find('table')
+                            .first()
+                                .children('tbody').before(thead)
+                            .end()
+                        .end()
+                    .end()
+                .end()[0].outerHTML;
+        } else {
+            printableContentSummary += gridElementSummary.clone()[0].outerHTML;
+        }
+
+        doc.write(htmlStart + printableContent + htmlEnd);
+        doc.close();
+        win.focus();
+        win.print();
+        win.close();
+    }
+</script>

@@ -1,0 +1,425 @@
+﻿body {
+    font-family: Helvetica, Arial, 'Times New Roman';
+    color: #212445;
+    background: #daecf4;
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #000;
+    font-family: Helvetica, Arial, 'Times New Roman';
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    font-size: 1.2em;
+}
+
+h2 {
+    font-size: 1.1em;
+}
+
+h3 {
+    font-size: 1.02em;
+    color: Navy;
+    margin-bottom: .3em;
+}
+
+#wrapper {
+    width: 90%;
+    margin: auto;
+    background-color: #FFF;
+}
+
+#header {
+}
+
+#redBar {
+    width: 100%;
+    height: 4px;
+    background-color: #004B8D;
+}
+
+#wrapper2 {
+    background-color: #004B8D;
+}
+
+#banner {
+    background-image: url('../Images/USDA-Logo.png');
+    width: 449px;
+    height: 77px;
+    background-repeat: no-repeat;
+}
+
+#appTitle {
+    width: 100%;
+    font-family: Helvetica, Arial, 'Times New Roman';
+    font-size: 1.5em;
+    padding-left: 10px;
+    padding: 10px 0 10px 10px;
+    clear: both;
+}
+
+/*#naviWrapper
+{
+background-color: #daecf4;
+height: 2em;
+font-family: Helvetica, Arial, 'Times New Roman';
+margin-bottom: -6px;
+font-variant: small-caps;
+clear: both;
+}
+
+.naviWrapper
+{
+background-color: #daecf4;
+height: 2em;
+font-family: Helvetica, Arial, 'Times New Roman';
+margin-bottom: -6px;
+font-variant: small-caps;
+clear: both;
+}
+
+#naviMenu
+{
+width: 60%;
+float: left;
+clear: both;
+}
+
+#naviMenu ul
+{
+height: 2em;
+font-size: 1em;
+list-style-type: none;
+margin: 0;
+padding: 0;
+}
+
+#naviMenu ul li
+{
+display: inline;
+float: left;
+padding: 4px 4px 0px 4px;
+border-right: 2px inset #FFF;
+}
+
+
+#naviMenu ul li a
+{
+text-decoration: none;
+height: 1.8em;
+display: block;
+color: #000;
+font-weight: bold;
+letter-spacing: .1em;
+}
+
+#naviMenu ul li:hover, #naviMenu ul li a:hover
+{
+color: #daecf4;
+background-color: #000;
+}*/
+
+
+#loggedInUser {
+    width: 30%;
+    font-size: 1em;
+    text-align: right;
+    float: right;
+    padding-top: 4px;
+    padding-right: 6px;
+}
+
+.bar {
+    clear: both;
+    border: 2px solid #004B8D;
+    margin-top: 3px;
+}
+
+#content {
+    padding: 2px 4px 2px 6px;
+    min-height: 250px;
+}
+
+#footer {
+    clear: both;
+    width: 100%;
+    text-align: center;
+    font-family: Helvetica, Arial, 'Times New Roman';
+    font-size: .8em;
+    margin-top: 1px;
+}
+
+    #footer p {
+        margin: 0;
+        padding: 3px 0 8px 0;
+    }
+
+input[type="submit"], input[type="button"], button[type=submit] {
+    color: #003f59;
+    font-size: 1em;
+    background-color: #daecf4;
+    background-image: none,linear-gradient(to bottom,rgba(255,255,255,.45) 0,rgba(255,255,255,.0) 100%);
+    border: 1px solid #a3d0e4;
+    padding: 3px 12px 3px 12px;
+    font-variant: small-caps;
+}
+
+    input[type="submit"]:hover, input[type="button"]:hover, button[type=submit]:hover {
+        color: #000;
+        background-color: #7bd2f6;
+        border: 1px solid #a3d0e4;
+    }
+
+button[type="submit"]:disabled {
+    color: #7bd2f6;
+}
+
+.loginWarning {
+    color: #cc0000;
+    text-align: center;
+    font-family: Helvetica, Arial, 'Times New Roman';
+    font-size: .8em;
+    font-weight: bold;
+}
+
+
+.popup {
+    font-size: 1em;
+    font-family: Helvetica, Arial, 'Times New Roman';
+    padding: 8px 18px 12px 18px;
+    margin: 0px 2px 2px 2px;
+    clear: both;
+}
+
+    .popup label {
+        float: left;
+        width: 25%;
+        text-align: right;
+        clear: left;
+        margin-top: 8px;
+        margin-right: 2%;
+        margin-bottom: 4px;
+    }
+
+    .popup input, .popup select {
+        margin-bottom: 8px;
+    }
+
+.form {
+    font-size: 1em;
+    font-family: Helvetica, Arial, 'Times New Roman';
+    padding: 8px 18px 12px 18px;
+    margin: 0px 2px 2px 2px;
+    clear: both;
+}
+
+    .form label {
+        float: left;
+        width: 45%;
+        text-align: right;
+        clear: left;
+        margin-right: 2%;
+        margin-bottom: 4px;
+    }
+
+    .form .fieldValue {
+        font-weight: bold;
+        font-family: Helvetica, Arial, 'Times New Roman';
+    }
+
+    .form br, .form hr, .formLeft br, .formRight br {
+        line-height: 1em;
+        clear: both;
+    }
+
+    .form input, .form select {
+        margin-top: -2px;
+        margin-bottom: 8px;
+    }
+
+        .form input[type="submit"], .form input[type="button"] {
+        }
+
+    .form .exception {
+        margin-left: 245px;
+    }
+
+.searchForm {
+    font-size: .9em;
+    font-family: Helvetica, Arial, 'Times New Roman';
+    margin: 0;
+    padding: 2px 12px 2px 12px;
+}
+
+
+
+    .searchForm .firstCol {
+        width: 10em;
+        float: left;
+        text-align: right;
+        clear: left;
+        margin-top: 5px;
+        margin-right: 15px;
+    }
+
+
+    .searchForm .secondCol {
+        margin-left: 39px;
+    }
+
+    .searchForm .thirdCol {
+        margin-left: 65px;
+    }
+
+    .searchForm select {
+        height: 1.8em;
+        width: 156px;
+        margin-left: 1px;
+    }
+
+    .searchForm label, .searchForm input, .searchForm select {
+        margin-bottom: 4px;
+    }
+
+.details {
+    font-size: .9em;
+    font-family: Helvetica, Arial, 'Times New Roman';
+    margin: 0;
+    padding: 2px 12px 2px 12px;
+    width: 90%;
+}
+
+    .details .label {
+        width: 16%;
+        float: left;
+        text-align: right;
+        margin-right: 15px;
+    }
+
+    .details .value {
+        width: 16%;
+    }
+
+
+.textBoxS {
+}
+
+.textBoxM {
+}
+
+.textBoxL {
+}
+
+table {
+    font-size: .72em;
+    font-family: Helvetica, Arial, 'Times New Roman';
+    border: 1px solid #000;
+    width: 100%;
+}
+
+    table th {
+        padding: 4px 2px 4px 2px;
+        text-align: center;
+        color: #000;
+        background-color: #daecf4;
+    }
+
+    table td {
+        font-size: .98em;
+        padding: 2px 2px 2px 2px;
+        color: #000;
+    }
+
+        table td .comments {
+            width: 100px;
+        }
+
+.controls {
+    margin-top: 6px;
+    padding: 4px 0px 4px 4px;
+    border: 1px solid #000;
+}
+
+    .controls input[type="submit"], .controls input[type="button"], .controls button[type="submit"] {
+        font-size: .75em;
+        width: 98px;
+    }
+
+        .controls button[type="submit"]:disabled {
+            color: #68b1d2;
+            background-color: #daecf4;
+            border-color: #a3d0e4;
+            background-image: none, linear-gradient(to bottom,rgba(255,255,255,.45) 0,rgba(255,255,255,.0) 100%);
+        }
+
+    .controls .pageSize {
+        width: 300px;
+        float: right;
+        font-size: 1em;
+        font-family: Helvetica, Arial, 'Times New Roman';
+        font-variant: small-caps;
+        text-align: right;
+    }
+
+        .controls .pageSize label {
+            margin-left: 1em;
+        }
+
+.pager {
+    color: #000;
+    background-color: #E1E0DB;
+    padding: 0;
+    margin: 0;
+}
+
+    .pager table {
+        width: auto;
+        border: 0;
+        font-family: Helvetica, Arial, 'Times New Roman';
+        font-size: 1em;
+        font-weight: bold;
+        margin: -6px 0 -6px 0;
+        padding: 0 2px 0 2px;
+    }
+
+    .pager a {
+        background-color: #E1E0DB;
+    }
+
+.textCentered {
+    text-align: center;
+}
+
+.validationWarning {
+    color: #cc0000;
+    text-align: left;
+    font-family: Helvetica, Arial, 'Times New Roman';
+    font-size: .8em;
+    font-weight: bold;
+}
+
+.disabledColumn {
+    color: #808080;
+}
+
+.updateFeedback {
+    color: #cc0000;
+    margin-left: 40px;
+    font-family: Helvetica, Arial, 'Times New Roman';
+    font-size: .8em;
+    font-weight: bold;
+}
+
+.legalStatement {
+    color: #cc0000;
+    text-align: left;
+    font-family: Helvetica, Arial, 'Times New Roman';
+    font-size: .9em;
+    font-weight: bold;
+    padding-left: 10px;
+    padding-bottom: 0;
+}

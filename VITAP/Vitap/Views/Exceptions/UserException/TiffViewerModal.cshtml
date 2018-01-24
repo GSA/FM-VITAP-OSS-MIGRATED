@@ -1,0 +1,342 @@
+﻿@* MAND MEMO MODAL *@
+@model VITAP.Data.Models.Exceptions.UserExceptionViewModel
+
+@{
+    ViewBag.Title = "Pegasys Exception (" + Model.ErrorCode + " - " + Model.Memo;
+    Layout = "~/Views/Shared/_ModalMenuLayout.cshtml";
+}
+
+@{Model.BigImgPg = Model.StartPg;}
+
+    <div class="container-fluid">
+        <div style = "padding:10px" >
+            <div class="row">
+                <div class="col-md-12">
+                    @{
+                        string bigSrc = Url.Action("ViewTiffAtPath", "Exceptions", new { View = "1", FilePath = HttpUtility.UrlEncode(Model.TiffFilePath), Pg = Model.BigImgPg, Height = Model.DefaultBigHeight, Width = Model.DefaultBigWidth, unsized = "1" });
+                        <div id="tiffCanvasWrapper"><canvas></canvas></div>
+                        <div style = "margin:5px" >
+                            <a id="_hlRot270" href="javascript:void(0);" onclick="rotateLeft()">[Rotate Left]</a>
+                            <a id="_hlRot90" href="javascript:void(0);" onclick="rotateRight()">[Rotate Right]</a>
+                            <a id="_hlRot180" href="javascript:void(0);" onclick="rotate180()">[Rotate 180]</a>
+                            <a id="_tiffZoomIn" href="javascript:void(0);">[Zoom In]</a>
+                            <a id="_tiffZoomOut" href="javascript:void(0);">[Zoom Out]</a>
+                            <a id="_revert" href="javascript:void(0);" onclick="revertImg()">[Revert]</a>
+                            @{
+                                string pages = Model.TotalTIFPgs.ToString() + " Page" + (Model.TotalTIFPgs > 1 ? "s" : "");
+                                <label>@pages</label>
+                            }
+                        </div>
+                    }
+                    <table id = "_tblImgs" >
+                        <tr>
+                            <td >
+                                @{
+                                    //Determine Start/End Pages
+                                    Model.StartPg = 1;
+                                    if (Request.QueryString["StartPage"] != null)
+                                    {
+                                        Model.StartPg = System.Convert.ToInt16(Request.QueryString["StartPage"]);
+                                    }
+
+                                    //int BigImgPg = Model.StartPg;
+                                    Model.EndPg = Model.StartPg + (Model.PagerSize - 1);
+                                    if (Model.EndPg > Model.TotalTIFPgs)
+                                    {
+                                        Model.EndPg = Model.TotalTIFPgs;
+                                    }
+
+                                    //Add/configure the thumbnails
+                                    var pagerPage = Model.StartPg - 1;
+                                    while (pagerPage < Model.EndPg)
+                                    {
+                                        pagerPage = pagerPage + 1;
+                                        if (pagerPage % 4 == 0 && pagerPage != 0)
+                                        {
+                                            <label>&nbsp;<br /></label>
+                                            }
+                                            else
+                                            {
+                                            <label>&nbsp;</label>
+                                        }
+
+                                        string src = Url.Action("ViewTiffAtPath", "Exceptions", new { View = "1", FilePath = Model.TiffFilePath, Pg = pagerPage, Height = Model.DefaultThumbHeight, Width = Model.DefaultThumbWidth });
+                                            <img onclick = "ChangePg(@pagerPage)" style="border: 1px solid black" src="@src" />
+                                        }
+
+                                        //ConfigPagers
+                                        //Config first pager
+                                        if ((Model.TotalTIFPgs / Model.PagerSize) >= 1)
+                                        {
+                                            string linkText;
+                                               string linkUrl;
+
+                                            if ((1 + Model.PagerSize) > Model.TotalTIFPgs)
+                                            {
+                                                linkText = "1-" + Model.TotalTIFPgs;
+                                            }
+                                            else
+                                            {
+                                                linkText = "1-" + Model.PagerSize;
+                                            }
+
+                                            <label>&nbsp;</label>
+                                            if (Request.Url.ToString().IndexOf("&StartPage=") >= 0)
+                                            {
+                                                linkUrl = Request.Url.ToString().Substring(0, Request.Url.ToString().IndexOf("&StartPage=")) + "&StartPage=1";
+                                            }
+                                            else
+                                            {
+                                                linkUrl = Request.Url.ToString() + "";
+                                            }
+
+                                            <a style = "display:block" href="@linkUrl">@linkText</a>
+
+                                        }
+
+                                        //Config the rest of the page pagers
+                                        for (int i = 1; i <= (Model.TotalTIFPgs / Model.PagerSize); i++)
+                                        {
+                                        <label>&nbsp;</label>
+                                            string otherLinkUrl;
+                                            string otherLinkText;
+
+                                            if (i == (Model.TotalTIFPgs / Model.PagerSize))
+                                            {
+                                                otherLinkText = ((i* Model.PagerSize) + 1).ToString() + "-" + Model.TotalTIFPgs;
+                                            }
+                                            else
+                                            {
+                                                otherLinkText = ((i* Model.PagerSize) + 1).ToString() + "-" + (((i + 1) * Model.PagerSize)).ToString();
+                                            }
+
+                                            if (Request.Url.ToString().IndexOf("&StartPage=") >= 0)
+                                            {
+                                                otherLinkUrl = Request.Url.ToString().Substring(0, Request.Url.ToString().IndexOf("&StartPage=")) + "&StartPage=" + ((i* Model.PagerSize) + 1).ToString();
+                                            }
+                                            else
+                                            {
+                                                otherLinkUrl = Request.Url.ToString() + "&StartPage=" + ((i* Model.PagerSize) + 1).ToString();
+                                            }
+
+                                            <a href = "@otherLinkUrl" > @otherLinkText </a>
+                                        }
+                                }
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<script type="text/javascript">
+	$(document).ready(function () {
+	    window.type = '@Model.TiffType';
+	    window.typeId = '@Model.TiffTypeId';
+        window.filePath = '@HttpUtility.UrlEncode(Model.TiffFilePath)';
+
+	    window.bigSrc = '@Url.Action("ViewTiffAtPath", "Exceptions", new { View = "1", FilePath = "JSFILEPATH", Pg = Model.StartPg, Height = "600", Width = "600", unsized = "1" })';
+	    gkhead.src = ReplaceFilePathAndAmps(window.bigSrc);
+	});
+
+    function ChangePg(Pg) {
+        SrcBig = '@Url.Action("ViewTiffAtPath", "Exceptions", new { View = "1", FilePath = "JSFILEPATH", Pg = "JSPAGE", Height = "800", Width = "800", unsized = "1" })';
+        SrcBig = SrcBig.replace("JSPAGE", Pg);
+        SrcBig = ReplaceFilePathAndAmps(SrcBig);
+
+	    gkhead.src = SrcBig;
+	    document.getElementById('_hlRot270').onclick = function () { ChangePg(Pg); gkhead.src = SrcBig + "&Rotate=270"; };
+	    document.getElementById('_hlRot180').onclick = function () { ChangePg(Pg); gkhead.src = SrcBig + "&Rotate=180"; };
+	    document.getElementById('_hlRot90').onclick = function () { ChangePg(Pg); gkhead.src = SrcBig + "&Rotate=90"; };
+	    document.getElementById('_revert').onclick = function () { ChangePg(Pg); gkhead.src = SrcBig;}
+	}
+
+    function ReplaceFilePathAndAmps(SrcStr)
+    {
+        var newStr = SrcStr.replace("JSFILEPATH", window.filePath);
+        return newStr.replaceAll('amp;', '');
+    }
+
+	function GetBigSrc(Qrystr)
+	{
+	    var Qry = document.getElementById('_imgBig').src;
+	    gy = Qry.split("&");
+	    for (i=0;i<gy.length;i++)
+	    {
+	        ft = gy[i].split("=");
+	        if (ft[0] == Qrystr)
+	            return ft[1];
+	    }
+	}
+
+	function rotateRight() {
+	    var rotateSrc = '@Url.Action("ViewTiffAtPath", "Exceptions", new { View = "1", FilePath = "JSFILEPATH", Pg = Model.BigImgPg, Height = Model.DefaultBigHeight, Width = Model.DefaultBigWidth, Rotate = "90", unsized = "1" })';
+	    gkhead.src = ReplaceFilePathAndAmps(rotateSrc);
+	}
+
+    function rotateLeft() {
+        var rotateSrc = '@Url.Action("ViewTiffAtPath", "Exceptions", new { View = "1", FilePath = "JSFILEPATH", Pg = Model.BigImgPg, Height = Model.DefaultBigHeight, Width = Model.DefaultBigWidth, Rotate = "270", unsized = "1" })';
+        gkhead.src = ReplaceFilePathAndAmps(rotateSrc);
+	}
+
+    function rotate180() {
+        var rotateSrc = '@Url.Action("ViewTiffAtPath", "Exceptions", new { View = "1", FilePath = "JSFILEPATH", Pg = Model.BigImgPg, Height = Model.DefaultBigHeight, Width = Model.DefaultBigWidth, Rotate = "180", unsized = "1" })';
+        gkhead.src = ReplaceFilePathAndAmps(rotateSrc);
+	}
+
+    function revertImg() {
+        var rotateSrc = '@Url.Action("ViewTiffAtPath", "Exceptions", new { View = "1", FilePath = "JSFILEPATH", Pg = Model.BigImgPg, Height = Model.DefaultBigHeight, Width = Model.DefaultBigWidth, unsized = "1" })';
+        gkhead.src = ReplaceFilePathAndAmps(rotateSrc);
+    }
+
+    var canvas = document.getElementsByTagName('canvas')[0];
+
+    window.addEventListener("resize", handleResize);
+    function handleResize() {
+        redraw();
+    }
+
+    var gkhead = new Image();
+    gkhead.onload = function () {
+        // Load full-size.
+        canvas.width = this.naturalWidth;
+        canvas.height = this.naturalHeight;
+        redraw();
+
+        // Initial zoom out to half of browser width.
+        var width = $(parent.window).width() / 2;
+        var scaleFactor = 1.1;
+        var zoomFactor = Math.pow(scaleFactor,-1);
+        if (canvas.width > width) {
+            var ctx = canvas.getContext('2d');
+
+            var clicks = 1;
+            var newWidth = canvas.width * zoomFactor;
+            while (newWidth > width) {
+                newWidth = newWidth * zoomFactor;
+                clicks++;
+            }
+
+            var factor = Math.pow(scaleFactor, -clicks);
+            ctx.scale(factor, factor);
+            canvas.height = canvas.height * factor;
+            canvas.width = canvas.width * factor;
+
+            redraw();
+        }
+	}
+	String.prototype.replaceAll = function(search, replacement) {
+	    var target = this;
+	    return target.split(search).join(replacement);
+	};
+
+	function redraw(){
+	    var ctx = canvas.getContext('2d');
+	    trackTransforms(ctx);
+
+	    // Clear the entire canvas
+	    var p1 = ctx.transformedPoint(0,0);
+	    var p2 = ctx.transformedPoint(canvas.width,canvas.height);
+	    ctx.clearRect(p1.x,p1.y,p2.x-p1.x,p2.y-p1.y);
+
+	    ctx.save();
+	    ctx.setTransform(1,0,0,1,0,0);
+	    ctx.clearRect(0,0,canvas.width,canvas.height);
+	    ctx.restore();
+	    ctx.drawImage(gkhead,0,0,canvas.width,canvas.height);
+	}
+
+	window.onload = function(){
+	    var ctx = canvas.getContext('2d');
+	    trackTransforms(ctx);
+
+	    redraw();
+
+	    var scaleFactor = 1.1;
+
+	    var zoom = function(clicks){
+	        var factor = Math.pow(scaleFactor,clicks);
+	        ctx.scale(factor, factor);
+	        canvas.height = canvas.height * factor;
+	        canvas.width = canvas.width * factor;
+	        redraw();
+	    }
+
+	    var tiffZoomOut = function () {
+	        zoom(-1);
+	    }
+	    var tiffZoomIn = function () {
+	        zoom(1);
+	    }
+
+	    $('#_tiffZoomOut').click(tiffZoomOut);
+	    $('#_tiffZoomIn').click(tiffZoomIn);
+	};
+
+	// Adds ctx.getTransform() - returns an SVGMatrix
+	// Adds ctx.transformedPoint(x,y) - returns an SVGPoint
+	function trackTransforms(ctx){
+	    var svg = document.createElementNS("http://www.w3.org/2000/svg",'svg');
+	    var xform = svg.createSVGMatrix();
+	    ctx.getTransform = function(){ return xform; };
+
+	    var savedTransforms = [];
+	    var save = ctx.save;
+	    ctx.save = function(){
+	        savedTransforms.push(xform.translate(0,0));
+	        return save.call(ctx);
+	    };
+
+	    var restore = ctx.restore;
+	    ctx.restore = function(){
+	        xform = savedTransforms.pop();
+	        return restore.call(ctx);
+	    };
+
+	    var scale = ctx.scale;
+	    ctx.scale = function(sx,sy){
+	        xform = xform.scaleNonUniform(sx,sy);
+	        return scale.call(ctx,sx,sy);
+	    };
+
+	    var rotate = ctx.rotate;
+	    ctx.rotate = function(radians){
+	        xform = xform.rotate(radians*180/Math.PI);
+	        return rotate.call(ctx,radians);
+	    };
+
+	    var translate = ctx.translate;
+	    ctx.translate = function(dx,dy){
+	        xform = xform.translate(dx,dy);
+	        return translate.call(ctx,dx,dy);
+	    };
+
+	    var transform = ctx.transform;
+	    ctx.transform = function(a,b,c,d,e,f){
+	        var m2 = svg.createSVGMatrix();
+	        m2.a=a; m2.b=b; m2.c=c; m2.d=d; m2.e=e; m2.f=f;
+	        xform = xform.multiply(m2);
+	        return transform.call(ctx,a,b,c,d,e,f);
+	    };
+
+	    var setTransform = ctx.setTransform;
+	    ctx.setTransform = function(a,b,c,d,e,f){
+	        xform.a = a;
+	        xform.b = b;
+	        xform.c = c;
+	        xform.d = d;
+	        xform.e = e;
+	        xform.f = f;
+	        return setTransform.call(ctx,a,b,c,d,e,f);
+	    };
+
+	    var pt  = svg.createSVGPoint();
+	    ctx.transformedPoint = function(x,y){
+	        pt.x=x; pt.y=y;
+	        return pt.matrixTransform(xform.inverse());
+	    }
+	}
+
+</script>

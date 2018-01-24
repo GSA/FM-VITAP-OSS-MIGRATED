@@ -1,0 +1,125 @@
+﻿@model VITAP.Models.Reports.ContactReportViewModel
+
+@{
+    ViewBag.Title = "Contact Report";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var textAttr = new Dictionary<string, object> { { "style", "width:140px" }, { "disabled", "" } };
+    var headerAttr = new { @style = "font-weight:bold" };
+    var alignRight = new { style = "text-align: right" };
+    var footerSum = "<div class='grid-footer'>#=sum#</div>";
+}
+
+@using (Html.BeginForm("ContactReport", "Reports", FormMethod.Post, new { id = "form1" }))
+{
+    <div class="container-fluid">
+        <div class="row panel-body">
+            <div class="col-md-12">
+                <div class="row panel">
+                    <div class="col-md-12">
+                        <label style="font: bold; font-size: large">Contact Report</label>
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-md-6">
+                        <label class="fill">
+                            <span>Search by OrgCode</span> @Html.TextBoxFor(x => x.SearchValue)
+                        </label>
+                        <label class="fill">
+                            <button type="button" class="btn btn-info" onclick="return btnSearchOnClick();" style="margin-top:0px;">Search</button>
+                        </label>
+                        @*<label class="fill">
+                                <button type="submit" class="btn btn-info" style="margin-top:0px;" id="saveToCsv" readonly disabled>Save To CSV</button>
+                            </label>*@
+                    </div>
+                    <div class="col-md-6 text-right">
+                        @*@Html.DisplayFor(x => x.ResultsFound) <span>Contacts found</span>*@
+                    </div>
+                </div>
+                <div class="row panel">
+                    @{  Html.Kendo().Grid<VITAP.Models.Reports.ContactReportViewModel>()
+                        .Name("grid")
+                        .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .Events(events => events.Change("GridChanged"))
+                        .Aggregates(aggr =>
+                        {
+                            //example
+                            //aggr.Add(p => p.GrandTotal).Sum();
+                        }
+                        )
+                        .Read(r => r
+                            .Action("ContactReportRecords", "Reports")
+                            .Data("GetSearchParametersContactReportRecords")
+                        )
+                    )
+                        .Columns(columns =>
+                        {
+                            columns.Bound(x => x.ContactId).Width(120).Title("CONTACT ID");
+                            columns.Bound(x => x.Region).Width(120).Title("REGION");
+                            columns.Bound(x => x.Fund).Width(120).Title("FUND");
+                            columns.Bound(x => x.OrgCode).Width(120).Title("ORG CODE");
+                            columns.Bound(x => x.BA).Width(120).Title("BA");
+                            columns.Bound(x => x.Name).Width(120).Title("NAME");
+                            columns.Bound(x => x.Phone).Width(120).Title("PHONE");
+                            columns.Bound(x => x.Fax).Width(120).Title("FAX");
+                            columns.Bound(x => x.Email).Width(120).Title("EMAIL");
+                            columns.Bound(x => x.CorrSymbol).Width(120).Title("CORR SYMBOL");
+                            columns.Bound(x => x.ContactOption).Width(120).Title("CONTACT OPTION");
+                            columns.Bound(x => x.OfficeName).Width(120).Title("OFFICE NAME");
+
+                            //.HeaderHtmlAttributes(headerAttr)
+                            //.ClientFooterTemplate("<div class='grid-footer'>Totals</div>");
+                        })
+                      .ToolBar(tools => tools.Excel())
+                    .Excel(excel => excel
+                    .FileName("ContactReport.xlsx")
+                    .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+                )
+                        .Pageable(pageable => pageable
+                        .Input(true)
+                        .Numeric(false)
+                        .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                    )
+                        .Render();
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            MakeKendoGridScrollable('grid', '600px');
+            ConfigureKendoGridPaginationControlsFor508('grid');
+        });
+
+
+        function GetSearchParametersContactReportRecords() {
+
+            return {
+                OrgCode: $("#SearchValue").val()
+            };
+        }
+
+        function btnSearchOnClick() {
+            $('#grid').data("kendoGrid").dataSource.read();
+        }
+
+        GridChanged = function (e) {
+
+            var grid = $("#grid").data("kendoGrid");
+            var count = grid.dataSource.total();
+
+            var button = $('#saveToCsv');
+            if (count > 0) {
+                button.prop('disabled', false);
+            }
+            else {
+                button.prop('disabled', true);
+            }
+        }
+    </script>
+
+                        }

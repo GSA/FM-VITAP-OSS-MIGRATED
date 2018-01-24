@@ -1,0 +1,75 @@
+﻿@model IEnumerable<VITAP.Data.Models.PO>
+
+@{
+    ViewBag.Title = ViewBag.PageTitle;
+}
+
+<h2>@ViewBag.PageTitle</h2>
+
+@(Html.Kendo().Grid(Model)
+        .Name("grdPOList")
+        .Columns(columns =>
+        {
+            columns.Command(c => c.Custom("Select").Click("grdPOListSelected")).Title("Action");
+            columns.Bound(c => c.ACT).Title("Act");
+            columns.Bound(c => c.PDocNo).Title("PDocNo");
+            columns.Bound(c => c.VendorName).Title("Vendor Name");
+            columns.Bound(c => c.VCPO).Title("VCPO");
+            columns.Bound(c => c.Contract).Title("Contract");
+        })
+        .HtmlAttributes(new { style = "margin-top: 6px;" })
+        .Pageable(pageable => pageable
+            .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+         )
+        .Selectable()
+        .ToolBar(tools => tools.Excel())
+        .Excel(excel => excel
+            .FileName("POList.xlsx")
+            .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+            .AllPages(true)
+        )
+        .Sortable()
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .PageSize(10)
+            .ServerOperation(false)
+         )
+         .Resizable(resize => resize.Columns(true))
+         .Events(events => events.Change("grdPOListChanged"))
+)
+<script type="text/javascript">
+    $(document).ready(function () {
+        var grdPOList = $("#grdPOList").data("kendoGrid");
+        if (grdPOList != null) {
+            var poListGridId = "grdPOList";
+            ConfigureKendoGridPaginationControlsFor508(poListGridId);
+        }
+    });
+
+    function grdPOListChanged() {
+        var grid = $("#grdPOList").data("kendoGrid");
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        grdPOListSelecting(dataItem);
+    }
+
+    function grdPOListSelected(e) {
+        // Highlight the row when "Select" button clicked
+        $("#grdPOList table tr").removeClass('k-state-selected');
+        $(e.currentTarget).closest("tr").addClass('k-state-selected');
+
+        // Get the data from the current row
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        grdPOListSelecting(dataItem);
+    }
+
+    function grdPOListSelecting(dataItem) {
+        location = '@Html.Raw(@Url.Action("Index", "TransHist"))'
+                + '?pDocNo=' + ConvertNullToEmptyString(dataItem.PDocNo).encodeUriComponent()
+                + '&act=' + ConvertNullToEmptyString(dataItem.ACT).encodeUriComponent()
+                + '&searchFY=@ViewBag.SearchFY'
+                + '&searchedBy=@ViewBag.SearchedBy'
+                + '&searchShow=@ViewBag.SearchShow';
+    }
+</script>
+

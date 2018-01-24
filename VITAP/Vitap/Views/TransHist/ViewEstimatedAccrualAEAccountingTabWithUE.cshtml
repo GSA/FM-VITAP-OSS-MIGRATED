@@ -1,0 +1,64 @@
+﻿@using VITAP.ViewModels.TransHist;
+@model List<EstimatedAccrualAEAccountingModel>
+
+<div class="pad10">
+    @{
+        Html.Kendo().Grid(Model)
+            .Name("gridAccounting")
+            .Columns(columns =>
+            {
+                columns.Bound(x => x.LineNo);
+                columns.Bound(x => x.LineAmount);                
+                columns.Bound(x => x.PoLineNo).Title("MDL");
+                columns.Bound(x => x.Fy);
+                columns.Bound(x => x.Fund);
+                columns.Bound(x => x.Fc);
+                columns.Bound(x => x.Orgcode);
+                columns.Bound(x => x.Ba);
+                columns.Bound(x => x.Ce);
+                columns.Bound(x => x.Oc);
+                columns.Bound(x => x.Proj);
+                columns.Bound(x => x.Rwa);
+                columns.Bound(x => x.Workitem);
+                columns.Bound(x => x.Bldg);
+            })
+            .DataSource(dataSource => dataSource
+                .Ajax()
+                .ServerOperation(false)
+                .PageSize(10)
+            )
+            .ToolBar(tools => tools.Excel())
+            .Excel(excel => excel
+                .FileName("EstimatedAccrualAccounting.xlsx")
+                .ProxyURL(Url.Action("Excel_Export_Save", "Grid"))
+                .AllPages(true)
+            )
+            .Pageable(pageable => pageable
+                .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+            )
+            .Render();
+    }
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        MakeKendoGridScrollable('gridAccounting', '300px');
+        ConfigureKendoGridPaginationControlsFor508('gridAccounting');
+    });
+
+
+    function GetSearchParametersAccounting() {
+
+        // Reserved property names
+        // used by DataSourceRequest: sort, page, pageSize, group, filter
+        return {
+            AeId: $("#AeId").val()
+        };
+    }
+
+    function btnSearchOnClick() {
+        $('#gridAccounting').data("kendoGrid").dataSource.read();
+    }
+</script>
+
+

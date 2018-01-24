@@ -1,0 +1,22 @@
+﻿
+@{
+    ViewBag.Title = "Application Closure";
+    Layout = "~/Views/Shared/_LayoutWithoutNavi.cshtml";
+}
+
+<h2>Visual Invoice Tracking and Payment (VITAP) Application Closure</h2>
+<br />
+<br />
+
+<div id="ClosureMessage" style="font-weight:bold; font-size:larger">
+</div>
+
+<script>
+    $(document).ready(function () {
+        if ('@TempData.Peek("ClosureMsg").ToString()' != "") {
+            var msg = '@(TempData.Peek("ClosureMsg").ToString())';
+            $("#ClosureMessage").html(msg);
+            $("#ClosureMessage").html($("#ClosureMessage").text());
+        }
+    })
+</script>

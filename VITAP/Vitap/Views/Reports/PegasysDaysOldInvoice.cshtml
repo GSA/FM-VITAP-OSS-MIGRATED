@@ -1,0 +1,184 @@
+﻿@using VITAP.ViewModels.Reports
+
+@{
+    var textAttr = new Dictionary<string, object> { { "style", "width:140px" }, { "disabled", "" } };
+    var headerAttr = new { @style = "font-weight:bold" };
+    var alignRight = new { style = "text-align: right" };
+}
+
+@Html.AntiForgeryToken()
+<style>
+    label {
+        display: inline;
+        float: left;
+        margin-right: 4px;
+        vertical-align: top;
+    }
+
+    div.grid-footer {
+        text-align: right;
+        font-size: 10pt;
+    }
+</style>
+
+<br />
+<h1 style="font-weight:bold">Day's Old - Pegasys Invoice</h1>
+<br />
+<div class="container-fluid" style="float:left">
+    <div style="float: left;">
+        
+        <div style="float: left; width: 100%;">
+            <Label>
+                Date From<br />
+                @(Html.Kendo().DatePicker().Name("DateFrom").HtmlAttributes(new
+            {
+                id = "DateFrom",
+                style = "width: 115px; height: 22px;"
+            })
+                )
+            </Label>
+            <Label>
+                Date To<br />
+                @(Html.Kendo().DatePicker().Name("DateTo").HtmlAttributes(new
+            {
+                id = "DateTo",
+                style = "width: 115px; height: 22px;"
+            })
+                )
+            </Label>
+
+            <Label>
+               Search By<br />
+
+                @(Html.Kendo().DropDownList()
+                .Name("ddlSearch")
+                .DataTextField("Text")
+                .DataValueField("Value")
+                .BindTo(new List<SelectListItem>() {
+                    new SelectListItem { Text = "FTS, Network Services", Value = "FTS, Network Services" },
+                    new SelectListItem { Text = "192X, VCPO only", Value = "192X, VCPO only" },
+                    new SelectListItem { Text = "192X, Non-Recurring", Value = "192X, Non-Recurring" },
+                    new SelectListItem { Text = "192X, All", Value = "192X, All" },
+                    new SelectListItem { Text = "PBS, 442", Value = "PBS, 442" },
+                    new SelectListItem { Text = "Other", Value = "Other" },
+                    new SelectListItem { Text = "All", Value = "All" }
+                })
+                )
+            </Label>
+            <Label>
+                Order By<br />
+                @(Html.Kendo().DropDownList()
+     .Name("ddlSearch")
+     .DataTextField("Text")
+     .DataValueField("Value")
+     .BindTo(new List<SelectListItem>() {
+                new SelectListItem { Text = "Days Old", Value = "Days Old" },
+                new SelectListItem { Text = "Amount", Value = "Amount" },
+                new SelectListItem { Text = "ACT #", Value = "ACT #" },
+                new SelectListItem { Text = "INV #", Value = "INV #" },
+                new SelectListItem { Text = "Start Date/Log Date", Value = "Start Date/Log Date" },
+                new SelectListItem { Text = "OrgCode", Value = "OrgCode" },
+                new SelectListItem { Text = "Vendor", Value = "Vendor" },
+                new SelectListItem { Text = "Cumulative Interest", Value = "Cumulative Interest" },
+                new SelectListItem { Text = "Daily Interest", Value = "Daily Interest" },
+                new SelectListItem { Text = "PDocNoPo", Value = "PDocNoPo" },
+                new SelectListItem { Text = "Inv Key Id", Value = "Inv Key Id" }
+        })
+                )
+            </Label>
+</div>
+        <div id="Buttons" style="float: left;min-width: 55%;">
+            <br />
+            <button type="button" class="btn btn-primary btn-default" onclick="btnSearchOnClick();" style="margin-left: 20px">Search</button>
+            <button type="button" class="btn btn-info" style="margin-left: 20px">Save to File</button>
+            <button type="button" class="btn btn-info" style="margin-left: 20px">Print</button>
+            <button type="button" class="btn btn-info" style="margin-left: 20px; margin-right: 20px">Cancel</button>
+        </div>
+
+    </div>
+
+    <div style="clear: left;">
+        <br />
+        @{
+            Html.Kendo().Grid<PegasysDaysOldInvoiceItem>()
+                .Name("gridPegasysDaysOldInvoice")
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .Read(r => r
+                        .Action("PegasysDaysOldInvoice", "Reports")
+                        .Data("GetSearchParameters")
+                    )
+                     .Aggregates(aggregates =>
+                                {
+                                    aggregates.Add(p => p.INVOICE).Count();
+                                    aggregates.Add(p => p.AMOUNT).Sum();
+                                    aggregates.Add(p => p.DAILYINT).Sum();
+                                    aggregates.Add(p => p.CUMINT).Sum();
+                                })
+                                .Model(model => model.Id(p => p.INV_KEY_ID))
+                )
+                .Columns(columns =>
+                {
+                    columns.Bound(v => v.ACT).Title("ACT").Width(70).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(v => v.VCPO).Title("VCPO").Width(70).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(v => v.PDOCNOPO).Title("PDOCNOPO").Width(70).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(v => v.DAYSOLD).Title("DAYSOLD").Width(88).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(v => v.INV_KEY_ID).Title("INV_KEY_ID").Width(92).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(v => v.AMOUNT).Title("AMOUNT").Width(88).ClientFooterTemplate("#= kendo.format('{0:c}', sum)#").HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(v => v.INVOICE).Title("INVOICE").Width(128).ClientFooterTemplate("Total Invoices: #=count#").HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(v => v.LOGDATE).Title("LOGDATE").Width(90).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(v => v.ORGCODE).Title("ORGCODE").Width(90).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(v => v.BA).Title("BA").Width(90).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(v => v.VENDNAME).Title("VENDNAME").Width(90).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(v => v.DAILYINT).Title("DAILYINT").Width(90).ClientFooterTemplate("#= kendo.format('{0:c}', sum)#").HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(v => v.CUMINT).Title("CUMINT").Width(90).ClientFooterTemplate("#= kendo.format('{0:c}', sum)#").HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(v => v.ERR_CODE).Title("ERR_CODE").Width(90).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(v => v.KEYDATE).Title("KEYDATE").Width(90).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(v => v.CONTRACT).Title("CONTRACT").Width(90).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+
+                })
+                .AutoBind(false)
+                .HtmlAttributes(new { style = "width: 1000px" })
+                .Scrollable(s => s.Height(150))
+                .Sortable()
+                .Filterable()
+                .Pageable(pageable => pageable
+                    .Input(true)
+                    .Numeric(false)
+                    .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                )
+                .Render();
+        }
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        OnChangePeriod();
+        // Without this, the navigation bar at the bottom of the grid is way too tall.
+        $('.k-pager-wrap').css('height', '45px');
+    }
+    )
+
+    function OnChangePeriod() {
+        var isRange = $("#Period").val() == "Range";
+        if (isRange)
+            $("#SearchDates").show();
+        else
+            $("#SearchDates").hide();
+    }
+
+    function GetSearchParameters() {
+        // Reserved property names
+        // used by DataSourceRequest: sort, page, pageSize, group, filter
+        return {
+            //Period: $("#Period").val(),
+            DateFrom: $("#DateFrom").val(),
+            DateTo: $("#DateTo").val()
+        };
+    }
+
+    function btnSearchOnClick() {
+        $('#gridPegasysDaysOldInvoice').data("kendoGrid").dataSource.read();
+    }
+</script>

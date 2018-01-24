@@ -1,0 +1,56 @@
+﻿@model IEnumerable<VITAP.ViewModels.TransHist.TjModel>
+
+@{
+    ViewBag.Title = "Transaction History Record : For VITAP Records Please Search by ACT #";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var rightAlignAttr = new { @style = "text-align:right" };
+}
+
+<h2>Transaction History Record : For VITAP Records Please Search by ACT #</h2>
+
+@(Html.Kendo().Grid(Model)
+    .Name("grdTransHistTj")
+    .Columns(columns =>
+    {
+        columns.Bound(c => c.SYS_DT_TM).Format("{0:d}");
+        columns.Bound(c => c.DOC_ACTN);
+        columns.Bound(c => c.XSYS_DOC_NUM);
+        columns.Bound(c => c.DOC_NUM);
+        columns.Bound(c => c.AMND_NUM);
+        columns.Bound(c => c.CLIN);
+        columns.Bound(c => c.ACTG_LNUM_CH);
+        columns.Bound(c => c.TRAN_CRCY_AM).Format("{0:c2}").HtmlAttributes(rightAlignAttr);
+        columns.Bound(c => c.FISC_YEAR);
+        columns.Bound(c => c.RFBY_DOC_NUM);
+        columns.Bound(c => c.VEND_CD);
+        columns.Bound(c => c.VEND_ADDR_CD);
+        columns.Bound(c => c.VEND_NM);
+        columns.Bound(c => c.REOR_CD);
+        columns.Bound(c => c.USER_ID);
+    })
+    .HtmlAttributes(new { style = "height: 480px;" })
+    .Pageable(pageable => pageable
+        .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+    )
+    .ToolBar(tools => tools.Excel())
+    .Sortable()
+    .Excel(excel => excel
+        .FileName("TransHistTjs.xlsx")
+        .AllPages(true)
+        .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+    )
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(10)
+        .ServerOperation(false)
+    )
+    .Resizable(resize => resize.Columns(true))
+)
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        ConfigureKendoGridPaginationControlsFor508('grdTransHistTj');
+        MakeKendoGridScrollable('grdTransHistTj', "300px");
+    });
+</script>

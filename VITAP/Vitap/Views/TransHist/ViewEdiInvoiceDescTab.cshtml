@@ -1,0 +1,8 @@
+﻿@model VITAP.ViewModels.TransHist.EDIInvoiceDescriptionModel
+@using (Html.BeginForm())
+{
+	<div class="pad10" style="width:100%;">
+        <label>Description:</label><br />
+		@Html.DisplayFor(x => x.Description, new { @class = "textAreaElastic" })
+	</div>
+}

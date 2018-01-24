@@ -1,0 +1,169 @@
+﻿@model VITAP.Data.Models.ExceptionClearedViewModel
+
+@{
+    ViewBag.Title = "Exceptions Cleared Report";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var headerAttr = new { @style = "font-weight:bold" };
+    var rightAlignAttr = new { @style = "text-align:right" };
+}
+
+@using (Html.BeginForm("Index", "ExceptionCleared", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="container-fluid">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <label style="font: bold; font-size: large">Exception Cleared Report</label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="From" class="control-label">Date From:</label>
+                                @Html.Kendo().DatePicker().Name("From").HtmlAttributes(new { style = "width: 110px" })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="To" class="control-label">Date To:</label>
+                                @Html.Kendo().DatePicker().Name("To").HtmlAttributes(new { style = "width: 110px" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="SearchValue" class="control-label">Search:</label>
+                                @Html.Kendo().TextBox().Name("SearchValue")
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="SearchCriteria">In:</label>
+                                @(Html.Kendo().DropDownList()
+                                .Name("SearchCriteria")
+                                .DataTextField("Text")
+                                .DataValueField("Value")
+                                .BindTo(new List<SelectListItem>() {
+                                    new SelectListItem { Text = "All", Value = "All" },
+                                    new SelectListItem { Text = "Prep Code", Value = "PrepCode" },
+                                    new SelectListItem { Text = "Error Code", Value = "ErrCode" }
+                                })
+                                )
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label for="ChkBox" class="control-label">Show Backend Autorun (PC = VI)</label>
+                    @Html.Kendo().CheckBox().Name("ChkBox")
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <input type="submit" name="submitButton" value="Search" class="btn btn-default" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    @{
+                        Html.Kendo().Grid(Model.ExceptCleared)
+                                .Name("grdExCleared")
+
+                                .Columns(columns =>
+                                {
+                                    columns.Bound(c => c.PREPCODE).HeaderHtmlAttributes(headerAttr);
+                                    columns.Bound(c => c.USERNAME).HeaderHtmlAttributes(headerAttr);
+                                    columns.Bound(c => c.ERROR_CODE).HeaderHtmlAttributes(headerAttr);
+                                    columns.Bound(c => c.EXCEPTION_MEMO).HeaderHtmlAttributes(headerAttr);
+                                    columns.Bound(c => c.COUNT).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr).ClientFooterTemplate("Total : #= kendo.format('{0:n0}', sum)#");
+                                })
+                                .Sortable()
+                                .ToolBar(tools => tools.Excel())
+                                .Excel(excel => excel
+                                    .FileName("ExceptionsCleared.xlsx")
+                                    .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+                                    .AllPages(true)
+                                )
+                                .Pageable(pageable => pageable
+                                    .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 }))
+                                .DataSource(dataSource => dataSource
+                                    .Ajax()
+                                    .PageSize(50)
+                                    .ServerOperation(false)
+                                    .Aggregates(aggregates =>
+                                    {
+                                        aggregates.Add(p => p.COUNT).Sum();
+                                    })
+                                    .Model(model => model.Id(p => p.COUNT))
+                                )
+                                .Render();
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+<script type="text/javascript">
+
+    $("#From").change(function () { 
+        dateChanged(this);
+    });
+
+    $("#To").change(function () {
+        dateChanged(this);
+    });
+
+    $(document).ready(function () {
+        ConfigureKendoGridPaginationControlsFor508('grdExCleared');
+        MakeKendoGridScrollable('grdExCleared', "400px");
+    });
+
+    function dateChanged(e) {
+        // If date is specified, it must be valid.
+        if (e.value) {
+            var result = true;
+            var message = "";
+            var date = kendo.parseDate(e.value);
+            if (!date) {
+                result = false;
+                message = e.value + " is an invalid date."
+            }
+
+            if (!result) {
+                kendoAlert(message, "Verify Date");
+            }
+        }
+    }
+
+</script>
+
+       
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

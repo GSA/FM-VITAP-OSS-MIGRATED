@@ -1,0 +1,30 @@
+﻿@{
+    ViewBag.Title = "ViewErrorMessage";
+}
+
+@using (Html.BeginForm())
+{
+    <div class="container">
+        <br />
+        <div class="row padBottom20">
+            <div class="col-sm-9" style="font-weight:bold; width:800px;">
+                <div class="row panel" style="width:800px">
+                    <div class="col-sm-4" style="width:800px; color:red;">
+                        <h1 style="color:red; font-weight:bold;">Error Message</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row padBottom20">
+            <div class="col-sm-9" style="font-weight:bold; width:800px;">
+                <div class="row panel" style="width:800px">
+                    <div class="col-sm-4" style="width:800px;">
+                        <h2 style="color:red; font-weight:bold;">@ViewBag.Message</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+

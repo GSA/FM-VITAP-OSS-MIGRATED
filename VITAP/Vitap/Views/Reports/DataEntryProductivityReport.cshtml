@@ -1,0 +1,285 @@
+﻿@model VITAP.Models.Reports.DataEntryProductivityReportViewModel
+@using VITAP.Library.Strings;
+
+@{
+    ViewBag.Title = "Data Entry Productivity Report";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var headerAttr = new { @style = "font-weight:bold" };
+    var rightAlignAttr = new { @style = "text-align:right" };
+    var typeColumnWidth = 100;
+}
+
+@using (Html.BeginForm("DataEntryProductivityReport", "Reports", FormMethod.Post))
+{
+<div class="container-fluid">
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <label style="font: bold; font-size: large">Data Entry Productivity Report</label>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="transactionPeriodType" class="control-label">
+                        Transactions for period:
+                    </label><br />
+                    @(Html.Kendo().RadioButton()
+                    .Name("transactionPeriodType")
+                    .Checked(Model.TransactionsForPeriodType == "1")
+                    .HtmlAttributes(new { @name = "transactionPeriodType" })
+                    .Value("1")
+                    .Label("Yesterday"))
+                    @(Html.Kendo().RadioButton()
+                    .Name("transactionPeriodType")
+                    .Checked(Model.TransactionsForPeriodType == "7")
+                    .HtmlAttributes(new { @name = "transactionPeriodType" })
+                    .Value("7")
+                    .Label(">= 7 days old"))
+                    @(Html.Kendo().RadioButton()
+                    .Name("transactionPeriodType")
+                    .Checked(Model.TransactionsForPeriodType == "30")
+                    .HtmlAttributes(new { @name = "transactionPeriodType" })
+                    .Value("30")
+                    .Label(">= 30 days old"))
+                    @(Html.Kendo().RadioButton()
+                    .Name("transactionPeriodType")
+                    .Checked(Model.TransactionsForPeriodType == "Range")
+                    .HtmlAttributes(new { @name = "transactionPeriodType" })
+                    .Value("Range")
+                    .Label("Range"))
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="FromDate" class="control-label">Date From:</label>
+                            @(Html.Kendo().DatePickerFor(x => x.FromDate)
+                            .HtmlAttributes(new { @class = "form-control" })
+                            .Format("MM/dd/yyyy")
+                            .Enable(Model.TransactionsForPeriodType == "Range")
+                            )
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="ToDate" class="control-label">Date To:</label>
+                            @(Html.Kendo().DatePickerFor(x => x.ToDate)
+                            .HtmlAttributes(new { @class = "form-control" })
+                            .Format("MM/dd/yyyy")
+                            .Enable(Model.TransactionsForPeriodType == "Range")
+                            )
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="btnSearchValidate" class="control-label">Search:</label>
+                            <button type="submit" class="btn btn-info" name="btnSearchValidate" id="btnSearchValidate" onclick="return dateSearchValidate()">Search</button>
+                            <button type="submit" name="btnDateSearch" id="btnDateSearch" hidden="hidden"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-2 text-right">
+                <div class="form-group">
+                    <label for="GrandTotal">Grand Total:</label>
+                    @Html.DisplayFor(x => x.GrandTotal)
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <label>Indexed:</label>
+                @{
+                    Html.Kendo().Grid(Model.IndexedRecords)
+                                .Name("indexedGrid")
+                                .Columns(columns =>
+                                {
+                                    columns.Bound(x => x.Name).Width(120).HeaderHtmlAttributes(headerAttr);
+                                    columns.Bound(x => x.PC).Width(40).HeaderHtmlAttributes(headerAttr);
+                                    columns.Bound(x => x.Total).Width(60).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(x => x.PO).Width(typeColumnWidth).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(x => x.RR).Width(typeColumnWidth).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(x => x.NonTops).Width(typeColumnWidth).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(x => x.Vcpo).Width(typeColumnWidth).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(x => x.Tops).Width(typeColumnWidth).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(x => x.Misc).Width(typeColumnWidth).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(x => x.Acrn).Width(typeColumnWidth).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(x => x.ThreeEightEightOne).Width(typeColumnWidth).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(x => x.Bid).Width(typeColumnWidth).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(x => x.Cncs).Width(typeColumnWidth).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(x => x.Jv).Width(typeColumnWidth).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(x => x.Mipr).Width(typeColumnWidth).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(x => x.Outl).Width(typeColumnWidth).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(x => x.Opac).Width(typeColumnWidth).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(x => x.Pd).Width(typeColumnWidth).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(x => x.RecY).Width(typeColumnWidth).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(x => x.Rwa).Width(typeColumnWidth).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(x => x.PDir).Width(typeColumnWidth).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(x => x.Rei).Width(typeColumnWidth).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(x => x.Noc).Width(typeColumnWidth).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(x => x.Ipac).Width(typeColumnWidth).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                })
+                                .Scrollable()
+                                .Render();
+                }
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-10">
+            </div>
+            <div class="col-md-2 text-right">
+                <div class="form-group">
+                    <label for="GrandTotalIndexed">Total Indexed:</label>
+                    @Html.DisplayFor(x => x.GrandTotalIndexed)
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <label>Keyed:</label>
+                @{
+                    Html.Kendo().Grid(Model.KeyedRecords)
+                                .Name("keyedGrid")
+                                .Columns(columns =>
+                                {
+                                    columns.Bound(x => x.Name).Width(120).HeaderHtmlAttributes(headerAttr);
+                                    columns.Bound(x => x.PC).Width(40).HeaderHtmlAttributes(headerAttr);
+                                    columns.Bound(x => x.Total).Width(60).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(x => x.PO).Width(typeColumnWidth).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(x => x.RR).Width(typeColumnWidth).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(x => x.NonTops).Width(typeColumnWidth).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(x => x.Vcpo).Width(typeColumnWidth).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(x => x.Tops).Width(typeColumnWidth).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(x => x.Misc).Width(typeColumnWidth).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(x => x.Rwa).Width(typeColumnWidth).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                })
+                                .Scrollable()
+                                .Render();
+                }
+            </div>
+        </div>
+    
+        <div class="row">
+            <div class="col-md-10">
+            </div>
+            <div class="col-md-2 text-right">
+                <div class="form-group">
+                    <label for="GrandTotalKeyed">Total Keyed:</label>
+                    @Html.DisplayFor(x => x.GrandTotalKeyed)
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <button type="submit" class="btn btn-info" style="width:auto; margin-top:0px;" name="btnSaveToFile" id="btnSaveToFile" @(Model.IndexedRecords.Count + Model.KeyedRecords.Count == 0 ? "readonly disabled" : "")>Save To File</button>
+                <button type="button" class="btn btn-info" style="width:auto; margin-top:0px;" name="btnToBeKeyedIndexed" id="btnToBeKeyedIndexed">To Be Keyed/Indexed</button>
+            </div>
+        </div>
+    </div>
+</div>
+@Html.HiddenFor(m => m.TransactionsForPeriodType);
+@Html.HiddenFor(m => m.AssignedService);
+@Html.HiddenFor(m => m.SaveToFile);
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#FromDate").change(function () {
+            dateChanged(this);
+        });
+        $("#ToDate").change(function () {
+            dateChanged(this);
+        });
+
+        $('#btnSaveToFile').click(function () {
+            $("#SaveToFile").val("true");
+            return true;
+        });
+
+	    $('#btnToBeKeyedIndexed').click(function () {
+	        window.location = '@Url.Action("DataEntryProductivityReportKeyedIndexedDetail", "Reports")';
+	    });
+
+        updateColumnHeadersForAssignedService('@Model.AssignedService');
+    });
+
+    $(document).on("change", "input[name=transactionPeriodType]", function () {
+        if (this.value == "Range") {
+            disableDateRangeFields(false);
+        } else {
+            disableDateRangeFields(true);
+        }
+    })
+
+    function dateChanged(e) {
+        // If date is specified, it must be valid.
+        if (e.value) {
+            var result = true;
+            var message = "";
+            var date = kendo.parseDate(e.value);
+            if (!date) {
+                result = false;
+                message = e.value + " is an invalid date."
+            }
+            if (!result) {
+                kendoAlert(message, "Verify Date");
+            }
+        }
+    }
+
+    function disableDateRangeFields(disabled) {
+        $('#FromDate').prop("disabled", disabled);
+        $('#FromDate').data('kendoDatePicker').enable(!disabled);
+        $('#ToDate').prop("disabled", disabled);
+        $('#ToDate').data('kendoDatePicker').enable(!disabled);
+    }
+
+    function updateColumnHeadersForAssignedService(assignedService) {
+        if (assignedService == "PBS") {
+            $('#indexedGrid th[data-field=NonTops]').html('@DataEntryProductivityReport.HeaderNonConst');
+            $('#indexedGrid th[data-field=Tops]').html('@DataEntryProductivityReport.HeaderConst');
+            $('#keyedGrid th[data-field=NonTops]').html('@DataEntryProductivityReport.HeaderNonConst');
+            $('#keyedGrid th[data-field=Tops]').html('@DataEntryProductivityReport.HeaderConst');
+        } else if (assignedService != "FTS") {
+            $('#indexedGrid th[data-field=NonTops]').html('@DataEntryProductivityReport.HeaderNonTopsConst');
+            $('#indexedGrid th[data-field=Tops]').html('@DataEntryProductivityReport.HeaderTopsConst');
+            $('#keyedGrid th[data-field=NonTops]').html('@DataEntryProductivityReport.HeaderNonTopsConst');
+            $('#keyedGrid th[data-field=Tops]').html('@DataEntryProductivityReport.HeaderTopsConst');
+        }
+        // FTS service uses the default Non-TOPS/TOPS column headers.
+    }
+
+    function dateSearchValidate(event) {
+        // Range search requires dates.
+        var optionValue = $('input[name=transactionPeriodType]:checked').val()
+        if (optionValue == "Range") {
+            var message = "";
+            if ($('#FromDate').val().replace(/^\s+|\s+$/g, "").length == 0) {
+                message = "Date From<br>";
+            }
+            if ($('#ToDate').val().replace(/^\s+|\s+$/g, "").length == 0) {
+                message = "Date To<br>";
+            }
+            if (message) {
+                kendoAlert(message, "Missing Date Fields");
+                return false;
+            }
+        }
+
+        // Fall through success.
+        $('#TransactionsForPeriodType').val(optionValue);
+        $('#SaveToFile').val("");
+        $("#btnDateSearch").click();
+        return false;
+    }
+</script>

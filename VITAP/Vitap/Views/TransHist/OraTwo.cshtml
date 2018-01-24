@@ -1,0 +1,93 @@
+﻿@model IEnumerable<VITAP.Data.Models.TransHist>
+@using VITAP.Data
+@using VITAP.ViewModels.TransHist
+
+@{
+    ViewBag.Title = "Transaction History Record";
+    Layout = "~/Views/Shared/_LayoutWithoutNavi.cshtml";
+}
+<h2>@ViewBag.Caption</h2>
+
+@(Html.Kendo().Grid(Model)
+        .Name("grdTransHist")
+        .Columns(columns =>
+        {
+            columns.Command(v => v.Custom("Select").Click("grdTransHistSelected")).Title("Action");
+            columns.Bound(v => v.TRANSDATE).Title("Trans Date");
+            columns.Bound(v => v.TRANSTIME).Title("Trans Time");
+            columns.Bound(v => v.ACT).Title("ACT");
+            columns.Bound(v => v.PDOCNO).Title("PDocNo");
+            columns.Bound(v => v.INVOICE).Title("Invoice");
+            columns.Bound(v => v.PO_ID).Title("PO ID");
+            columns.Bound(v => v.RR_ID).Title("RR ID");
+            columns.Bound(v => v.INV_KEY_ID).Title("INV KEY ID");
+            columns.Bound(v => v.AE_ID).Title("AE ID");
+            columns.Bound(v => v.PA_ID).Title("PA ID");
+            columns.Bound(v => v.AC_ID).Title("AC ID");
+            columns.Bound(v => v.ERR_CODE).Title("Err Code");
+            columns.Bound(v => v.ERR_RESPONSE).Title("Err Response");
+            columns.Bound(v => v.CLEARED_DATE).Title("Cleared Date");
+            columns.Bound(v => v.PREPCODE).Title("PC");
+            columns.Bound(v => v.ALLPROCESS).Title("All Process");
+        })
+        .HtmlAttributes(new { style = "margin-top: 6px;" })
+        .Pageable(pageable => pageable
+            .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+            )
+        .Selectable()
+        .ToolBar(tools => tools.Excel())
+        .Excel(excel => excel
+            .FileName("TransHistListOraTwo.xlsx")
+            .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+            .AllPages(true)
+        )
+        .Sortable()
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .PageSize(10)
+            .ServerOperation(false)
+            .Model(model => model.Id(item => item.TH_ID))
+            )
+            .Resizable(resize => resize.Columns(true))
+            .Events(events => events.Change("grdTransHistChanged"))
+)
+<fieldset>
+    <legend>Memo</legend>
+    <span id="lblMemo"></span>
+</fieldset>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var grdTransHist = $("#grdTransHist").data("kendoGrid");
+        if (grdTransHist != null) {
+            var transHistGridId = "grdTransHist";
+            ConfigureKendoGridPaginationControlsFor508(transHistGridId);
+            MakeKendoGridScrollable(transHistGridId, "380px");
+        }
+    });
+
+    // When user selects one record in the grid
+    function grdTransHistChanged() {
+        var grid = $("#grdTransHist").data("kendoGrid");
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        grdTransHistSelecting(dataItem);
+    }
+
+    function grdTransHistSelected(e) {
+
+        // Highlight the row when "Select" button clicked
+        $("#grdTransHist table tr").removeClass('k-state-selected');
+        $(e.currentTarget).closest("tr").addClass('k-state-selected');
+
+        // Get the data from the current row
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        grdTransHistSelecting(dataItem);
+    }
+
+    function grdTransHistSelecting(dataItem) {
+        $("#lblMemo").html(dataItem.CUFF_MEMO);
+    }
+</script>
+

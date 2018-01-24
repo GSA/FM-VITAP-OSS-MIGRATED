@@ -1,0 +1,93 @@
+﻿@model VITAP.Data.Models.Exceptions.MainExPOTabModel
+
+@{ 
+    var attrText = new { @class = "" };
+    var attrTextRight = new { @class = " text-right" };
+    var attrLabel = new { @class = "control-label" };
+}
+
+<div id="tabPO" class="container-fluid peg-main-ex">
+    <div class="row no-buffer">
+        <div class="col-xs-2 sm-buffer">
+            @Html.LabelFor(m => m.VendorCode, attrLabel)<br/>
+            @Html.TextBoxFor(m => m.VendorCode, attrText)<br />
+            @Html.LabelFor(m => m.RemitVendorCode, attrLabel)<br />
+            @Html.TextBoxFor(m => m.RemitVendorCode, attrText)<br />
+            @Html.LabelFor(m => m.VendorName, attrLabel)<br />
+            @Html.TextBoxFor(m => m.VendorName, attrText)<br />
+            <label for="VendorAddress1" class="control-label sr-only">Remit Vendor Address</label>
+            @Html.TextBoxFor(m => m.VendorAddress1, attrText)<br />
+            <label for="VendorAddress2" class="control-label sr-only">Remit Vendor Address 2</label>
+            @Html.TextBoxFor(m => m.VendorAddress2, attrText)<br />
+            <label for="VendorAddress3" class="control-label sr-only">Remit Vendor Address 3</label>
+            @Html.TextBoxFor(m => m.VendorAddress3, attrText)<br />
+            <label for="VendorCityStateZip" class="control-label sr-only">Remit Vendor City State Zipcode</label>
+            @Html.TextBoxFor(m => m.VendorCityStateZip, attrText)<br />
+        </div>
+        <div class="col-xs-2 sm-buffer">
+            @Html.LabelFor(m => m.PegasysDocumentNumber, attrLabel)<br />
+            @Html.TextBoxFor(m => m.PegasysDocumentNumber, attrText)<br />
+            @Html.LabelFor(m => m.PurchaseOrderNumber, attrLabel)<br />
+            @Html.TextBoxFor(m => m.PurchaseOrderNumber, attrText)<br />
+            @Html.LabelFor(m => m.ContractNumber, attrLabel)<br />
+            @Html.TextBoxFor(m => m.ContractNumber, attrText)<br />
+            @Html.LabelFor(m => m.NetDays, attrLabel)<br />
+            @Html.TextBoxFor(m => m.NetDays, attrText)<br />
+            @Html.LabelFor(m => m.PPA, attrLabel)<br />
+            @Html.TextBoxFor(m => m.PPA, attrText)<br />
+            <div class="container sm-buffer" style="margin-left:10px">
+                <div class="row">
+                    <label class="sm-buffer">
+                        Period of Performance
+                    </label>
+                </div>
+                <div class="row">
+                    <div class="col-xs-5 sm-buffer">
+                        @Html.LabelFor(m => m.PopStartDate, attrLabel)<br />
+                        @Html.TextBoxFor(m => m.PopStartDate, attrText)
+                    </div>
+                    <div class="col-xs-5 sm-buffer">
+                        @Html.LabelFor(m => m.PopEndDate, attrLabel)<br />
+                        @Html.TextBoxFor(m => m.PopEndDate, attrText)
+                    </div>
+                    <div class="col-xs-6"></div>
+                </div>
+
+            </div>
+        </div>
+        <div class="col-xs-2 sm-buffer">
+            @Html.LabelFor(m => m.ActNumber, attrLabel)<br />
+            @Html.TextBoxFor(m => m.ActNumber, attrText)<br />
+            @Html.LabelFor(m => m.NetOrder, attrLabel)<br />
+            @Html.TextBoxFor(m => m.NetOrder, attrTextRight)<br />
+            @Html.LabelFor(m => m.UnpaidBalance, attrLabel)<br />
+            @Html.TextBoxFor(m => m.UnpaidBalance, attrTextRight)<br />
+            @Html.LabelFor(m => m.UnaccruedBalance, attrLabel)<br />
+            @Html.TextBoxFor(m => m.UnaccruedBalance, attrTextRight)<br />
+            @Html.LabelFor(m => m.TotalDiscount, attrLabel)<br />
+            @Html.TextBoxFor(m => m.TotalDiscount, attrText)<br />
+        </div>
+        <div class="col-xs-2" style = "margin-top: 20px;">
+            <label>
+                @Html.CheckBoxFor(m => m.IsVCPO, new { @class = "check-box" })&nbsp;<label for="IsVCPO" class="control-label">VCPO</label>
+            </label>
+            <button type="button" id="btnViewPO" class="btn btn-default" style="margin-top: 180px">View PO</button><br />
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $().ready(function () {
+        $('#tabPO :input').attr('disabled', 'disabled');
+        $("#tabPO :input.check-box").attr("disabled", true);
+        if ('@Model.BtnPO.Enabled' != 'True')
+            $('#btnViewPO').attr('disabled', 'disabled');
+        else
+            $('#btnViewPO').removeAttr('disabled');
+    });
+
+    $("#btnViewPO").on("click", function () {
+        var url = '@Url.Action("ViewPO", "TransHist", new { po_Id = Model.BtnPO.Id })';
+        window.location = url;
+    });
+</script>

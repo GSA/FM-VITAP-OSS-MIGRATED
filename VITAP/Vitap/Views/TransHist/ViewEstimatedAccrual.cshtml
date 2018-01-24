@@ -1,0 +1,152 @@
+﻿@model VITAP.ViewModels.TransHist.EstimatedAccrualModel
+
+@{
+    ViewBag.Title = "Pegasys Estimated Accrual";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (Model == null)
+{
+    <span class="validationWarning">No Data found</span>
+}
+else
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $('#viewTj').click(function () {
+                var url = '@Html.Raw(Url.Action("viewtj", "transhist", new { pDocNo = Model.PDocNo, aeId = Model.AeId }))';                
+                var eaId = '@Model.AeId';                
+                if(!eaId.match(/C$/)){
+                    url = '@Url.Action("viewtj", "transhist", new { pDocNo = Model.AeId })';
+                }                
+                url = url.replace('&amp;', '&');
+                window.location.href = url;
+            });
+        });
+    </script>
+
+    <div class="container">
+        <br />
+        <h1 class="bold padBottom20">Pegasys Estimated Accrual</h1>
+        <div class="row panel">
+            <div class="col-sm-6">
+                @Html.LabelFor(x => x.ACT)<br />
+                @Html.DisplayFor(x => x.ACT, new { @disabled = "" })<br />
+                @Html.LabelFor(x => x.AeId)<br />
+                @Html.DisplayFor(x => x.AeId, new { @disabled = "" })<br />
+                @Html.LabelFor(x => x.PDocNo)<br />
+                @Html.DisplayFor(x => x.PDocNo, new { @disabled = "" })
+            </div>
+            <div class="col-sm-6">
+                @Html.LabelFor(x => x.RemitVendor)<br />
+                @Html.DisplayFor(x => x.RemitVendor)<br /><br />
+                @Html.LabelFor(x => x.NameAddressLine1)<br />
+                @Html.DisplayFor(x => x.NameAddressLine1)<br />
+                @Html.DisplayFor(x => x.NameAddressLine2)<br />
+                @Html.DisplayFor(x => x.NameAddressLine3)<br />
+                @Html.DisplayFor(x => x.NameAddressLine4)
+            </div>
+        </div>
+        <div class="row panel">
+            <div class="col-sm-6">
+                @Html.LabelFor(x => x.EstimateAccrualAmt)<br />
+                @Html.DisplayFor(x => x.EstimateAccrualAmt, new { @disabled = "" })<br />
+                @Html.LabelFor(x => x.EstimateAccrOpenAmt)<br />
+                @Html.DisplayFor(x => x.EstimateAccrOpenAmt, new { @disabled = "" })<br />
+                @Html.LabelFor(x => x.VendId)<br />
+                @Html.DisplayFor(x => x.VendId, new { @disabled = "" })<br />
+                @Html.LabelFor(x => x.RemitVendId)<br />
+                @Html.DisplayFor(x => x.RemitVendId, new { @disabled = "" })<br />
+            </div>
+            <div class="col-sm-6">
+                @Html.LabelFor(x => x.PoNumber)<br />
+                @Html.DisplayFor(x => x.PoNumber)<br />
+                @Html.LabelFor(x => x.ContractNumber)<br />
+                @Html.DisplayFor(x => x.ContractNumber)<br />
+
+                @if (!Model.HideContractSpecialist)
+                {
+                    @Html.LabelFor(x => x.ContractSpecialist)<br />
+                    @Html.DisplayFor(x => x.ContractSpecialist)<br />
+                }
+
+            </div>
+        </div>
+        <div class="row panel">
+            <div class="bold col-sm-6">
+                <h1>PO Amounts</h1>
+            </div>
+            <div class="bold col-sm-6">
+                <h1>Period of Performance</h1>
+            </div>
+        </div>
+        <div class="row panel padBottom20">
+            <div class="col-sm-3">
+                @Html.LabelFor(x => x.OrderAmount)<br />
+                @Html.DisplayFor(x => x.OrderAmount, new { @disabled = "" })<br />
+                @Html.LabelFor(x => x.UndeliveredOrder)<br />
+                @Html.DisplayFor(x => x.UndeliveredOrder, new { @disabled = "" })
+            </div>
+            <div class="col-sm-3">
+                @Html.LabelFor(x => x.AccruedAmount)<br />
+                @Html.DisplayFor(x => x.AccruedAmount, new { @disabled = "" })<br />
+                @Html.LabelFor(x => x.PaymentAmount)<br />
+                @Html.DisplayFor(x => x.PaymentAmount, new { @disabled = "" })
+            </div>
+            <div class="col-sm-3">
+                @Html.LabelFor(x => x.StartDatePeriodOfPerformance)<br />
+                @Html.DisplayFor(x => x.StartDatePeriodOfPerformance, new { @disabled = "" })<br />
+            </div>
+            <div class="col-sm-3">
+                @Html.LabelFor(x => x.EndDatePeriodOfPerformance)<br />
+                @Html.DisplayFor(x => x.EndDatePeriodOfPerformance, new { @disabled = "" })<br />
+                @Html.LabelFor(x => x.StampDate, "Finance Received Date")<br />
+                @Html.DisplayFor(x => x.StampDate, new { @disabled = "" })
+            </div>
+        </div>
+        <div class="row padBottom20">
+            <div class="col-sm-12">
+                @{Html.Kendo().TabStrip()
+                        .Name("tsTabs")
+                        .Items(items =>
+                        {
+
+                            items.Add().Text("AE Detail")
+                            .Content(Html.Partial("ViewEstimatedAccrualAEDetailTab", Model.EstimatedAccrualAEDetailModels).ToHtmlString());
+                            if (!Model.AeId.StartsWith("UE"))
+                            {
+                                items.Add().Text("AE Accounting")
+                                .Content(Html.Partial("ViewEstimatedAccrualAEAccountingTab", Model.EstimatedAccrualAEAccountingModels).ToHtmlString());
+                            }
+                            else
+                            {
+                                items.Add().Text("AE Accounting")
+                                .Content(Html.Partial("ViewEstimatedAccrualAEAccountingTabWithUE", Model.EstimatedAccrualAEAccountingModels).ToHtmlString());
+                            }
+                            //items.Add().Text("Other Information")
+                            //    .Content(Html.Partial("ViewEstimatedAccrualOtherInformationTab", Model.EstimatedAccrualOtherInformationModel).ToHtmlString());
+                        })
+                        .SelectedIndex(0)
+                        .Render();
+                }
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-10">
+                @Html.LabelFor(x => x.Status) @Html.DisplayFor(x => x.Status) @Html.LabelFor(x => x.ReceivedBy) @Html.DisplayFor(x => x.ReceivedBy)
+            </div>
+            <div class="col-sm-2 text-right">
+                <button type="button" class="btn btn-info" command="viewTj" id="viewTj" style="@(!Model.HideViewTJButton ? "" : "display:none")">View TJ</button>
+                <!-- OMIT PER RON -->
+                @*<button type="button" class="btn btn-info" command="viewImage" id="viewImage">View Image</button>*@
+            </div>
+        </div>
+    </div>
+
+    @Html.HiddenFor(x => x.Command)
+                    @Html.HiddenFor(x => x.AeId)
+                    @Html.HiddenFor(x => x.PDocNo)
+                    @Html.HiddenFor(x => x.ACT)
+
+                    }

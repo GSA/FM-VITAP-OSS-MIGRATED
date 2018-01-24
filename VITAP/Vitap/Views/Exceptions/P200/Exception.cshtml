@@ -1,0 +1,703 @@
+﻿@using VITAP.Data.Models.Exceptions
+@model ExceptionP200ViewModel
+
+@{
+    ViewBag.Title = "Pegasys Exception (" + Model.ErrorCode + " - " + Model.Memo;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var headerAttr = new { @style = "font-weight:bold" };
+    var textAttr = new Dictionary<string, object> { { "style", "width:140px" }, { "disabled", "" } };
+    var textAttrRW = new Dictionary<string, object> { { "style", "width:140px" } };
+    var textAttrRight = new Dictionary<string, object> { { "style", "width:140px; text-align: right;" }, { "disabled", "" } };
+    var textAttrShort = new Dictionary<string, object> { { "style", "width:100px" }, { "disabled", "" } };
+    var textAttrMedium = new Dictionary<string, object> { { "style", "width:200px" }, { "disabled", "" } };
+    var textAttrMediumRight = new Dictionary<string, object> { { "style", "width:200px; text-align: right;" }, { "disabled", "" } };
+    var textAttrLong = new Dictionary<string, object> { { "style", "width:300px" }, { "disabled", "" } };
+    var textAttrLongRW = new Dictionary<string, object> { { "style", "width:300px" } };
+
+    var ddlSearchIn = ViewBag.ddlSearchIn as List<SelectListItem>;
+
+}
+
+<style>
+    .marginleft {
+        margin-left: 20pt;
+    }
+    .scrollable-container {
+        width: 300px;
+        height: 60px;
+        overflow-y: scroll;
+        overflow-x:hidden;
+    }
+
+    .k-grid table {
+        table-layout: fixed; /*Not sure I want to apply this to whole site*/
+    }
+</style>
+
+<h1 style="font-weight: bold">@string.Format("{0} | Pegasys Exception ({1}) - {2}", Model.InvKeyId, Model.ErrorCode, Model.Memo)</h1>
+<br />
+
+<div class="container-fluid">
+    <div class="row no-buffer">
+        <div class="col-md-5 edi hide" style="border: solid; border-color: black; margin-right: 5px; padding-bottom: 400px;">
+            <div class="container-fluid no-buffer">
+                <div class="row no-buffer">
+                    <div class="col-md-10" style="text-align: center">
+                        <br />
+                        <h2><b>Electronic Data</b></h2>
+                        <br />
+                    </div>
+                </div>
+                <div class="row no-buffer">
+                    <div class="col-md-5 no-buffer">
+                        <label for="PegInv_INV_KEY_ID">
+                            Doc Number
+                        </label><br />
+                        @Html.DisplayFor(m => m.PegInv.INV_KEY_ID, textAttrMedium)<br />
+                        <label for="PegInv_PONUMBER">
+                            PO Number
+                        </label><br />
+                        @Html.DisplayFor(m => m.PegInv.PONUMBER, textAttrMedium)<br />
+                        <label for="PegInv_CONTRACT">
+                            Contract
+                        </label><br />
+                        @Html.DisplayFor(m => m.PegInv.CONTRACT, textAttrMedium)<br />
+                        <label for="ModNumber">
+                            Mod Number
+                        </label><br />
+                        <span id="ModNumber"></span><br />
+                    </div>
+                    <div class="col-md-3 ">
+                        <label class="">
+                            Act Number
+                        </label><br />
+                        @Html.DisplayFor(m => m.PegInv.ACT)<br />
+                        <label class="">
+                            Amount
+                        </label><br />
+                        @Html.DisplayFor(m => m.PegInv.AMOUNT, textAttrMediumRight)<br />
+                        <label class="">
+                            Invoice
+                        </label><br />
+                        @Html.DisplayFor(m => m.PegInv.INVOICE, textAttrMedium)<br />
+                    </div>
+                </div>
+            </div>
+            <div class="row no-buffer">
+                <div class="col-md-12">
+                    <label for="PegInv_VEND_CD">
+                        Vendor Code<br />
+                    </label><br />
+                    <div style="width:300px" disabled="">
+                        @string.Format("{0}&{1}", Model.PegInv.VEND_CD, Model.PegInv.VEND_ADDR_CD)
+                    </div>
+                    <br />
+                    <label for="RemitVendorCode">
+                        Remit Vendor Code<br />
+                    </label><br />
+                    <div style="width:300px" disabled="">
+                        @string.Format("{0}&{1}", Model.PegInv.VEND_CD, Model.PegInv.VEND_ADDR_CD)
+                    </div>
+                    <br />
+                    <label for="PegInv_VENDNAME">
+                        Remit Vendor<br />
+                    </label><br />
+                    @Html.DisplayFor(m => m.PegInv.VENDNAME, textAttrLong)<br />
+                    @Html.DisplayFor(m => m.PegInv.ADDR_L1, textAttrLong)
+                    @Html.DisplayFor(m => m.PegInv.ADDR_L2, textAttrLong)
+                    @Html.DisplayFor(m => m.PegInv.ADDR_L3, textAttrLong)
+                    <div>
+                        @string.Format("{0}, {1} {2}", Model.PegInv.ADDR_CITY
+                        , Model.PegInv.ADDR_STATE, Model.PegInv.ADDR_ZPCD)
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <label>Search For:</label>
+                @Html.TextBox("txtSearchFor")
+                <label>In:</label>
+                @Html.DropDownList("txtSearchIn", ddlSearchIn, new { width = "80px" })
+                <br />
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <button type="button" id="btnChangeAct" class="btn btn-info">Change Act</button>
+                    <button type="button" id="btnChangePDocNo" class="btn btn-info">Change PDocNo</button>
+                    <button type="button" id="btnViewDocument" class="btn btn-info">View Document</button>
+                    <button type="button" id="btnViewImage" class="btn btn-info">View Image</button>
+                    <button type="button" id="btnSearch" class="btn btn-info">Search</button>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-12">
+                    @{ 
+                        Html.Kendo().Grid<X200Model>()
+                            .Name("P200Grid")
+                            .DataSource(dataSource => dataSource
+                                .Ajax()
+                                .Sort(sort => sort.Add("PDOCNO").Ascending())
+                                .Model(model => model.Id(o => o.PDOCNO))
+                                .Read(r => r
+                                    .Action("P200Search", "Exceptions")
+                                    .Data("GetP200SearchParameters")
+                                )
+                            )
+                            .AutoBind(false)
+                            .Selectable(s => s.Mode(GridSelectionMode.Single))
+                            .Pageable(pageable => pageable
+                                .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                            // Get rid of "No items to display" in grid status.
+                            //.Messages(m => m.Empty(""))
+                            )
+                            .Excel(excel => excel
+                                .FileName("Export.xlsx")
+                                .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+                                .AllPages(true)
+                            )
+                            .Events(events => events.Change("grdP200Change"))
+                            .Columns(c =>
+                            {
+                                c.Command(x => x.Custom("Select").Click("P200Selected")).Title("Action").Width(85).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.ISPEG).Width(80).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.ACT).Width(140).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.PDOCNO).Width(120).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.DOC_DT).Format("{0:MM/dd/yyyy}").Width(150).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.AMOUNT).Format("{0:n2}").Width(80).HeaderHtmlAttributes(headerAttr).HtmlAttributes(new { style = "text-align: right;" });
+                                c.Bound(x => x.VENDNAME).Width(120).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.ADDR_L1).Width(120).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.ADDR_L2).Width(120).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.ADDR_L3).Width(120).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.ADDR_CITY).Width(80).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.ADDR_STATE).Width(50).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.ADDR_ZPCD).Width(100).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.RMIT_VEND).Width(140).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.CONTRACT).Width(140).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.PONUMBER).Width(140).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.DSCR).Width(500).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.UIDY).Width(325).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.PODTYP).Width(120).HeaderHtmlAttributes(headerAttr);
+                                c.Bound(x => x.CLSD_FL).Width(80).HeaderHtmlAttributes(headerAttr);
+                            })
+                            .HtmlAttributes(new { style="width: 650px;" })
+                            .ToolBar(tools => tools.Excel())
+                            .Excel(excel => excel
+                                .FileName("P200-Exceptions-" + DateTime.Today.ToString("yyyy-MM-dd") + ".xlsx")
+                                .ProxyURL(Url.Action("Excel_Export_Save"))
+                                .AllPages(true)
+                            )
+                            .Render();
+                    }
+                </div>
+            </div>
+            <br />
+            <div class="row no-buffer">
+                <div class="col-sm-3 no-buffer">
+                    <label for="ActNumber" style="margin-right: 60px">Act<br /></label>
+                    @Html.TextBoxFor(m => m.ActNumber, textAttr)
+                </div>
+                <div class="col-sm-5 no-buffer">
+                    <label for="PegasysDocumentNumber">Pegasys PO Doc No<br /></label>
+                    @Html.TextBoxFor(m => m.PegasysDocumentNumber, textAttrLong)
+                </div>
+                <div class="col-sm-3 no-buffer" style="margin-left: 5px;">
+                    <label for="PurchaseOrderDocumentType">PO Doc Type<br /></label>
+                    @Html.TextBoxFor(m => m.PurchaseOrderDocumentType, textAttrShort)
+                </div>
+            </div>
+            <div class="row no-buffer" style="margin-top: 10px;">
+                <div class="col-md-6 no-buffer">
+                    @Html.LabelFor(m => m.PurchaseOrderNumber)<br/>
+                    @Html.TextBoxFor(m => m.PurchaseOrderNumber, textAttrLong)<br />
+                    @Html.LabelFor(m => m.ContractNumber)<br />
+                    @Html.TextBoxFor(m => m.ContractNumber, textAttrLong)<br />
+                    @Html.LabelFor(m => m.VendorCode)<br />
+                    @Html.TextBoxFor(m => m.VendorCode, textAttrLong)<br />
+                    @Html.LabelFor(m => m.RemitVendorCode)<br />
+                    @Html.TextBoxFor(m => m.RemitVendorCode, textAttrLong)<br />
+                    @Html.LabelFor(m => m.VendorName)<br />
+                    @Html.TextBoxFor(m => m.VendorName, textAttrLong)
+                    <label for="VendorAddress1" class="sr-only">Remit Vendor Address 1</label><br />
+                    @Html.TextBoxFor(m => m.VendorAddress1, textAttrLong)
+                    <label for="VendorAddress2" class="sr-only">Remit Vendor Address 2</label><br />
+                    @Html.TextBoxFor(m => m.VendorAddress2, textAttrLong)
+                    <label for="VendorAddress3" class="sr-only">Remit Vendor Address 3</label><br />
+                    @Html.TextBoxFor(m => m.VendorAddress3, textAttrLong)
+                    <label for="VendorCityStateZip" class="sr-only">Remit Vendor City State Zipcode</label><br />
+                    @Html.TextBoxFor(m => m.VendorCityStateZip, textAttrLong)
+                </div>
+                <div class="col-md-6">
+                    @Html.LabelFor(m => m.Amount)<br />
+                    @Html.TextBoxFor(m => m.Amount, textAttrMediumRight)<br />
+                    @Html.LabelFor(m => m.Invoice)<br />
+                    @Html.TextBoxFor(m => m.Invoice, textAttrMedium)<br />
+                    <br /><br />
+                    @Html.LabelFor(m => m.ResponseNotes)<br />
+                    @Html.TextAreaFor(m => m.ResponseNotes, new { @rows = 5, @style = "width: 300px;", @disabled = "disabled" })
+                </div>
+            </div>
+            <div class="row no-buffer pull-right">
+                <div class="col-sm-12">
+                    <button type = "button" id="btnSkip" class="btn btn-info">Skip</button>
+                    <button type = "button" id="btnTransHist" class="btn btn-info">TransHist</button>
+                    <button type = "button" id="btnViewPO" class="btn btn-info">View PO</button>
+                </div>
+            </div>
+            <div class="row no-buffer pull-right">
+                <div class="col-sm-12">
+                    <button type = "button" id="btnPoMatch" class="btn btn-info">PO Match</button>
+                    <button type = "button" id= "btnPoRequest" class="btn btn-info">PO Request</button>
+                    <button type = "button" id= "btnRoute" class="btn btn-info">Route</button>
+                    <button type = "button" id="btnReject" class="btn btn-info">Reject</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.Hidden("OriginalAct", Model.OriginalActNumber)
+@Html.Hidden("OriginalPDocNo", Model.OriginalPegasysDocumentNumber)
+
+<script type = "text/javascript" >
+
+    $(document).ready(function ()
+        {
+            ConfigureKendoGridPaginationControlsFor508('P200Grid');
+            MakeKendoGridScrollable("P200Grid", "200px");
+            var isEdi = '@Model.PegInv.EDI_IND' == 'T';
+            if (isEdi)
+            {
+            $('#btnViewImage').attr('disabled', 'disabled');
+            $('.edi').removeClass('hide');
+            // Make status bar height taller when EDI since messages wrap and will be obscured.
+            $('.k-pager-wrap').css('min-height', '60px');
+            }
+            else
+            {
+            $('#P200Grid').css('width', '1100px')
+                $('.edi').hide();
+            // Make status bar height shorter when not EDI since messages have enough space and don't wrap.
+            $('.k-pager-wrap').css('max-height', '30px');
+            }
+
+        $('#P200Grid').data().kendoGrid.bind('dataBound', function(e) {
+                this.element.find('tbody tr:first').addClass('k-state-selected')
+            var grdP200 = $("#P200Grid").data("kendoGrid");
+                grdP200.select();
+                grdP200Change();
+            })
+
+            ResetErrors();
+        });
+
+    function P200Selected(e)
+        {
+            e.preventDefault();
+        $("#P200Grid table tr").removeClass('k-state-selected');
+        $(e.currentTarget).closest("tr").addClass('k-state-selected');
+            var row = this.dataItem($(e.currentTarget).closest("tr"));
+            grdP200Select(row);
+        }
+
+        function GetSelectedRow()
+        {
+            var grid = $('#P200Grid').data('kendoGrid');
+            var row = grid.dataItem(grid.select());
+            return row;
+        }
+
+        function grdP200Selected(e)
+        {
+            // Highlight the row when "Select" button clicked
+            var grid = $('#P200Grid').data('kendoGrid');
+            var row = $(e.currentTarget).closest("tr");
+        $("#P200Grid table tr").removeClass('k-state-selected');
+            row.addClass('k-state-selected');
+
+            grid.select(row);
+            // Get the data from the current row
+            var dataItem = grid.dataItem($(e.currentTarget).closest("tr"));
+            grdP200Change(dataItem);
+        }
+
+        // When user selects one record in the grid
+        function grdP200Change(dataItem)
+        {
+            ResetErrors();
+            var row = GetSelectedRow();
+            if (row == null)
+                return;
+            grdP200Select(row);
+        }
+
+        function grdP200Select(row)
+        {
+            var docType = '';
+            var pDocNo = GetPDocNo(row);
+            if (pDocNo.length > 2)
+            {
+                docType = pDocNo.substring(0, 2);
+            }
+        $("#ActNumber").val(row.ACT);
+        $("#PegasysDocumentNumber").val(row.PDOCNO);
+        $("#PurchaseOrderDocumentType").val(docType);
+        $("#PurchaseOrderNumber").val(row.PONUMBER);
+        $("#ContractNumber").val(row.CONTRACT);
+        $("#VendorCode").val(row.RMIT_VEND);
+        $("#RemitVendorCode").val(row.RMIT_VEND);
+        $("#VendorName").val(row.VENDNAME);
+        $("#VendorAddress1").val(row.ADDR_L1);
+        $("#VendorAddress2").val(row.ADDR_L2);
+        $("#VendorAddress3").val(row.ADDR_L3);
+        $("#VendorCityStateZip").val(row.ADDR_CITY + ", " + row.ADDR_STATE + "  " + row.ADDR_ZPCD);
+        $("#Invoice").val(row.INVOICE);
+
+           
+            $("#Amount").val(row.AMOUNT == null ? '' : numberWithCommas(parseFloat(Math.round(row.AMOUNT * 100) / 100).toFixed(2)));
+
+
+            var obj = GetAmountAndDates(row.PDOCNO, row.ISPEG == 'PEGASYS');
+            if (obj.AMOUNT != null && obj.AMOUNT > 0)
+            {
+                $("#Amount").val(obj.AMOUNT == null ? '' : numberWithCommas(parseFloat(Math.round(obj.AMOUNT * 100) / 100).toFixed(2)));
+            }        
+        }
+
+        function GetFormattedDate(strDate)
+        {
+            if (strDate == null || strDate.length == 0)
+                return "";
+            var date = new Date(strDate);
+            return (date.getMonth() + 1) + "/" + (date.getDate()) + "/" + (date.getFullYear());
+        }
+
+        function GetPDocNo(row)
+        {
+            var pDocNo = $.trim(row.PDOCNO);
+            if (pDocNo != null && pDocNo.length > 0)
+            {
+                pDocNo = pDocNo.split('&', 1)[0];
+            }
+            return pDocNo;
+        }
+
+        function GetAmountAndDates(poId, isPegasys)
+        {
+            var obj = {
+            AMOUNT: "",
+            START_DT: "",
+            END_DT: ""
+            };
+
+        $.ajax({
+            async: false,
+            type: "POST",
+            data: { poId: poId, isPegasys: isPegasys },
+            url: '@Url.Action("P200GetAmountAndDates", "Exceptions")',
+            success: function(data) {
+                obj.AMOUNT = data.AMOUNT;
+                obj.START_DT = data.START_DT;
+                obj.END_DT = data.END_DT;
+            },
+            error: function(error) {
+                //alert('Error: ' + error.responseText);
+                obj.AMOUNT = null;
+                obj.START_DT = null;
+                obj.END_DT = null;
+            }
+        });
+
+        return obj;
+    }
+
+    function GetP200SearchParameters()
+    {
+        // Reserved property names
+        // used by DataSourceRequest: sort, page, pageSize, group, filter
+        var searchFor = $("#txtSearchFor").val();
+        if (searchFor == null || searchFor.trim().length == 0)
+        {
+            searchFor = '@Model.PegasysDocumentNumber';
+        }
+        var searchIn = $("#txtSearchIn").val();
+        if (searchIn == null || searchIn.trim().length == 0)
+        {
+            searchIn = "PDOCNO";
+        }
+        var searchParams = {
+            FieldName: searchIn,
+            SearchValue: searchFor
+        };
+        return searchParams;
+    }
+
+function RefreshGrid(clear, e)
+{
+    if (clear)
+    {
+        e.preventDefault();
+            $("#P200Grid").data('kendoGrid').dataSource.data([]);
+    }
+    else
+    {
+            $('#P200Grid').data("kendoGrid").dataSource.read();
+    }
+}
+
+    $("#btnChangeAct").on("click", function (e)
+{
+    ResetErrors();
+    var originalAct = $.trim($('#OriginalAct').val());
+    var newAct = $.trim($('#ActNumber').val());
+
+    if (ChangeActError(originalAct, newAct))
+        return false;
+
+    if (!confirm('Do you really want to change the Act Number from ' + originalAct + ' to ' + newAct + '?'))
+        return false;
+
+    var url = '@Url.Action("ChangeAct", "Exceptions")' + '?newAct=' + newAct;
+
+        $.ajax({
+        async: false,
+            type: "POST",
+            data: { newAct: newAct },
+            url: url,
+            success: function(data) {
+                $('#OriginalAct').val(newAct);
+            DisplayAlert(false, '#errorAct', '#ActNumber', 'Act Number has been changed from ' + originalAct + ' to ' + newAct);
+        },
+            error: function(error) {
+            DisplayAlert(true, '#errorAct', '#ActNumber', 'An error has occurred:\n\n' + error.responseText);
+        }
+    });
+});
+
+    function ChangeActError(originalAct, newAct)
+{
+    if (newAct == null || newAct.length == 0)
+    {
+        DisplayAlert(true, '#errorAct', '#ActNumber'
+            , 'The Act Number you specified is the same as the old one.\nPlease enter a new Act Number in the text box.');
+        return true;
+    }
+
+    if (newAct == originalAct)
+    {
+        DisplayAlert(true, '#errorAct', '#ActNumber'
+            , 'The Act Number you specified is the same as the old one.\nPlease enter a new Act Number in the text box.');
+        return true;
+    }
+    return false;
+}
+
+function DisplayAlert(isError, lbl, txt, msg)
+{
+    SetErrorColor(isError, lbl, txt);
+    alert(msg);
+    if (isError)
+            $(txt).focus();
+    return !isError;
+}
+
+function SetErrorColor(isError, lbl, txt)
+{
+    if (isError)
+    {
+            $(lbl).css('color', 'red');
+            $(txt).css('border-color', 'red');
+    }
+    else
+    {
+            $(lbl).css('color', '');
+            $(txt).css('border-color', '');
+    }
+    return !isError;
+}
+
+function ResetErrors()
+{
+    SetErrorColor(false, '#errorAct', '#ActNumber');
+    SetErrorColor(false, '#errorPdocNo', '#PegasysDocumentNumber');
+}
+
+    $("#btnChangePDocNo").on("click", function (e)
+{
+    ResetErrors();
+    var originalPDocNo = $.trim($('#OriginalPDocNo').val());
+    var newPDocNo = $.trim($('#PegasysDocumentNumber').val());
+
+    if (ChangePDocNoError(originalPDocNo, newPDocNo))
+        return false;
+
+    if (!confirm('Do you really want to change the Pegasys PO Doc No from ' + originalPDocNo + ' to ' + newPDocNo + '?'))
+        return false;
+
+    var url = '@Url.Action("ChangePdocno", "Exceptions")' + '?newPDocNo=' + newPDocNo;
+
+        $.ajax({
+        async: false,
+            type: "POST",
+            data: { newPDocNo: newPDocNo },
+            url: url,
+            success: function(data) {
+                $('#OriginalPDocNo').val(newPDocNo);
+            DisplayAlert(false, '#errorPdocNo', '#PegasysDocumentNumber'
+                , 'PDocNo has been changed from ' + originalPDocNo + ' to ' + newPDocNo);
+        },
+            error: function(error) {
+            DisplayAlert(true, '#errorPdocNo', '#PegasysDocumentNumber'
+                , 'An error has occurred:\n\n' + error.responseText);
+        }
+    });
+});
+
+    function ChangePDocNoError(originalPDocNo, newPDocNo)
+{
+    if (newPDocNo == null || newPDocNo.length == 0)
+    {
+        DisplayAlert(true, '#errorPdocNo', '#PegasysDocumentNumber'
+            , 'A new Pegasys PO Doc No is required.\nPlease enter it in the text box.');
+        return true;
+    }
+
+    if (newPDocNo == originalPDocNo)
+    {
+        DisplayAlert(true, '#errorPdocNo', '#PegasysDocumentNumber'
+            , 'The Pegasys PO Doc No you specified is the same as the old one.\nPlease enter a new one in the text box.');
+        return true;
+    }
+    return false;
+}
+
+    $("#btnViewDocument").on("click", function (e)
+{
+    ResetErrors();
+    var url = '@Url.Action("ViewInvoice", "TransHist", new { inv_Key_Id = Model.PegInv.INV_KEY_ID })';
+    window.location = url;
+});
+
+    $("#btnViewImage").on("click", function (e)
+{
+    ResetErrors();
+    var docId = "@Model.PegInv.IMAGEID";
+    if (docId == null || docId.trim().length == 0)
+    {
+        alert("No image was found!");
+        return false;
+    }
+    var url = '@Url.Action("ViewImageByImageID", "Exceptions")';
+    window.location = url + '?docId=' + docId;
+});
+
+    $("#btnSearch").on("click", function (e)
+{
+    ResetErrors();
+    RefreshGrid(false, e);
+});
+
+    $("#btnSkip").on("click", function (e)
+{
+    ResetErrors();
+    var url = '@Html.Raw(Url.Action("Skip", "Exceptions", new
+        {
+        exceptionId = @Model.ExceptionId,
+                PDocNo = @Model.PegInv.PDOCNOPO
+        }))';
+        window.location = url;
+});
+
+    $("#btnTransHist").on("click", function (e) {
+        ResetErrors();
+        var url = '@Html.Raw(Url.Action("Index", "TransHist", new
+              {
+                  searchFor = string.IsNullOrWhiteSpace(Model.PegInv.ACT) ? Model.PegInv.PDOCNOPO : Model.PegInv.ACT,
+                  searchIn = string.IsNullOrWhiteSpace(Model.PegInv.ACT) ? "PDocNo" : "ACT",
+                  searchShow = "ALL",
+                  searchFY = "ALL",
+                  id = Model.PegInv.INV_KEY_ID,
+                  act = Model.PegInv.ACT,
+                  pDocNo = Model.PegInv.PDOCNOPO,
+                  searchedBy = ""
+              }))';
+        window.location = url;
+    });
+
+    $("#btnViewPO").on("click", function (e) {
+        ResetErrors();
+        var row = GetSelectedRow();
+        if (row == null) {
+            alert("Please select an item in the grid above.");
+            return false;
+        }
+        var newPdocno = GetPDocNo(row);
+        if (newPdocno == "") {
+            return;
+        }
+        var url = '@Url.Action("ViewPO", "TransHist")';
+        window.location = url + '?po_Id=' + newPdocno;
+    });
+
+    $("#btnPoMatch").on("click", function (e) {
+        ResetErrors();
+        var url = '@Url.Action("POMatch", "Exceptions")';
+        var Pdocno = "@Model.PegInv.PDOCNOPO";
+        var row = GetSelectedRow();
+        if (row == null) {
+            alert("Please select an item in the grid above.");
+            return;
+        }
+        var newPdocno = GetPDocNo(row);
+        var newAct = $.trim(row.ACT);
+
+        var vcpo = 'F';
+
+        if (row.DSCR.toLowerCase().indexOf('vcpo') !== -1)
+        {
+            vcpo = 'T'
+        }
+        if (row.PDOCNO.toLowerCase().StartsWith("ro"))
+        {
+            vcpo = "T";
+        }
+
+        window.location = url + '?Pdocno=' + Pdocno + '&NewAct=' + newAct + '&NewPDocNo=' + newPdocno + "&VCPO=" + vcpo;
+    });
+
+    $("#btnPoRequest").on("click", function (e) {
+        ResetErrors();
+        var row = GetSelectedRow();
+        if (row == null) {
+            alert("Please select an item in the grid above.");
+            return;
+        }
+        var newPdocno = GetPDocNo(row);
+        if (newPdocno == "") {
+            alert("No PDocNo found.");
+            return;
+        }
+        var url = '@Url.Action("PORequest", "Exceptions")';
+        window.location = url + '?pDocNo=' + newPdocno;
+    });
+
+    $("#btnRoute").on("click", function () {
+        ResetErrors();
+        var url = '@Url.Action("Route", "Exceptions", new { ExId = Model.ExceptionId }, null)';
+        window.location = url;
+    });
+
+    $("#btnReject").on("click", function (e) {
+        ResetErrors();
+        var url = '@Url.Action("Reject", "Exceptions", new { PDocNo = @Model.PegInv.PDOCNOPO })';
+        window.location = url;
+    });
+
+    function numberWithCommas(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+</script>
+

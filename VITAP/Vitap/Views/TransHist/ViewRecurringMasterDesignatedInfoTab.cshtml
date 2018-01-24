@@ -1,0 +1,42 @@
+﻿@model VITAP.ViewModels.TransHist.RecurringMasterDesignatedInfoModel
+@using (Html.BeginForm())
+{
+    <div class="container">
+        <div class="row panel">
+            <div class="col-sm-12" style="padding-top:8px;">
+                @Html.LabelFor(x => x.DggtVendorCode)<br />
+                @Html.TextBoxFor(x => x.DggtVendorCode, new { @disabled = "disabled" })
+            </div>
+        </div>
+        <div class="row panel">
+            <div class="col-sm-12">
+                @Html.LabelFor(x => x.DggtAddressCode)<br />
+                @Html.TextBoxFor(x => x.DggtAddressCode, new { @disabled = "disabled" })
+            </div>
+        </div>
+        <div class="row panel">
+            <div class="col-sm-12">
+                @Html.LabelFor(x => x.DggtVendorName)<br />
+                @Html.TextBoxFor(x => x.DggtVendorName, new { @disabled = "disabled" })
+            </div>
+        </div>
+        <div class="row panel">
+            <div class="col-sm-12">
+                @Html.LabelFor(x => x.DggtAddress)<br />
+                @Html.TextAreaFor(x => x.DggtAddress, new { @disabled = "disabled", rows = "2", cols = "44" })
+            </div>
+        </div>
+        <div class="row panel">
+            <div class="col-sm-12">
+                @Html.LabelFor(x => x.DggtBankId)<br />
+                @Html.TextBoxFor(x => x.DggtBankId, new { @disabled = "disabled" })
+            </div>
+        </div>
+        <div class="row panel">
+            <div class="col-sm-12">
+                @Html.LabelFor(x => x.DggtBankAcctNumber)<br />
+                @Html.TextBoxFor(x => x.DggtBankAcctNumber, new { @disabled = "disabled" })
+            </div>
+        </div>
+    </div>
+}

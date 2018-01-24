@@ -1,0 +1,36 @@
+﻿@model VITAP.Data.Models.Pegasys.Address
+@using (Html.BeginForm())
+{
+    var textAttr = new Dictionary<string, object> { { "style", "width:140px" }, { "disabled", "" } };
+    var textAttrShort = new Dictionary<string, object> { { "style", "width:80px; padding 5px" }, { "disabled", "" } };
+    var textAttrLong = new Dictionary<string, object> { { "style", "width:300px; padding 5px" }, { "disabled", "" } };
+    var textAreaAttrLong = new Dictionary<string, object> { { "style", "width:280px; padding 5px" }, { "disabled", "" }, { "rows", "2" } };
+    var headerAttr = new { @style = "font-weight:bold" };
+    var labelAttrVendor = new { @style = "width: 80px; padding 5px" };
+
+    @Html.AntiForgeryToken()
+    <style>
+        label
+        {
+            display:inline;
+            float:left;
+            margin-right:4px;
+            vertical-align:top;
+        }
+    </style>
+
+    <div class="form-group">
+        <div style="float: left;">
+            <fieldset>
+                <legend style="font-weight: bold">PO Office Address</legend>
+                @Html.LabelFor(m => m.Name, labelAttrVendor) @Html.TextBoxFor(m => m.Name, textAttr) <br />
+                @Html.LabelFor(m => m.Address1, labelAttrVendor) @Html.TextBoxFor(m => m.Address1, textAttrLong) <br />
+                @Html.LabelFor(m => m.Address2, labelAttrVendor) @Html.TextBoxFor(m => m.Address2, textAttrLong) <br />
+                @Html.LabelFor(m => m.City, labelAttrVendor) @Html.TextBoxFor(m => m.City, textAttrLong) <br style="clear: left" />
+                @Html.LabelFor(m => m.State, labelAttrVendor) @Html.TextBoxFor(m => m.State, textAttrShort)
+                @Html.LabelFor(m => m.Zip) @Html.TextBoxFor(m => m.Zip, textAttrShort) <br />
+            </fieldset>
+        </div>
+    </div>
+
+}

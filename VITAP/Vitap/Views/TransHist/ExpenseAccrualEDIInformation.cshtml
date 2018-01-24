@@ -1,0 +1,89 @@
+﻿@model VITAP.ViewModels.TransHist.ExpenseAccrualEDIInformationModel
+
+@{
+    ViewBag.Title = "Expense Accrual EDI Information";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using (Html.BeginForm())
+{
+    <div class="container">
+        <br />
+        <h1 class="bold padBottom20">Expense Accrual EDI Information</h1>
+        <div class="row padBottom20">
+            <div class="col-sm-2">
+                @Html.LabelFor(x => x.AEDocNo)<br />
+                @Html.DisplayFor(x => x.AEDocNo)
+            </div>
+            <div class="col-sm-2">
+                @Html.LabelFor(x => x.PoDocNo)<br />
+                @Html.DisplayFor(x => x.PoDocNo)
+            </div>
+            <div class="col-sm-2">
+                @Html.LabelFor(x => x.Act)<br />
+                @Html.DisplayFor(x => x.Act)
+            </div>
+            <div class="col-sm-2">
+                @Html.LabelFor(x => x.OriginalAEDocNo)<br />
+                @Html.DisplayFor(x => x.OriginalAEDocNo)
+            </div>
+            <div class="col-sm-2">
+                @Html.LabelFor(x => x.Status)<br />
+                @Html.DisplayFor(x => x.Status)
+            </div>
+            <div class="col-sm-2">
+            </div>
+        </div>
+        <div class="row padBottom20">
+            <div class="col-sm-12">
+                @{  Html.Kendo().Grid<VITAP.ViewModels.TransHist.ExpenseAccrualEDIInformationModel>()
+                        .Name("gridExpenseAccrualEdiRecords")
+                         .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .Aggregates(aggr =>
+                    {
+                      //example
+                      //aggr.Add(p => p.Reject).Sum();
+                  }
+                    )
+                    .Read(r => r
+                        .Action("ExpenseAccrualEdiRecords", "TransHist")
+                        .Data("GetSearchParametersExpenseAccrualEdiRecords")
+                    )
+                )
+                        //.Columns(columns =>
+                        //{
+                        //  example
+                        //	columns.Bound(x => x.ExceptionCode).Width(120).HeaderHtmlAttributes(headerAttr).ClientFooterTemplate("<div class='grid-footer'>Totals</div>");
+                        //})
+                        .Pageable(pageable => pageable
+                            .Input(true)
+                            .Numeric(false)
+                            .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                        )
+                        .Render();
+                }
+
+            </div>
+        </div>
+        <div class="row padBottom20">
+            @Html.DisplayFor(x => x.ModelStatus)
+        </div>
+    </div>
+
+    @Html.HiddenFor(x => x.Command)
+                    @Html.HiddenFor(x => x.UIDY)
+
+                    <script type="text/javascript">
+                        function GetSearchParametersExpenseAccrualEdiRecords() {
+
+                            return {
+                                UIDY: $("#UIDY").val()
+                            };
+                        }
+
+                        function btnSearchOnClick() {
+                            $('#gridExpenseAccrualEdiRecords').data("kendoGrid").dataSource.read();
+                        }
+                    </script>
+
+                    }

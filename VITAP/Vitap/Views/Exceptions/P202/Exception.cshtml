@@ -1,0 +1,273 @@
+﻿@model VITAP.Data.Models.Exceptions.P202.ExceptionP202Model
+
+@{
+    ViewBag.Title = "Pegasys Exception (" + Model.ErrorCode + " - " + Model.Memo;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    input, select, textarea {
+        max-width: 100%;
+    }
+</style>
+
+
+@using (Html.BeginForm())
+{
+<div class="container-fluid">
+    <br />
+    <h1 style="font-weight: bold">@string.Format("{0} | Pegasys Exception ({1}) - {2}", Model.InvKeyId, Model.ErrorCode, Model.Memo)</h1>
+    <br />
+    <div class="row">
+        <div class="col-sm-6">
+            @*Col Header*@
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h1 class="pull-right"> Invoice Details</h1>
+                    </div>
+                </div>
+            </div>
+            @*End Col Header*@
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-sm-7">
+                        <label class="control-label">Invoice Key ID</label>
+                        @Html.TextBoxFor(x => x.InvKeyId, new { @class = "form-control", disabled="disabled"})
+                    </div>
+                    <div class="col-sm-5">
+                        <label class="control-label">Invoice Date</label>
+                        @Html.TextBoxFor(x => x.InvDate, new { @class = "form-control", disabled = "disabled" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-sm-7">
+                        <label class="control-label">Act</label>
+                        @Html.TextBoxFor(x => x.InvAct, new { @class = "form-control", disabled = "disabled" })
+                    </div>
+                    <div class="col-sm-5">
+                        <label class="control-label">Invoice Amount</label>
+                        @Html.TextBoxFor(x => x.InvAmt, new { @class = "form-control", disabled = "disabled" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <label class="control-label">Invoice Number</label>
+                        @Html.TextBoxFor(x => x.InvInvNum, new { @class = "form-control", disabled = "disabled" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <label class="control-label">Invoice Receipt Date</label>
+                        @Html.TextBoxFor(x => x.InvRptDate, new { @class = "form-control", disabled = "disabled" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <label class="control-label">Remit Vendor</label>
+                        @Html.TextBoxFor(x => x.InvRemVendor, new { @class = "form-control", disabled = "disabled" })
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            @*Col Header*@
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h1 class="pull-right"> Receipt Details</h1>
+                    </div>
+                </div>
+            </div>
+            @*End Col Header*@
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-sm-7">
+                        <label class="control-label">RR ID</label>
+                        @Html.TextBoxFor(x => x.RR_ID, new { @class = "form-control", disabled = "disabled" })
+                    </div>
+                    <div class="col-sm-5">
+                        <label class="control-label">Receipt Amount</label>
+                        @Html.TextBoxFor(x => x.RptAmt, new { @class = "form-control", disabled = "disabled" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-sm-7">
+                        <label class="control-label">Act</label>
+                        @Html.TextBoxFor(x => x.RptAct, new { @class = "form-control", disabled = "disabled" })
+                    </div>
+                    <div class="col-sm-5">
+                        <label class="control-label">Received Date</label>
+                        @Html.TextBoxFor(x => x.RptRecDate, new { @class = "form-control", disabled = "disabled" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <label class="control-label">Invoice Number</label>
+                        @Html.TextBoxFor(x => x.RptInvNum, new { @class = "form-control", disabled = "disabled" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <label class="control-label">Accepted Date</label>
+                        @Html.TextBoxFor(x => x.RptAccDate, new { @class = "form-control", disabled = "disabled" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <label class="control-label">Remit Vendor</label>
+                        @Html.TextBoxFor(x => x.RptRemVendor, new { @class = "form-control", disabled = "disabled" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3">
+
+        </div>
+        <div class="col-sm-6">
+            <button onclick="viewInv()" type="button" class="btn btn-info btn-fixed-width btn-fixed-width-large">View Invoice</button>
+            <button onclick="transhist()"type="button" class="btn btn-info btn-fixed-width btn-fixed-width-large">TransHist</button>
+            <button onclick="viewRR()" type="button" class="btn btn-info btn-fixed-width btn-fixed-width-large">View Receipt</button>
+            <button id="btnListRR" type="button" class="btn btn-info btn-fixed-width btn-fixed-width-large">List RRs</button>
+        </div>
+        <div class="col-sm-3">
+
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-3">
+
+        </div>
+        <div class="col-sm-6">
+            <button type="button" id="btnAccept" class="btn btn-info btn btn-fixed-width btn-fixed-height">Accept</button>
+            <button onclick="NotThisOne()" type="button" class="btn btn-info">Not This One</button>
+            <button id="btnRRREquest" type="button" class="btn btn-info">RR Request</button>
+            <button onclick="Skip()" type="button" class="btn btn-info">Skip</button>
+        </div>
+        <div class="col-sm-3">
+
+        </div>
+    </div>
+</div>
+
+}
+
+@section ModalControls
+{
+    <div id="dialog"></div>
+}
+
+@section Scripts
+{
+    <script>
+        function transhist() {
+           var url = '@Url.Action("Index", "TransHist")';
+            var Act = "@Model.InvAct";
+            var Pdocno = "@Model.PDocNo";
+
+            if (Act != null && Act != "" && Act != "        ")
+            {
+                url = url + '?searchFor=' + Act + '&searchIn=ACT&searchShow=ALL&searchFY=ALL';
+            }
+            else
+            {
+                url = (url + '?searchFor=' + Pdocno + '&searchIn=PDocNo&searchShow=ALL&searchFY=ALL');
+            }
+
+            window.open(url, "_blank");
+        }
+
+        function viewInv() {
+            window.location.href = '@Url.Action("ViewInvoice", "TransHist", new { inv_Key_Id = Model.InvKeyId}, null)'
+        }
+
+        function viewRR() {
+            window.location.href = '@Url.Action("ViewRR", "TransHist", new { rr_Id = Model.RR_ID}, null)'
+        }
+
+        $('.btn-img').click(function () {
+            var window = $("#dialog");
+            if (window.data("kendoWindow")) {
+                $("#dialog").data("kendoWindow").open();
+            }
+            else {
+                $("#dialog").kendoWindow();
+            }
+            var dialog = $("#dialog").data("kendoWindow");
+            dialog.setOptions({
+                width: 800,
+                height: 800
+            });
+
+            @{
+                var url = string.Format("{0}://{1}{2}", Request.Url.Scheme, Request.Url.Authority, Url.Action("UserTiffViewer", "Exceptions"));
+            }
+
+            dialog.refresh({
+                url: "@url" + "?Type=" + $(this).data("imagetype") + "&TypeId=" + $(this).data("tiffid")
+            });
+        })
+
+        $("#btnListRR").click(function () {
+            var url = '@Html.Raw(@Url.Action("ListRR", "TransHist"))' + '?act=' + '@Model.InvAct' + '&pDocNo=' + '@Model.PDocNo';
+            window.location.href = url;
+        });
+
+        $("#btnAccept").click(function () {
+            var invKeyId = $("#InvKeyId").val();
+
+            var url = '@Url.Action("P202Accept", "Exceptions")' + "?invKeyId=" + invKeyId;
+
+            window.location = url;
+        });
+
+        function NotThisOne() {
+            var Pdocno = "@Model.PDocNo";
+
+            var url = '@Url.Action("NotThisOne", "Exceptions")';
+            url = url + "?Pdocno=" + Pdocno.encodeUriComponent() + "&";
+            location = url;
+        }
+
+        $("#btnRRREquest").on("click", function (e) {
+            var url = '@Url.Action("RRRequest", "Exceptions")';
+            window.location = url;
+        });
+
+        function Skip() {
+            var Pdocno = "@Model.PDocNo";
+            var exId = "@Model.ExId";
+            var url = '@Url.Action("Skip", "Exceptions")';
+            url = url + "?exceptionId=" + exId.encodeUriComponent() + "&Pdocno=" + Pdocno.encodeUriComponent() + "&";
+            location = url;
+        }
+
+    </script>
+
+}

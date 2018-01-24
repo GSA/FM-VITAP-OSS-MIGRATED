@@ -1,0 +1,79 @@
+﻿@using VITAP.ViewModels.TransHist;
+@model List<RecurringMasterFrequencyModel>
+
+@using (Html.BeginForm())
+{
+	<div class="pad10">
+		@{  Html.Kendo().Grid(Model)
+                .Name("frequencyGrid")
+                .Columns(columns =>
+                {
+                    columns.Bound(x => x.ChangeEffDt);
+                    columns.Bound(x => x.Frequency);
+                    columns.Bound(x => x.FreqInterval);
+                    columns.Bound(x => x.GenerationDate);
+                    columns.Bound(x => x.GenerationType);
+                })
+                .Selectable()                
+                .Sortable()                
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .PageSize(20)
+                    .ServerOperation(false)
+                    .Model(model => model.Id(item => item.ParnDocTmplId))
+                )                
+                .Render();
+		}
+	</div>
+
+	<script type="text/javascript">
+        $(document).ready(function () {
+            var frequencyGrid = $("#frequencyGrid").data("kendoGrid");
+            if (frequencyGrid != null) {
+                var frequencyGridId = "frequencyGrid";
+                ConfigureKendoGridPaginationControlsFor508(frequencyGridId);
+                MakeKendoGridScrollable(frequencyGridId, "190px");
+            }
+        });
+		function GetSearchParameters() {
+
+			// Reserved property names
+			// used by DataSourceRequest: sort, page, pageSize, group, filter
+			return {
+				//Amount: $("#Amount").val()
+			};
+		}
+
+		function btnSearchOnClick() {
+			$('#frequencyGrid').data("kendoGrid").dataSource.read();
+		}
+	</script>
+            }
+@*@{
+    Html.Kendo().Grid<VITAP.ViewModels.TransHist.RecurringMasterFrequencyModel>()
+        .Name("frequencyGrid")
+         .DataSource(dataSource => dataSource
+            .Ajax()
+            .Aggregates(aggr =>
+            {
+                        //example
+                        //aggr.Add(p => p.Reject).Sum();
+                    }
+            )
+        .Read(r => r
+            .Action("RecurringMasterFrequencyRecords", "TransHist")
+        //.Data("GetSearchParameters")
+        )
+        )
+        //.Columns(columns =>
+        //{
+        //  example
+        //	columns.Bound(x => x.ExceptionCode).Width(120).HeaderHtmlAttributes(headerAttr).ClientFooterTemplate("<div class='grid-footer'>Totals</div>");
+        //})
+        .Pageable(pageable => pageable
+            .Input(true)
+            .Numeric(false)
+            .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+        )
+        .Render();
+}*@

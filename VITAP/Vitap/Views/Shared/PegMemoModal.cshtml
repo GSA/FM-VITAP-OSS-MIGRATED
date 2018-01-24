@@ -1,0 +1,44 @@
+﻿
+@(Html.Kendo().Window()
+    .Name("PegMemoModal")
+    .Title("Pegasys Memo")
+        //.LoadContentFrom("Memo", "Pegasys")
+    .Content(@<text>@Html.Partial("../Pegasys/Memo")</text>)
+    .Draggable()
+    .Resizable()
+    .Width(840)
+    .Height(300)
+    .Position(p => p.Left(100).Top(100))
+    .Modal(true)
+    .Visible(false)
+    .Actions(actions => actions.Pin().Minimize().Maximize().Close())
+)
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $('#btnCancel').click(function () {
+            window.itemClicked = 'cancel';
+            $("#PegMemoModal").data("kendoWindow").close();
+        });
+
+        $('.k-pager-wrap').css('height', '45px');
+    });
+
+    function showPegMemoModal(id) {
+        gridPegMemoRefresh(id);
+        $("#PegMemoModal").data("kendoWindow").open();
+    }
+
+    function gridPegMemoRefresh(id) {
+        pegMemoId = id;
+        var grid = $('#gridPegMemos').data('kendoGrid');
+
+        // Clear grid before refreshing.
+        grid.dataSource.data([]);
+        $('#PegMemoText').val('');
+
+        grid.dataSource.read();
+    }
+
+</script>

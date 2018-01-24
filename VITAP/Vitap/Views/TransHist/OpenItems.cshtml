@@ -1,0 +1,85 @@
+﻿@model IEnumerable<Vitap.Data.Models.TransHist.TransHistOpenItem>
+
+@{
+    ViewBag.Title = "OpenItems";
+}
+
+<h2>Open Items</h2>
+<hr />
+@(Html.Kendo().Grid(Model)
+        .Name("grdOpenItems")
+        .Columns(columns =>
+        {
+            columns.Bound(c => c.ORGCODE).Title("Organization Code");
+            columns.Bound(c => c.BA).Title("Budget Activity");
+            columns.Bound(c => c.MDL).Title("Line #").Format("{0:n0}");
+            columns.Bound(c => c.UNDELIVERED).Title("UDO").Format("{0:n2}").HtmlAttributes(new { style = "text-align:right" });
+            columns.Bound(c => c.ACCRUED).Title("Accrued").Format("{0:n2}").HtmlAttributes(new { style = "text-align:right" });
+            columns.Bound(c => c.PAYMENTS).Title("Payments").Format("{0:n2}").HtmlAttributes(new { style = "text-align:right" });
+            columns.Bound(c => c.FUND).Title("Fund");
+            columns.Bound(c => c.BBFY);
+            columns.Bound(c => c.RWA);
+            columns.Bound(c => c.PROJNO).Title("Project #");
+            columns.Bound(c => c.FC).Title("Function Code");
+            columns.Bound(c => c.CE).Title("Cost Element");
+            columns.Bound(c => c.WK).Title("Work Item");
+            columns.Bound(c => c.BLDG).Title("Building");
+            columns.Bound(c => c.DOC_NUM).Title("Document #");
+        })
+        .HtmlAttributes(new { style = "width: 100%;" })
+        .ToolBar(tools => tools.Excel())
+        .Excel(excel => excel
+            .FileName("TransHistOpenItems_" + DateTime.Today.ToString("yyyy-MM-dd") + ".xlsx")
+            .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+            .AllPages(true)
+        )
+        .Sortable()
+        .Selectable()
+        .Pageable(pageable => pageable
+            .Input(true)
+            .Numeric(false)
+            .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+         )
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .ServerOperation(false)
+         )
+        .Resizable(resize => resize.Columns(true))
+)
+
+@{
+    string obligations = String.Format("{0:N2}", Model.Sum(o => o.UNDELIVERED));
+    string accrued = String.Format("{0:N2}", Model.Sum(o => o.ACCRUED));
+    string payments = String.Format("{0:N2}", Model.Sum(o => o.PAYMENTS));
+}
+<br />
+<fieldset class="searchForm" style="clear: both; width: 98%; float: left; margin-bottom: 4px;">
+    <legend>Totals</legend>
+    <label for="obligations">Obligations (UDO)</label>
+    @Html.Kendo().TextBox().Name("obligations").Value(obligations).Enable(false).HtmlAttributes(new { @Disabled = "", @readonly = "true", style = "text-align: right;" })
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label for="accrued">Accrued</label>
+    @Html.Kendo().TextBox().Name("accrued").Value(accrued).Enable(false).HtmlAttributes(new { @Disabled = "", @readonly = "true", style = "text-align: right;" })
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label for="payments">Payments</label>
+    @Html.Kendo().TextBox().Name("payments").Value(payments).Enable(false).HtmlAttributes(new { @Disabled = "", @readonly = "true", style = "text-align: right;" })    
+</fieldset>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var grdOpenItems = $("#grdOpenItems").data("kendoGrid");
+        if (grdOpenItems != null) {
+            grdOpenItems.element.find('tbody tr:first').addClass('k-state-selected');
+            var selectedRow = grdOpenItems.dataItem(grdOpenItems.select());
+        }
+
+        if (grdOpenItems != null) {
+            var grdOpenItemsId = "grdOpenItems";                 // Get Grid Id
+            ConfigureKendoGridPaginationControlsFor508(grdOpenItemsId);
+            MakeKendoGridScrollable(grdOpenItemsId, "300px");
+            grdOpenItems.element.find('tbody tr:first').addClass('k-state-selected');
+        }
+
+    });
+</script>

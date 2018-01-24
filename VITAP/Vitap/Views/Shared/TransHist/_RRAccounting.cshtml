@@ -1,0 +1,77 @@
+﻿@model IEnumerable<VITAP.Data.Models.ReceivingReportAccounting>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.RR_ID)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.RR_ACCT_ID)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.MDL)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.REFD_LNUM)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.MDLAMOUNT)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.CODING)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.AE_LNUM)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ORGCODE)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.BA_PROG)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FC_ACTY)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.CE_BDOB)
+        </th>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.RR_ID)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RR_ACCT_ID)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MDL)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.REFD_LNUM)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MDLAMOUNT)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CODING)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AE_LNUM)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ORGCODE)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BA_PROG)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FC_ACTY)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CE_BDOB)
+            </td>
+        </tr>
+    }
+</table>

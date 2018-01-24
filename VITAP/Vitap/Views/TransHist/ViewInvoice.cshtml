@@ -1,0 +1,434 @@
+﻿@model VITAP.ViewModels.TransHist.InvoiceModel
+
+@{
+    ViewBag.Title = Model.MemoCaption;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("ViewInvoice", "TransHist", FormMethod.Post))
+{
+    @Html.Partial("ConfirmYesNoModal")
+
+    <script type="text/javascript">
+
+        var model = @Html.Raw(Json.Encode(@Model));
+        $(document).ready(function () {
+
+            if (model.PromptForFaxSend == "true") {
+
+                $('#PromptForFaxSend').val('false');
+                showConfirmYesNoModal(confirmFaxSendViewInvoiceCallback, cancelFaxSendViewInvoiceCallback, "Fax Send", 'Do you want to send a Notification to the Vendor with a copy of the invoice?', "Yes", "No");
+            }
+
+            if ($('#DEMemo').val()) {
+                showWindowMandMemo(null, null, $('#DEMemoCaption').val(), $('#DEMemo').val(), $('#DEMemoCaption').val());
+                $("#DEMemo").val('');
+                $('#DEMemoCaption').val('');
+            }
+
+            if ($('#UnableToRejectReason').val()) {
+                showWindowMandMemo(null, null, 'Unable to Reject Invoice', $('#UnableToRejectReason').val(), 'Unable to Reject Invoice');
+                $("#UnableToRejectReason").val('');
+            }
+
+            $('.deMemo').click(function () {
+                setCommand($(this).attr('command'));
+                $('form').submit();
+            });
+
+            $('.viewMemo').click(function () {
+                setCommand($(this).attr('command'));
+                showPegMemoModal('@Model.UIDY'.replace(/&amp;/g, '&'));
+            });
+
+            $('.clearRRMismatch').click(function () {
+                setCommand($(this).attr('command'));
+                showConfirmYesNoModal(confirmSaveCallbackViewInvoice, cancelSaveCallbackViewInvoice, "Clear RR Mismatch", 'Are you sure you want to Clear Mismatched RRs and start over matching?', "Yes", "No");
+                return false;
+            });
+
+            $('.clearPOLink').click(function () {
+                setCommand($(this).attr('command'));
+                showConfirmYesNoModal(confirmSaveCallbackViewInvoice, cancelSaveCallbackViewInvoice, "Clear PO Link", 'Are you sure you want to Send Invoice back to Verification to try to match a different Order?', "Yes", "No");
+                return false;
+            });
+
+            $('.reject').click(function () {
+                setCommand($(this).attr('command'));
+                showConfirmYesNoModal(confirmRejectCallbackViewInvoice, cancelRejectCallbackViewInvoice, "Reject Invoice", 'Are you sure you want to Reject the Invoice ' + $('#InvoiceNumber').val() + ' back to the vendor?', "Yes", "No");
+                return false;
+            });
+
+            $('.unreject').click(function () {
+                setCommand($(this).attr('command'));
+                showConfirmYesNoModal(confirmUnRejectCallbackViewInvoice, cancelUnRejectCallbackViewInvoice, "UnReject Invoice", 'Are you sure you want to UnReject the Invoice ' + $('#InvoiceNumber').val() + '?', "Yes", "No");
+                return false;
+            });
+            $('.viewImage').click(function () {
+                var url = '@Url.Action("ViewImageByImageID", "Exceptions", new { docId = @Model.ImageId })';
+                window.location = url;
+
+                return false;
+            });
+
+            $('.viewTj').click(function () {
+                window.location.href = '@Url.Action("viewtj", "transhist", new { pDocNo = Model.InvoiceDocNumber })';
+                return false;
+            });
+
+            $('.viewEdi').click(function () {
+                window.location.href = '@Url.Action("viewediinvoice", "transhist", new { id = Model.InvKeyId })';
+                return false;
+            });
+
+            var buttons = @Html.Raw(Json.Encode(Model));           
+            if (buttons.ShowDEMemoButton)
+            {
+                $("#viewDeMemo").prop("disabled", false);
+            }
+
+            if (buttons.ShowRejectButton)
+            {
+                if (buttons.Status == "REJECT" || buttons.Status == "REJECTED")
+                {
+                    document.getElementById("unreject").style.visibility="visible";
+                    document.getElementById("reject").style.width = 0;
+                }
+                else
+                {
+                    document.getElementById("reject").style.visibility="visible";
+                    document.getElementById("unreject").style.width = 0;
+                }
+            }
+            else
+            {
+                document.getElementById("unreject").style.width = 0;
+                document.getElementById("reject").style.width = 0;
+            }
+
+            if (buttons.ShowClearMismatchButton)
+            {
+                document.getElementById("clearRR").disabled = false;
+            }
+
+            if (buttons.ShowClearPOButton)
+            {
+                document.getElementById("clearPO").disabled = false;
+            }
+
+            if (buttons.MemoId)
+            {
+                document.getElementById("viewMemo").disabled = false;
+            }
+
+            if ((!buttons.InboxUidy && buttons.EDI != "ELECTRONIC") || '@Model.ImageId'.length > 0)
+            {
+                document.getElementById("viewImage").disabled = false;
+            }
+
+            if (buttons.InvKeyId && buttons.EDI == "ELECTRONIC" && buttons.InboxUidy)
+            {
+                document.getElementById("viewEdi").disabled = false;
+            }
+
+            if (buttons.ShowViewTJButton)
+            {
+                document.getElementById("viewTJ").disabled = false;
+            }
+
+        });
+
+        function setCommand(val) {
+            $('#Command').val(val);
+        }
+
+        function confirmFaxSendViewInvoiceCallback(data) {
+            setCommand("sendFax");
+            $('form').submit();
+        }
+
+        function cancelFaxSendViewInvoiceCallback(data) {
+            setCommand("addNotes");
+            $('form').submit();
+            return false;
+        }
+
+        function confirmRejectCallbackViewInvoice(data) {
+            //$('form').submit();
+            showWindowRejectInvoice(confirmRejectReasonCallback);
+            return false;
+        }
+
+        function cancelRejectCallbackViewInvoice(data) {
+            return false;
+        }
+
+        function confirmUnRejectCallbackViewInvoice(data) {
+            setCommand("unreject");
+            $('form').submit();
+        }
+
+        function cancelUnRejectCallbackViewInvoice(data) {
+            return false;
+        }
+
+        function confirmSaveCallbackViewInvoice(data) {
+            $('form').submit();
+        }
+
+        function cancelSaveCallbackViewInvoice(data) {
+            return false;
+        }
+
+        function confirmRejectReasonCallback(data) {
+
+            $('#RejectReason').val(data);
+            $('#Command').val('reject');
+            $('form').submit();
+        }
+
+        function confirmUnRejectReasonCallback(data) {
+            $('#RejectReason').val(data);
+            $('#Command').val('unreject');
+            $('form').submit();
+        }
+
+    </script>
+
+    <div class="container">
+        <br />
+        <h1 class="bold padBottom20">@Html.DisplayFor(x => x.MemoCaption)</h1>
+        <div class="row padBottom20">
+            @Html.DisplayFor(x => x.ModelStatus)
+        </div>
+        <div class="row padBottom20">
+            <div class="col-sm-9">
+                <div class="row panel">
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.InvoiceDocNumber)<br />
+                        @Html.DisplayFor(x => x.InvoiceDocNumber, new { @disabled = "" })
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.DeliveryOrderNumber)<br />
+                        @Html.DisplayFor(x => x.DeliveryOrderNumber)
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.ACT)<br />
+                        @Html.DisplayFor(x => x.ACT)
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.ContractNumber)<br />
+                        @Html.DisplayFor(x => x.ContractNumber)
+                    </div>
+                    <div class="col-sm-8">
+                        @Html.LabelFor(x => x.ContractSpecialist)<br />
+                        @Html.DisplayFor(x => x.ContractSpecialist)
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.InvoiceNumber)<br />
+                        @Html.DisplayFor(x => x.InvoiceNumber)
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.VendorInvoiceDate)<br />
+                        @(Html.DisplayFor(x => x.VendorInvoiceDate))
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.DocumentDate)<br />
+                        @(Html.DisplayFor(x => x.DocumentDate))
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="bold col-sm-12">
+                        <h1 class="bold">Amounts</h1><hr />
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.InvoicedAmount)<br />
+                        @Html.DisplayFor(x => x.InvoicedAmount)
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.ReceiptDate)<br />
+                        @Html.DisplayFor(x => x.ReceiptDate)
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.ClosedDate)<br />
+                        @(Html.DisplayFor(x => x.ClosedDate))
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.AppliedCredits)<br />
+                        @Html.DisplayFor(x => x.AppliedCredits)
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.EDI)<br />
+                        @Html.DisplayFor(x => x.EDI)
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.AccountingPeriod)<br />
+                        @Html.DisplayFor(x => x.AccountingPeriod)
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.Net)<br />
+                        @Html.DisplayFor(x => x.Net)
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.Outstanding)<br />
+                        @Html.DisplayFor(x => x.Outstanding)
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.Closed)<br />
+                        @Html.DisplayFor(x => x.Closed)
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="bold col-sm-12">
+                        <h1 class="bold">Service Period</h1><hr />
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.ServicePeriodStart)<br />
+                        @Html.DisplayFor(x => x.ServicePeriodStart)
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.ServicePeriodEnd)<br />
+                        @Html.DisplayFor(x => x.ServicePeriodEnd)
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.CustomerAccountNumber)<br />
+                        @Html.DisplayFor(x => x.CustomerAccountNumber)
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.PoDocNumber)<br />
+                        <div id="pDocNo"></div>
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.ReceivedBy)<br />
+                        @Html.DisplayFor(x => x.ReceivedBy)
+                    </div>
+                    <div class="col-sm-4">
+
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.TaxAmount)<br />
+                        @Html.DisplayFor(x => x.TaxAmount)
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.TarrifLateCharges)<br />
+                        @Html.DisplayFor(x => x.TarrifLateCharges)
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.Freight)<br />
+                        @Html.DisplayFor(x => x.Freight)
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.InvoiceDueDate)<br />
+                        @(Html.DisplayFor(x => x.InvoiceDueDate))
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.SecurityOrg)<br />
+                        @Html.DisplayFor(x => x.SecurityOrg)
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.Discount)<br />
+                        @Html.DisplayFor(x => x.Discount)
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="row panel">
+                    <div class="bold col-sm-12">
+                        <h1 class="bold">Remit Vendor</h1>
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-12">
+                        @Html.LabelFor(x => x.RemitVendorCode1)<br />
+                        @Html.DisplayFor(x => x.RemitVendorCode1) <span>-</span> @Html.DisplayFor(x => x.RemitVendorCode2)
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-12">
+                        @Html.LabelFor(x => x.RemitVendorName)<br />
+                        @Html.DisplayFor(x => x.RemitVendorName)
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-12">
+                        @Html.TextAreaFor(x => x.RemitVendorAddess1, new { @disabled = "", ReadOnly = true, @style = "width:100%; height:85px" })<br />
+                       
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row padBottom20">
+            <div class="col-sm-12">
+                @{Html.Kendo().TabStrip()
+                                    .Name("tsTabs")
+                                    .Items(items =>
+                                    {
+                                        items.Add().Text("Description")
+                                        .Content(Html.Partial("ViewInvoiceDescTab", Model.InvoiceDescriptionModel).ToHtmlString());
+
+                                        items.Add().Text("Invoice Accounting")
+                                            .Content(Html.Partial("ViewInvoiceAccountingTab", Model.InvoiceAccountingModel).ToHtmlString());
+
+                                        items.Add().Text("INV Items")
+                                          .Content(Html.Partial("ViewInvoiceItemsTab", Model.InvoiceItemsModel).ToHtmlString());
+                                    })
+                                    .SelectedIndex(0)
+                                    .Render();
+                }
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4">
+                @Html.LabelFor(x => x.Status) @Html.DisplayFor(x => x.Status)
+                @Html.DisplayFor(x => x.ErrorCode)
+            </div>
+            <div class="col-sm-8">
+                <button type="button" class="btn btn-info viewTj" disabled="disabled" command="viewTJ" id="viewTJ">View TJ</button>
+                <button type="button" class="btn btn-info reject" style="visibility:hidden;" command="reject" id="reject">Reject</button>
+                <button type="button" class="btn btn-info viewImage" disabled="disabled" command="viewImage" id="viewImage">View Image</button>
+                <button type="button" class="btn btn-info clearRRMismatch" disabled="disabled" command="clearRR" id="clearRR">Clear RR Mismatch</button><br />
+                <button type="button" class="btn btn-info clearPOLink" disabled="disabled" command="clearPO" id="clearPO">Clear PO Link</button><br />
+
+                <button type="button" class="btn btn-info deMemo" disabled="disabled" command="viewDeMemo" id="viewDeMemo">DE Memo</button>
+                <button type="button" class="btn btn-info unreject" style="visibility:hidden;" command="unreject" id="unreject">UnReject</button>
+                <button type="button" class="btn btn-info viewEdi" disabled="disabled" command="viewEdi" id="viewEdi">View EDI Info</button>
+                <button type="button" class="btn btn-info viewMemo" disabled="disabled" command="viewMemo" id="viewMemo">View PegMemo</button>
+            </div>
+        </div>
+    </div>
+
+    @Html.HiddenFor(x => x.Command)
+                    @Html.HiddenFor(x => x.Status)
+                    @Html.HiddenFor(x => x.InvoiceDocNumber)
+                    @Html.HiddenFor(x => x.InvoiceNumber)
+                    @Html.HiddenFor(x => x.InvoiceTableName)
+                    @Html.HiddenFor(x => x.UIDY)
+                    @Html.HiddenFor(x => x.PegDocNoInv)
+                    @Html.HiddenFor(x => x.ImageId)
+                    @Html.HiddenFor(x => x.InvKeyId)
+                    @Html.HiddenFor(x => x.Memo)
+                    @Html.HiddenFor(x => x.MemoCaption)
+                    @Html.HiddenFor(x => x.DEMemo)
+                    @Html.HiddenFor(x => x.DEMemoCaption)
+                    @Html.HiddenFor(x => x.RejectReason)
+                    @Html.HiddenFor(x => x.UnableToRejectReason)
+                    @Html.HiddenFor(x => x.PromptForFaxSend)
+                    }

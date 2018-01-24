@@ -1,0 +1,139 @@
+﻿@model VITAP.Data.Models.Exceptions.MainExRRTabModel
+@{
+    var attrHeader = new { @style = "font-weight:bold" };
+    var attrText = new { @class = "" };
+    var attrTextRight = new { @class = " text-right" };
+    var attrLabel = new { @class = "control-label" };
+}
+
+@Html.AntiForgeryToken()
+
+<div id="tabRR" class="container-fluid peg-main-ex">
+    <div class="row no-buffer">
+        <div class="col-xs-2 no-buffer">
+            <div class="row no-buffer" style="margin-top:10px;">
+                @Html.LabelFor(m => m.RRAmount, attrLabel)<br />
+                @Html.TextBoxFor(m => m.RRAmount, attrTextRight)<br />
+            </div>
+            <div class="row no-buffer" style="margin-top:15px;">
+                @Html.LabelFor(m => m.ExpendedAmount, attrLabel)<br />
+                @Html.TextBoxFor(m => m.ExpendedAmount, attrTextRight)<br />
+            </div>
+            <div class="row no-buffer" style="margin-top:15px;">
+                @Html.LabelFor(m => m.RRAmountOpen, attrLabel)<br />
+                @Html.TextBoxFor(m => m.RRAmountOpen, attrTextRight)<br />
+            </div>
+        </div>
+        <div class="col-xs-7 no-buffer">
+            <div class="container-fluid no-buffer">
+                <div class="row no-buffer">
+                    <div class="col-xs-3 sm-buffer">
+                        @Html.LabelFor(m => m.VendorName, attrLabel)<br />
+                        @Html.TextBoxFor(m => m.VendorName, attrText)<br />
+                    </div>
+                    <div class="col-xs-2 sm-buffer">
+                        @Html.LabelFor(m => m.ActNumber, attrLabel)<br />
+                        @Html.TextBoxFor(m => m.ActNumber, attrText)<br />
+                    </div>
+                    <div class="col-xs-2 sm-buffer">
+                        @Html.LabelFor(m => m.PurchaseOrderNumber, attrLabel)<br />
+                        @Html.TextBoxFor(m => m.PurchaseOrderNumber, attrText)<br />
+                    </div>
+                    <div class="col-xs-3 sm-buffer">
+                        @Html.LabelFor(m => m.ContractNumber, attrLabel)<br />
+                        @Html.TextBoxFor(m => m.ContractNumber, attrText)<br />
+                    </div>
+                </div>
+                <div class="row no-buffer">
+                    <div class="col-xs-5 sm-buffer">
+                        @Html.LabelFor(m => m.InvoiceNumber, attrLabel)<br />
+                        @Html.TextBoxFor(m => m.InvoiceNumber, new { @style = "width: 260px;" })<br />
+                    </div>
+                    <div class="col-xs-2 sm-buffer">
+                        @Html.LabelFor(m => m.DeliveryDate, attrLabel)<br />
+                        @Html.TextBoxFor(m => m.DeliveryDate, attrText)<br />
+                    </div>
+                    <div class="col-xs-2 sm-buffer">
+                        @Html.LabelFor(m => m.AccrualDate, attrLabel)<br />
+                        @Html.TextBoxFor(m => m.AccrualDate, attrText)<br />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-2">
+            <br />
+            <button type="button" id="btnViewRR" class="btn btn-default">View RR</button>
+            <button type="button" id="btnViewImage" class="btn btn-default">View Image</button>
+            <br /><br />
+            @Html.LabelFor(m => m.PegasysDocumentNumber, attrLabel)
+            @Html.TextBoxFor(m => m.PegasysDocumentNumber, attrText)
+            @Html.TextBoxFor(m => m.SourceNote, attrText)
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <br />
+            @{
+                Html.Kendo().Grid(Model.AccountInfo)
+                    .Name("grdRRAccounts")
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .PageSize(10)
+                        .ServerOperation(false)
+                        .Model(model => model.Id(m => m.DeliveryDate))
+                    )
+                    .Columns(columns =>
+                    {
+                        columns.Bound(x => x.DeliveryDate).Width(140).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.AccdDate).Width(120).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.AccountTemplate).Width(180).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.OrgCode).Width(120).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.CE).Width(60).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.AccdDate).Width(120).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.TranCrcyAm).Width(140).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.RefdLineId).Width(180).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.RefLiqdAm).Width(140).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.ClsdLnam).Width(120).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.TT).Width(80).HeaderHtmlAttributes(attrHeader);
+                    })
+                    .Resizable(r => r.Columns(true))
+                    .ToolBar(tools => tools.Excel())
+                    .Excel(excel => excel
+                        .FileName("Memos-" + DateTime.Today.ToString("yyyy-MM-dd") + ".xlsx")
+                        .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase"))
+                        .AllPages(true)
+                    )
+                    .Pageable(p => p.PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 }))
+                    .Render();
+            }
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $().ready(function () {
+        ConfigureKendoGridPaginationControlsFor508('grdRRAccounts');
+        MakeKendoGridScrollable('grdRRAccounts', "120px");
+        $('#tabRR :input').attr('disabled', 'disabled');
+        if ('@Model.BtnRR.Enabled' != 'True')
+            $('#btnViewRR').attr('disabled', 'disabled');
+        else
+            $('#btnViewRR').removeAttr('disabled');
+        if ('@Model.BtnRRImage.Enabled' != 'True')
+            $('#btnViewImage').attr('disabled', 'disabled');
+        else
+            $('#btnViewImage').removeAttr('disabled');
+        $('.k-grid-excel').removeAttr('disabled');
+    });
+
+    $("#btnViewRR").on("click", function () {
+        var url = '@Url.Action("ViewRR", "TransHist", new { rr_Id = Model.BtnRR.Id })';
+        window.location = url;
+    });
+
+    $("#btnViewImage").on("click", function () {
+        var url = '@Url.Action("ViewImageByImageID", "Exceptions", new { docId = Model.BtnRRImage.Id })';
+        window.location = url;
+    });
+</script>

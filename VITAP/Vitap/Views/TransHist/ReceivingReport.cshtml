@@ -1,0 +1,238 @@
+﻿@model VITAP.Data.ReceivingReport
+
+@{
+    ViewBag.Title = "ReceivingReport";
+}
+
+<h2>ReceivingReport</h2>
+
+<div>
+    
+    <hr />
+    <table>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+
+            <td>
+                @Html.DisplayFor(model => model.Id)
+            </td>
+            <th>
+                @Html.DisplayNameFor(model => model.ACT)
+            </th>
+
+            <td>
+                @Html.DisplayFor(model => model.ACT)
+            </td>
+
+            <th>
+                @Html.DisplayNameFor(model => model.ACCD_DT)
+            </th>
+
+            <td>
+                @Html.DisplayFor(model => model.ACCD_DT)
+            </td>
+        </tr>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.AMOUNT)
+            </th>
+
+            <td>
+                @Html.DisplayFor(model => model.AMOUNT)
+            </td>
+
+            <th>
+                @Html.DisplayNameFor(model => model.CONTRACT)
+            </th>
+
+            <td>
+                @Html.DisplayFor(model => model.CONTRACT)
+            </td>
+
+            <th>
+                @Html.DisplayNameFor(model => model.DLVR_DT)
+            </th>
+
+            <td>
+                @Html.DisplayFor(model => model.DLVR_DT)
+            </td>
+        </tr>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.EDI_IND)
+            </th>
+
+            <td>
+                @Html.DisplayFor(model => model.EDI_IND)
+            </td>
+
+            <th>
+                @Html.DisplayNameFor(model => model.INVOICE)
+            </th>
+
+            <td>
+                @Html.DisplayFor(model => model.INVOICE)
+            </td>
+
+            <th>
+                @Html.DisplayNameFor(model => model.KEYDATE)
+            </th>
+
+            <td>
+                @Html.DisplayFor(model => model.KEYDATE)
+            </td>
+        </tr>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.PDOCNOPO)
+            </th>
+
+            <td>
+                @Html.DisplayFor(model => model.PDOCNOPO)
+            </td>
+
+            <th>
+                @Html.DisplayNameFor(model => model.PERD_PERF_STDT)
+            </th>
+
+            <td>
+                @Html.DisplayFor(model => model.PERD_PERF_STDT)
+            </td>
+
+            <th>
+                @Html.DisplayNameFor(model => model.PERD_PERF_ENDT)
+            </th>
+
+            <td>
+                @Html.DisplayFor(model => model.PERD_PERF_ENDT)
+            </td>
+        </tr>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.PONUMBER)
+            </th>
+
+            <td>
+                @Html.DisplayFor(model => model.PONUMBER)
+            </td>
+
+            <th>
+                @Html.DisplayNameFor(model => model.SIGNATURE)
+            </th>
+
+            <td>
+                @Html.DisplayFor(model => model.SIGNATURE)
+            </td>
+
+            <th>
+                @Html.DisplayNameFor(model => model.STAMPDATE)
+            </th>
+
+            <td>
+                @Html.DisplayFor(model => model.STAMPDATE)
+            </td>
+        </tr>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.VENDNAME)
+            </th>
+
+            <td>
+                @Html.DisplayFor(model => model.VENDNAME)
+            </td>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Address1)
+            </th>
+
+            <td>
+                @Html.DisplayFor(model => model.Address1)
+            </td>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Address2)
+            </th>
+
+            <td>
+                @Html.DisplayFor(model => model.Address2)
+            </td>
+        </tr>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Address3)
+            </th>
+
+            <td>
+                @Html.DisplayFor(model => model.Address3)
+            </td>
+
+            <th>
+                @Html.DisplayNameFor(model => model.AMOUNT_CLEARED)
+            </th>
+
+            <td>
+                @Html.DisplayFor(model => model.AMOUNT_CLEARED)
+            </td>
+
+            <th>
+                @Html.DisplayNameFor(model => model.USID_ID)
+            </th>
+
+            <td>
+                @Html.DisplayFor(model => model.USID_ID)
+            </td>
+        </tr>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ContractSpecialist)
+            </th>
+
+            <td>
+                @Html.DisplayFor(model => model.ContractSpecialist)
+            </td>
+
+            <th>
+                @Html.DisplayNameFor(model => model.ExpendedAmount)
+            </th>
+
+            <td>
+                @Html.DisplayFor(model => model.ExpendedAmount)
+            </td>
+
+            <th>
+                @Html.DisplayNameFor(model => model.ClosedAmount)
+            </th>
+
+            <td>
+                @Html.DisplayFor(model => model.ClosedAmount)
+            </td>
+        </tr>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.MatchedAmount)
+            </th>
+
+            <td>
+                @Html.DisplayFor(model => model.MatchedAmount)
+            </td>
+
+            <th>
+                @Html.DisplayNameFor(model => model.DSCR)
+            </th>
+
+            <td>
+                @Html.DisplayFor(model => model.DSCR)
+            </td>
+        </tr>
+        
+</table>
+    <hr />
+    @Html.DisplayNameFor(model => model.Status)
+    @Html.DisplayFor(model => model.Status)
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

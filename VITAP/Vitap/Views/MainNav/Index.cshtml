@@ -1,0 +1,169 @@
+﻿@model VITAP.Data.Models.RoleListModel
+@using VITAP.Library.Strings
+
+@{
+    Layout = null;
+}
+
+<div id="naviWrapper">
+    <div class="k-content">
+        @(Html.Kendo().Menu()
+                      .Name("Menu")
+                      .Direction(MenuDirection.Bottom)
+                      .Items(items =>
+                      {
+                          if (!Model.USERNAME.IsEmpty())
+                          {
+                              items.Add()
+                              .Text("Log Out")
+                              .HtmlAttributes(new { @style = "float: right" })
+                              .Action("Logout", "Login");
+                          }
+
+                          items.Add()
+                              .Text("Home")
+                              .Url("~/Home");
+
+                          if (Model.HasDataEntryRole ||
+                              Model.HasApacctRole ||
+                              Model.HasExceptionsRole)
+                          {
+                              items.Add()
+                                  .Text("Data Entry")
+                                  .Items(childlevel1 =>
+                                  {
+                                      if (Model.HasApacctRole ||
+                                          Model.HasExceptionsRole)
+                                      {
+                                          childlevel1.Add()
+                                              .Text("Maintain Contact")
+                                              .Url("~/Contacts/Edit?openOption=menu");
+                                      }
+
+                                      if (Model.HasDataEntryRole)
+                                      {
+                                          if (Model.ASSIGN_SRV == "FTS")
+                                          {
+                                              childlevel1.Add()
+                                                  .Text("Key Pegasys Tops Invoices")
+                                                  .Url("~/DataEntry/Index?InvoiceType=" + DataEntry.TypeTops);
+                                              childlevel1.Add()
+                                                  .Text("Key Pegasys Non Tops Invoices")
+                                                  .Url("~/DataEntry/Index?InvoiceType=" + DataEntry.TypeNonTops);
+                                          }
+                                          if (Model.ASSIGN_SRV == "PBS")
+                                          {
+                                              childlevel1.Add()
+                                              .Text("Key Pegasys Construction Invoices")
+                                              .Url("~/DataEntry/Index?InvoiceType=" + DataEntry.TypeConst);
+                                              childlevel1.Add()
+                                                  .Text("Key Pegasys Non Construction Invoices")
+                                                  .Url("~/DataEntry/Index?InvoiceType=" + DataEntry.TypeNonConst);
+                                          }
+                                      }
+                                  });
+                          }
+                          //items.Add()
+                          //    .Text("Searches")
+                          //    .Items(childlevel1 =>
+                          //    {
+                          //        childlevel1.Add()
+                          //          .Text("Utilities Payment Query")
+                          //          .Url("~/Payments/Index");
+                          //    });
+                          items.Add()
+                              .Text("TransHist")
+                              .Url("~/TransHist");
+                          items.Add()
+                              .Text("Exceptions")
+                              .Url("~/Exceptions");
+
+                          if (Model.HasFinanceuserRole)
+                          {
+                              items.Add()
+                                  .Text("Reports")
+                                  .Items(Mgmt =>
+                                  {
+                                      if (Model.HasMgtReportsRole)
+                                      {
+                                          Mgmt.Add()
+                                              .Text("Management Reports")
+                                              .Items(Mgmt2 =>
+                                              {
+                                                  Mgmt2.Add()
+                                                          .Text("Aged Exceptions User Report")
+                                                          .Url("~/Reports/AgedExceptions");
+                                                  Mgmt2.Add()
+                                                          .Text("Associate Productivity Report")
+                                                          .Url("~/AssoProd/Index");
+                                                  Mgmt2.Add()
+                                                          .Text("Data Entry Productivity Report")
+                                                          .Url("~/Reports/DataEntryProductivityReport");
+                                                  Mgmt2.Add()
+                                                          .Text("Exceptions Cleared Report")
+                                                          .Url("~/ExceptionCleared/Index");
+                                                  Mgmt2.Add()
+                                                          .Text("Exceptions Worked by Preparer Code")
+                                                          .Url("~/ExceptionPreparerCode/Index");
+                                              });
+                                      }
+                                  })
+                                  .Items(Users =>
+                                  {
+                                      Users.Add()
+                                        .Text("User Reports")
+                                        .Items(Users2 =>
+                                        {
+                                            Users2.Add()
+                                                  .Text("Aged Exceptions User Report (Locked Prepcode)")
+                                                  .Url("~/Reports/AgedExceptionsUser");
+                                            Users2.Add()
+                                                    .Text("Days Old Report - Pegasys Invoices")
+                                                    .Url("~/DaysOld/Index");
+                                            //Users2.Add()
+                                            //      .Text("Data Entry Productivity")
+                                            //      .Url("~/Reports/DataEntryProductivityKeyedRecords");
+                                            Users2.Add()
+                                            .Text("Discount Availability and Viability Report")
+                                            .Url("~/Reports/DiscountAvailability");
+                                            Users2.Add()
+                                                  .Text("Exceptions Worked By Prepcode (User)")
+                                                  .Url("~/PreparerCodeProductivity/Index");
+                                            Users2.Add()
+                                                  .Text("Pegasys Documents To Be Keyed/Indexed")
+                                                  .Url("~/PegDocKey/Index");
+                                            Users2.Add()
+                                                  .Text("Report for POs - Vend Code vs Remit Vend Code")
+                                                  .Url("~/Reports/Report_PoListing");
+                                            //Users2.Add()
+                                            //      .Text("Preparer Code Productivity")
+                                            //      .Url("~/Reports/PreparerCodeProductivity");
+                                        });
+                                  })
+                                  .Items(Other =>
+                                  {
+                                      Other.Add()
+                                        .Text("Contact Report")
+                                        .Url("~/Reports/ContactReport");
+                                  });
+                              //if (Model.HasFinanceuserRole)
+                              //{
+
+                              //    items.Add()
+                              //        .Text("Other")
+                              //        .Items(children =>
+                              //        {
+
+                              //            children.Add()
+                              //              .Text("Pegasys PO EDI")
+                              //              .Url("~/Pegasys/PurchaseOrderEdi");
+                              //            children.Add()
+                              //              .Text("Pegasys Memo")
+                              //              .Url("~/Pegasys/Memo");
+                              //        });
+                              //}
+                          }
+                      })
+        )
+    </div>
+</div>

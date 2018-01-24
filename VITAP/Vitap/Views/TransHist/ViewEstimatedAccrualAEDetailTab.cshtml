@@ -1,0 +1,45 @@
+﻿@using VITAP.ViewModels.TransHist;
+@model List<EstimatedAccrualAEDetailModel>
+
+<div class="pad10">
+    @{
+        Html.Kendo().Grid(Model)
+            .Name("gridDetail")
+            .DataSource(dataSource => dataSource
+                .Ajax()
+                .ServerOperation(false)
+                .PageSize(10)
+            )
+            .ToolBar(tools => tools.Excel())
+            .Excel(excel => excel
+                .FileName("EstimatedAccrualAEDetail.xlsx")
+                .ProxyURL(Url.Action("Excel_Export_Save", "Grid"))
+                .AllPages(true)
+            )
+            .Pageable(pageable => pageable
+                .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+            )
+            .Render();
+    }
+</div>
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+        MakeKendoGridScrollable('gridDetail', '300px');
+        ConfigureKendoGridPaginationControlsFor508('gridDetail');
+    });
+
+    function GetSearchParametersDetailRecords() {
+
+        return {
+            AeId: $('#AeId').val()
+        };
+    }
+
+    function btnSearchOnClick() {
+        $('#gridDetail').data("kendoGrid").dataSource.read();
+    }
+</script>
+

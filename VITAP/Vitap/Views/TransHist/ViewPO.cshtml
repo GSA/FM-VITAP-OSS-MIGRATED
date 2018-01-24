@@ -1,0 +1,614 @@
+﻿@using VITAP.Data
+@model VITAP.Data.Models.ViewPOModel
+
+@{
+    ViewBag.Title = "ViewPO";
+    List<PEGASYSPOACCT_FRM> poAccountings = ViewBag.POAccountings;
+}
+
+<fieldset>
+    <legend>View PO</legend>
+</fieldset>
+<br />
+<div class="container">
+    <div class="row panel">
+        <div class="col-sm-3">
+            @Html.LabelFor(x => x.PO_ID)<br />
+            @Html.DisplayFor(model => model.PO_ID)
+        </div>
+        <div class="col-sm-3">
+            @Html.LabelFor(x => x.PONUMBER)<br />
+            @Html.DisplayFor(model => model.PONUMBER)
+        </div>
+        <div class="col-sm-3">
+            @Html.LabelFor(x => x.ACT)<br />
+            @Html.DisplayFor(model => model.ACT)
+        </div>
+        <div class="col-sm-3">
+            @Html.LabelFor(x => x.PODTYP)<br />
+            @Html.DisplayFor(model => model.PODTYP)
+        </div>
+    </div>
+    <div class="row panel">
+        <div class="col-sm-3">
+            @Html.LabelFor(x => x.MODNO)<br />
+            @Html.DisplayFor(model => model.MODNO)
+        </div>
+        <div class="col-sm-3">
+            @Html.LabelFor(x => x.CONTRACT)<br />
+            @Html.DisplayFor(model => model.CONTRACT)
+        </div>
+        <div class="col-sm-3">
+            @Html.LabelFor(x => x.CONTRACTSP)<br />
+            @Html.DisplayFor(model => model.CONTRACTSP)
+        </div>
+    </div>
+
+
+    <div class="row panel">
+        <div class="bold col-sm-12">
+            <h1 class="bold">Amounts</h1><hr />
+        </div>
+    </div>
+    <div class="row panel">
+        <div class="col-sm-3">
+            @Html.LabelFor(x => x.PRCR_AM)<br />
+            @Html.DisplayFor(model => model.PRCR_AM)
+        </div>
+        <div class="col-sm-3">
+            @Html.LabelFor(x => x.APCR_AM)<br />
+            @Html.DisplayFor(model => model.APCR_AM)
+        </div>
+        <div class="col-sm-3">
+            @Html.LabelFor(x => x.NET)<br />
+            @Html.DisplayFor(model => model.NET)
+        </div>
+        <div class="col-sm-3">
+            @Html.LabelFor(x => x.POBALANCE)<br />
+            @Html.DisplayFor(model => model.POBALANCE)
+        </div>
+    </div>
+    <div class="row panel">
+        <div class="col-sm-3">
+            @Html.LabelFor(x => x.OUTSTANDING)<br />
+            @Html.DisplayFor(model => model.OUTSTANDING)
+        </div>
+        <div class="col-sm-3">
+            @Html.LabelFor(x => x.PYMTS)<br />
+            @Html.DisplayFor(model => model.PYMTS)
+        </div>
+        <div class="col-sm-3">
+            @if (Model.Finsihed1BCheckBoxVisible)
+            {
+                @Html.CheckBoxFor(x => x.Finished1BChecked, new { disabled = "disabled" })
+                @Html.LabelFor(model => model.Finished1BChecked)
+            }
+        </div>
+        <div class="col-sm-3">
+            @Html.LabelFor(x => x.FULLAMOUNT)<br />
+            @Html.DisplayFor(model => model.FULLAMOUNT)
+        </div>
+    </div>
+    <div class="row panel">
+        <div class="col-sm-3">
+            @Html.LabelFor(x => x.FOB)<br />
+            @Html.DisplayFor(model => model.FOB)
+        </div>
+        <div class="col-sm-3">
+            @Html.LabelFor(x => x.NETDAYS)<br />
+            @Html.DisplayFor(model => model.NETDAYS)
+        </div>
+        <div class="col-sm-3">
+            @Html.LabelFor(x => x.ACCEPTDAYS)<br />
+            @Html.DisplayFor(model => model.ACCEPTDAYS)
+        </div>
+        <div class="col-sm-3">
+            @Html.LabelFor(x => x.SECORG)<br />
+            @Html.DisplayFor(model => model.SECORG)
+        </div>
+    </div>
+
+    <div class="row panel">
+        <div class="bold col-sm-12">
+            <h1 class="bold">Period of Performance</h1><hr />
+        </div>
+    </div>
+    <div class="row panel">
+        <div class="col-sm-3">
+            @Html.LabelFor(x => x.PERD_PERF_STDT)<br />
+            @Html.DisplayFor(model => model.PERD_PERF_STDT)
+        </div>
+        <div class="col-sm-3">
+            @Html.LabelFor(x => x.PERD_PERF_ENDT)<br />
+            @Html.DisplayFor(model => model.PERD_PERF_ENDT)
+        </div>
+        <div class="col-sm-3">
+            @Html.LabelFor(x => x.DOC_DT)<br />
+            @Html.DisplayFor(model => model.DOC_DT)
+        </div>
+        <div class="col-sm-3">
+            @Html.LabelFor(x => x.ORIG_DOC_DT)<br />
+            @Html.DisplayFor(model => model.ORIG_DOC_DT)
+        </div>
+    </div>
+    <div class="row panel">
+        <div class="col-sm-3">
+            @Html.LabelFor(x => x.CLSD_DT)<br />
+            @Html.DisplayFor(model => model.CLSD_DT)
+        </div>
+        <div class="col-sm-3">
+            @Html.LabelFor(x => x.ACCOUNTNO)<br />
+            @Html.DisplayFor(model => model.ACCOUNTNO)
+        </div>
+    </div>
+
+    <div class="row panel">
+        <div class="bold col-sm-12">
+            <h1 class="bold">Vendor</h1><hr />
+        </div>
+    </div>
+    <div class="row panel">
+        <div class="col-sm-3">
+            @*@Html.LabelFor(x => x.VEND_CD)<br />
+            @Html.DisplayFor(model => model.VEND_CD)*@
+            &nbsp;
+            @Html.DisplayFor(model => model.TIN)
+            &nbsp;
+            @Html.DisplayFor(model => model.ADDRCODE)
+        </div>
+        <div class="col-sm-3">
+            @Html.LabelFor(x => x.VENDNAME)<br />
+            @Html.DisplayFor(model => model.VENDNAME)
+        </div>
+        <div class="col-sm-3">
+            @Html.LabelFor(x => x.VENDADDR)<br />
+            @Html.TextAreaFor(model => model.VENDADDR, new { @disabled = "true", style = "width:100%; height:75px; border:0px white;" })
+        </div>
+        <div class="col-sm-3">
+            @Html.LabelFor(x => x.VendorData.DUNS)<br />
+            @Html.DisplayFor(model => model.VendorData.DUNS)
+            &nbsp;
+            @Html.DisplayFor(model => model.VendorData.PLUS4)
+        </div>
+    </div>
+    <div class="row panel">
+        <div class="col-sm-3">
+            @Html.LabelFor(x => x.NM_OF_PRSN)<br />
+            @Html.DisplayFor(model => model.NM_OF_PRSN)
+        </div>
+    </div>
+</div>
+    
+
+<br style="clear: both;" /><br />
+
+@{
+    Html.Kendo().TabStrip()
+        .Name("TabPO")
+        .Items(tabPO => tabPO.Add().Text("PO Desc").Content(
+            @<text>
+                <div style="width: 100%; min-height: 60px; overflow: auto;">
+                    @Html.Label("DSCR", "Description")
+                    <br />
+                    @Html.TextAreaFor(model => model.Dscr.DSCR, 8, 80, new { @disabled = "true", style = "width: 99%; border:0px white;" })
+                    <br /><br />
+                    <fieldset style="width: 220px; float: left; clear: both;">
+                        <legend>CCR Flag</legend>
+                        @Html.RadioButton("rdbCcrFlag", "true", new { @class = "rdbCcrFlag", @disabled = Model.CCREnabled }) True
+                        @Html.RadioButton("rdbCcrFlag", "false", new { @class = "rdbCcrFlag", @disabled = Model.CCREnabled }) False
+                        @Html.RadioButton("rdbCcrFlag", "NotSet", new { @class = "rdbCcrFlag", @disabled = Model.CCREnabled }) Not set
+                    </fieldset>
+                    <button onclick="ViewNovationHistory()" type="submit" style="margin: 24px 1% 10px 0; float: right;">Novation History</button>
+                </div>
+            </text>)
+         )
+         .Items(tabPO => tabPO.Add().Text("PO Accounting").Content(
+            @<text>
+                <div style="width: 100%; min-height: 60px; overflow: auto;">
+                   @(Html.Kendo().Grid(Model.POAcctData)
+                 .Name("grdPOAccounting")
+                 .Columns(columns =>
+                 {
+                     columns.Command(v => v.Custom("Select").Click("grdPOAccountingSelected")).Title("Action");
+                     columns.Bound(v => v.LNUM).Title("LNum").Width(70);
+                     columns.Bound(v => v.ORIGLNUM).Title("OrigNum").Width(70);
+                     columns.Bound(v => v.UDO).Title("UDO").Width(70).Format("{0:0.00}");
+                     columns.Bound(v => v.ACCRUED).Title("Accrued").Width(70).Format("{0:0.00}");
+                     columns.Bound(v => v.PYMTS).Title("Pymts").Width(70).Format("{0:0.00}");
+                     columns.Bound(v => v.PEGASYS_AMT).Title("Pegasys_Amt").Width(70).Format("{0:0.00}");
+                     if (Model.POAcctHasFullAmount == true)
+                     {
+                         columns.Bound(v => v.FULLAMOUNT).HtmlAttributes(new { id = "FullAmt" }).Title("Full_Amount").Width(70).Format("{0:0.00}");
+                     }
+                     columns.Bound(v => v.FUNDFY).Title("Fund FY").Width(70);
+                     columns.Bound(v => v.FUND).Title("Fund").Width(110);
+                     columns.Bound(v => v.ORGCODE).Title("Org Code").Width(70);
+                     columns.Bound(v => v.BA).Title("BA").Width(92);
+                     columns.Bound(v => v.CE).Title("CE").Width(92);
+                     columns.Bound(v => v.FC).Title("FC").Width(92);
+                     columns.Bound(v => v.PROJ).Title("Proj").Width(92);
+                     columns.Bound(v => v.COSTA).Title("CostA").Width(92);
+                     columns.Bound(v => v.COSTB).Title("CostB").Width(92);
+                     columns.Bound(v => v.WORKITEM).Title("Work Item").Width(110);
+                     columns.Bound(v => v.PROMTPAYTYPE).Title("Prompt Pay Type").Width(60);
+
+                 })
+                 .HtmlAttributes(new { style = "height: 250px; margin-top: 6px;" })
+                 .ToolBar(tools => tools.Excel())
+                 .Pageable(pageable => pageable
+                     .Input(true)
+                     .Numeric(false)
+                     .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                     )
+                     .Excel(excel => excel
+                     .FileName("POAccounting-" + DateTime.Today.ToString("yyyy-MM-dd") + ".xlsx")
+                     .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+                     .AllPages(true)
+                 )
+                 .Selectable()
+                 .Sortable()
+                 .DataSource(dataSource => dataSource
+                 .Ajax()
+                 .PageSize(10)
+                 .ServerOperation(false)
+                 )
+                 .Resizable(resize => resize.Columns(true))
+                )
+                </div>
+            </text>)
+         )
+         .Items(tabPO => tabPO.Add().Text("PO Office Address").Content(
+            @<text>
+                <div class="container">
+                    <div class="row panel">
+                        <div class="col-sm-3">
+                            @Html.LabelFor(x => x.OfficeData.OFFCCD)<br />
+                            @Html.DisplayFor(model => model.OfficeData.OFFCCD)
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.LabelFor(x => x.OfficeData.ADDRCD)<br />
+                            @Html.DisplayFor(model => model.OfficeData.ADDRCD)
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.LabelFor(x => x.OfficeData.OFFCTYP)<br />
+                            @Html.DisplayFor(model => model.OfficeData.OFFCTYP)
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.LabelFor(x => x.OfficeData.COUNTY)<br />
+                            @Html.DisplayFor(model => model.OfficeData.COUNTY)
+                        </div>
+                    </div>
+                    <div class="row panel">
+                        <div class="col-sm-3">
+                            @Html.LabelFor(x => x.OfficeData.COUNTRY)<br />
+                            @Html.DisplayFor(model => model.OfficeData.COUNTRY)
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.LabelFor(x => x.OfficeData.NAME)<br />
+                            @Html.DisplayFor(model => model.OfficeData.NAME)
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.LabelFor(x => x.OfficeData.ADDRESS)<br />
+                            @Html.TextAreaFor(model => model.OfficeData.ADDRESS, new { @disabled = "true", style = "width:250px; height:75px; border:0px white;" })
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.LabelFor(x => x.OfficeData.PHONE)<br />
+                            @Html.DisplayFor(model => model.OfficeData.PHONE)
+                        </div>
+                    </div>
+                    <div class="row panel">
+                        <div class="col-sm-3">
+                            @Html.LabelFor(x => x.OfficeData.FAX)<br />
+                            @Html.DisplayFor(model => model.OfficeData.FAX)
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.LabelFor(x => x.OfficeData.EMAIL)<br />
+                            @Html.DisplayFor(model => model.OfficeData.EMAIL)
+                        </div>
+                    </div>
+                </div>
+            </text>))
+         .Items(tabPO => tabPO.Add().Text("EDI").Content(
+            @<text>
+                <div style="width: 100%; min-height: 60px; overflow: auto;">
+                    @(Html.Kendo().Grid(Model.EdiData)
+                .Name("grdEdi")
+                .Columns(columns =>
+                {
+                    columns.Command(v => v.Custom("Select").Click("grdEdiSelected")).Title("Action");
+                    columns.Bound(v => v.ACT).Title("ACT");
+                    columns.Bound(v => v.PO_ID).Title("PO ID");
+                    columns.Bound(v => v.PONUMBER).Title("PO NUMBER");
+                    columns.Bound(v => v.CONTRACT).Title("Contract");
+                    columns.Bound(v => v.MODNO).Title("MOD No.");
+                    columns.Bound(v => v.PODTYP).Title("Doc Type");
+                    columns.Bound(v => v.AMOUNT).Title("Amount Uncleared").Format("{0:0.00}");
+                    columns.Bound(v => v.PODATE).Title("PO Date").Format("{0:d}");
+                    columns.Bound(v => v.FULLAMOUNT).Title("PO Amount").Format("{0:0.00}");
+                    columns.Bound(v => v.VEND_CD).Title("Remit VendNo");
+                    columns.Bound(v => v.COMPANY_NAME).Title("Company Name");
+                    columns.Bound(v => v.FOB).Title("FOB");
+                    columns.Bound(v => v.ACCEPTDAYS).Title("Accept Days");
+                    columns.Bound(v => v.NETDAYS).Title("Net Days");
+                    columns.Bound(v => v.DISCPERCENT).Title("DISC. Percent");
+                    columns.Bound(v => v.DISCDAYS).Title("Disc Days");
+                    columns.Bound(v => v.SIGNATURE).Title("Signature");
+                    columns.Bound(v => v.ACCOUNT).Title("Account No.");
+                    columns.Bound(v => v.PO_STATUS).Title("PO Status");
+                })
+                .HtmlAttributes(new { style = "height: 250px; margin-top: 6px;" })
+                .ToolBar(tools => tools.Excel())
+                .Pageable(pageable => pageable
+                    .Input(true)
+                    .Numeric(false)
+                    .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                 )
+                 .Excel(excel => excel
+                    .FileName("POEDI-" + DateTime.Today.ToString("yyyy-MM-dd") + ".xlsx")
+                    .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+                    .AllPages(true)
+                )
+                .Selectable()
+                .Sortable()
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .PageSize(10)
+                    .ServerOperation(false)
+                 )
+                 .Resizable(resize => resize.Columns(true))
+                    )
+                </div>
+            </text>)
+         )
+         .Items(tabPO => tabPO.Add().Text("Vendor Information").Content(
+            @<text>
+                <div class="container">
+                    <div class="row panel">
+                        <div class="bold col-sm-12">
+                            <h1 class="bold">Remit Vendor</h1><hr />
+                        </div>
+                    </div>
+                    <div class="row panel">
+                        <div class="col-sm-3">
+                            @Html.LabelFor(x => x.VendorData.RMIT_CD)<br />
+                            @Html.DisplayFor(model => model.VendorData.RMIT_CD)
+                            &nbsp;
+                            @Html.DisplayFor(model => model.VendorData.RMIT_ADDR_CD)
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.LabelFor(x => x.VendorData.RMIT_ADDR_NM)<br />
+                            @Html.DisplayFor(model => model.VendorData.RMIT_ADDR_NM)
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.LabelFor(x => x.VendorData.RMIT_ADDR)<br />
+                            @Html.TextAreaFor(model => model.VendorData.RMIT_ADDR, new { @disabled = "true", style = "width:350px; height:75px; border:0px white;" })
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.LabelFor(x => x.VendorData.RMIT_BANK_ID)<br />
+                            @Html.DisplayFor(model => model.VendorData.RMIT_BANK_ID)
+                        </div>
+                    </div>
+                    <div class="row panel">
+                        <div class="col-sm-3">
+                            @Html.LabelFor(x => x.VendorData.RMIT_BANK_ACCT_NUM)<br />
+                            @Html.DisplayFor(model => model.VendorData.RMIT_BANK_ACCT_NUM)
+                        </div>
+                    </div>
+
+                    <div class="row panel">
+                        <div class="bold col-sm-12">
+                            <h1 class="bold">Designated Agent</h1><hr />
+                        </div>
+                    </div>
+                    <div class="row panel">
+                        <div class="col-sm-3">
+                            @Html.LabelFor(x => x.VendorData.DGGT_CD)<br />
+                            @{ 
+                                String dggt_cdDisplay = "";
+                                if (!String.IsNullOrEmpty(Model.VendorData.DGGT_CD))
+                                {
+                                    string[] splitdggt = Model.VendorData.DGGT_CD.Split('&');
+                                    if (splitdggt.Length >= 3)
+                                    {
+                                        dggt_cdDisplay = splitdggt[2];
+                                    }
+                                }
+
+                                String dggt_addr_cdDisplay = "";
+                                if (!String.IsNullOrEmpty(Model.VendorData.DGGT_ADDR_CD))
+                                {
+                                    string[] splitdggtaddr = Model.VendorData.DGGT_ADDR_CD.Split('&');
+                                    if (splitdggtaddr.Length >= 4)
+                                    {
+                                        dggt_addr_cdDisplay = splitdggtaddr[3];
+                                    }
+                                }
+                            }
+                            <textbox disabled>@dggt_cdDisplay</textbox>
+                            &nbsp;
+                            <textbox disabled>@dggt_addr_cdDisplay</textbox>
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.LabelFor(x => x.VendorData.DGGT_ADDR_NM)<br />
+                            @Html.DisplayFor(model => model.VendorData.DGGT_ADDR_NM)
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.LabelFor(x => x.VendorData.DGGT_ADDR)<br />
+                            @Html.TextAreaFor(model => model.VendorData.DGGT_ADDR, new { @disabled = "true", style = "width:250px; height:75px; border:0px white;" })
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.LabelFor(x => x.VendorData.DGGT_BANK_ID)<br />
+                            @Html.DisplayFor(model => model.VendorData.DGGT_BANK_ID)
+                        </div>
+                    </div>
+                    <div class="row panel">
+                        <div class="col-sm-3">
+                            @Html.LabelFor(x => x.VendorData.DGGT_BANK_ACCT_NUM)<br />
+                            @Html.DisplayFor(model => model.VendorData.DGGT_BANK_ACCT_NUM)
+                        </div>
+                    </div>
+                </div>
+       
+            </text>
+ )).SelectedIndex(0).Render();
+}
+
+<hr />
+Status:
+@Html.DisplayFor(model => model.STATUS)
+<br /><br />
+Discount:
+@Html.DisplayFor(model => model.DISCOUNT)
+
+<div style="width: 450px; float: right;">
+    <button type="submit" id="btnViewRecur"
+            @((Model != null) && Model.ViewRecurButtonEnabled ? "" : "disabled")>
+        View Recur
+    </button>
+    <button type="submit"
+            @((Model != null) && Model.ViewTJButtonEnabled ? "" : "disabled")
+            onclick="location.href='@Url.Action("ViewTj", "TransHist", new { pDocNo = Model.PO_ID + '&' + Model.MODNO })'">
+        View TJ
+    </button>
+    <button type="submit" class="viewMemo" command="viewMemo"
+            @((Model != null) && Model.PegMemoEnabled ? "" : "disabled")>
+        View PegMemo
+    </button>
+    <button type="submit" id="btnViewImage" 
+            @((Model != null) && Model.ViewImageButtonEnabled ? "" : "disabled")> 
+        @{ String ViewImageButtonText = ""; }
+        @if (!String.IsNullOrEmpty(Model.IMAGEID))
+        {
+            ViewImageButtonText = "View Image";
+        }
+        else
+        {
+            ViewImageButtonText = "View EDI";
+        }
+        @ViewImageButtonText
+    </button>
+</div>
+
+<script>
+    $("#btnViewImage").on("click", function () {
+        var url = '';
+        if ('@Model.IMAGEID') {
+            url = '@Url.Action("ViewImageByImageID", "Exceptions", new { docId = Model.IMAGEID })';
+
+        }
+        else {
+            url = '@Html.Raw(Url.Action("ViewEDIPO", "TransHist", new { Act = Model.ACT, ModNo = Model.MODNO, InboxUidy = Model.INBOXUIDY, Po_Id = Model.PO_ID }))';
+        }
+
+        window.location = url;
+    });
+
+    //function setFullAmountCol()
+    //{
+    //    var hasFullAmount = '@Model.POAcctHasFullAmount';
+    //
+    //    if (hasFullAmount == false)
+    //     {
+    //         var grid = $("#grdPOAccounting").data("kendoGrid");
+    //        grid.hideColumn("FullAmt");
+    //    }
+    //}
+
+    function setCCR() {
+
+        var ccr = '';
+        if ('@Model.Dscr') {
+            if ('@Model.Dscr.CCR') {
+                ccr = '@Model.Dscr.CCR';
+            }
+        }
+
+        $('.rdbCcrFlag')[0].checked = true;
+        $('.rdbCcrFlag')[1].checked = false;
+        $('.rdbCcrFlag')[2].checked = false;
+
+        if (ccr == 'T') {
+            $('.rdbCcrFlag')[0].checked = true;
+        }
+        else if (ccr == '') {
+            $('.rdbCcrFlag')[2].checked = true;
+        }
+        else {
+            $('.rdbCcrFlag')[1].checked = true;
+        }
+    }
+
+    function SetupButtonViewRecur() {
+        var recurId = "",
+            pDocNo = '@Model.PO_ID',
+            act = '@Model.ACT';
+
+        if (pDocNo.substring(0, 2) == 'RO') {
+            if (act.substring(0, 1) == 'B') {
+                recurId = '1' + act;
+            }
+            else {
+                recurId = "1B" + act;
+            }
+        }
+
+        if (recurId != '') {
+            $("#btnViewRecur").prop("disabled", false);
+            $("#btnViewRecur").show();
+            $("#btnViewRecur").click(function () {
+                window.location = '@Html.Raw(@Url.Action("ViewRecur", "TransHist"))' + '?recur_Id=' + Model.RECUR_ID;
+            });
+        }
+    }
+    function setGrids() {
+        var gridName = "grdPOAccounting";
+        ConfigureKendoGridPaginationControlsFor508(gridName);
+        MakeKendoGridScrollable(gridName, "150px");
+        gridName = "grdEdi";
+        ConfigureKendoGridPaginationControlsFor508(gridName);
+        MakeKendoGridScrollable(gridName, "150px");
+    }
+
+    function setCommand(val) {
+        $('#Command').val(val);
+    }
+
+    $('.viewMemo').click(function () {
+        setCommand($(this).attr('command'));
+        showPegMemoModal('@Html.Raw(Model.UIDY)');
+    });
+
+    $(document).ready(function () {
+        setCCR();
+        SetupButtonViewRecur();
+        setGrids();
+        // the following line causes View EDI/View Image button not disbaled based on the underline data
+        //$("#btnViewImage").prop("disabled", false);
+        //setFullAmountCol();
+
+    });
+
+    function ViewNovationHistory() {
+        window.location = '@Html.Raw(Url.Action("ViewNovationHistory", "TransHist", new { docNum = Model.PO_ID, uidy = Model.UIDY }))';
+    }
+
+
+    function grdEdiSelected(e) {
+
+        // Highlight the row when "Select" button clicked
+        $("#grdEdi table tr").removeClass('k-state-selected');
+        $(e.currentTarget).closest("tr").addClass('k-state-selected');
+
+    }
+
+    function grdPOAccountingSelected(e) {
+
+        // Highlight the row when "Select" button clicked
+        $("#grdPOAccounting table tr").removeClass('k-state-selected');
+        $(e.currentTarget).closest("tr").addClass('k-state-selected');
+
+    }
+</script>
+
+@Html.HiddenFor(x => x.Command)
+

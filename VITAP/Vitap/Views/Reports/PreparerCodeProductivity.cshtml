@@ -1,0 +1,152 @@
+﻿@using VITAP.Models.Reports
+@{
+    var textAttr = new Dictionary<string, object> { { "style", "width:140px" }, { "disabled", "" } };
+    var headerAttr = new { @style = "font-weight:bold" };
+    var alignRight = new { style = "text-align: right" };
+    var footerSum = "<div class='grid-footer'>#=sum#</div>";
+}
+
+@Html.AntiForgeryToken()
+<style>
+    label {
+        display: inline;
+        float: left;
+        margin-right: 4px;
+        vertical-align: top;
+    }
+    div.grid-footer {
+        text-align: right;
+        font-size: 10pt;
+    }
+</style>
+
+<br />
+<h1 style="font-weight:bold">Preparer Code Productivity Report</h1>
+
+<div class="container-fluid" style="float:left">
+    <div style="float: left;">
+        <div id="Buttons" style="float: left;min-width: 55%;">
+            <br />  
+            <label>Prep Code</label>
+            <input type="text" id="PreparerCode" style="width: 80px" />
+            <button type="button" class="btn btn-primary btn-default" onclick="btnSearchOnClick();" style="margin-left: 20px">Search</button>
+            <button type="button" class="btn btn-info" style="margin-left: 20px">Save to File</button>
+            <button type="button" class="btn btn-info" style="margin-left: 20px">Print</button>
+            <button type="button" class="btn btn-info" style="margin-left: 20px; margin-right: 20px">Cancel</button>
+        </div>
+        <div style="float: left;width: 18%;">
+            <Label style="width: 200px;" >
+                Transactions for Period:
+                <select id="Period" onchange="OnChangePeriod();">
+                    <option selected="selected" value="All">All</option>
+                    <option value="Today">Today</option>
+                    <option value="7">&gt;= 7 days old</option>
+                    <option value="30">&gt;= 30 days old</option>
+                    <option value="Range">Range</option>
+                </select>
+            </Label>
+        </div>
+        <div id="SearchDates" style="float: left; display: none; width: 25%;">
+            <Label>
+                Date From<br />
+                @(Html.Kendo().DatePicker().Name("DateFrom").HtmlAttributes(new
+                    {
+                        id = "DateFrom",
+                        style = "width: 115px; height: 22px;"
+                    })
+                )
+            </Label>
+            <Label>
+                Date To<br />
+                @(Html.Kendo().DatePicker().Name("DateTo").HtmlAttributes(new
+                    {
+                        id = "DateTo",
+                        style = "width: 115px; height: 22px;"
+                    })
+                )
+            </Label>
+        </div>
+    </div>
+    
+    <div style="clear: left;">
+        <br />
+        @{
+            Html.Kendo().Grid<PreparerCodeProductivityItem>()
+                .Name("gridPreparerCodeProductivity")
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .Aggregates(aggr =>
+                        {
+                            aggr.Add(p => p.Reject).Sum();
+                            aggr.Add(p => p.Accept).Sum();
+                            aggr.Add(p => p.Skip).Sum();
+                            aggr.Add(p => p.NextDay).Sum();
+                            aggr.Add(p => p.DoqReq).Sum();
+                            aggr.Add(p => p.Change).Sum();
+                            aggr.Add(p => p.Other).Sum();
+                            aggr.Add(p => p.Cleared).Sum();
+                        }
+                    )
+                    .Read(r => r
+                        .Action("PreparerCodeProductivity", "Reports")
+                        .Data("GetSearchParameters")
+                    )
+                )
+                .Columns(columns =>
+                {
+                    columns.Bound(x => x.ExceptionCode).Width(120).HeaderHtmlAttributes(headerAttr).ClientFooterTemplate("<div class='grid-footer'>Totals</div>");
+                    columns.Bound(x => x.Reject).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).ClientFooterTemplate(footerSum);
+                    columns.Bound(x => x.Accept).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).ClientFooterTemplate(footerSum);
+                    columns.Bound(x => x.Skip).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).ClientFooterTemplate(footerSum);
+                    columns.Bound(x => x.NextDay).Width(110).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).ClientFooterTemplate(footerSum);
+                    columns.Bound(x => x.DoqReq).Width(110).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).ClientFooterTemplate(footerSum);
+                    columns.Bound(x => x.Change).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).ClientFooterTemplate(footerSum);
+                    columns.Bound(x => x.Other).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).ClientFooterTemplate(footerSum);
+                    columns.Bound(x => x.Cleared).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).ClientFooterTemplate(footerSum);
+                })
+                .AutoBind(false)
+                .HtmlAttributes(new { style = "width: 1000px" })
+                .Scrollable(s => s.Height(150))
+                .Sortable()
+                .Filterable()
+                .Pageable(pageable => pageable
+                    .Input(true)
+                    .Numeric(false)
+                    .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                )
+                .Render();
+        }
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        OnChangePeriod();
+        // Without this, the navigation bar at the bottom of the grid is way too tall.
+        $('.k-pager-wrap').css('height', '45px');
+    }
+    )
+
+    function OnChangePeriod() {
+        var isRange = $("#Period").val() == "Range";
+        if (isRange)
+            $("#SearchDates").show();
+        else
+            $("#SearchDates").hide();
+    }
+
+    function GetSearchParameters() {
+        // Reserved property names
+        // used by DataSourceRequest: sort, page, pageSize, group, filter
+        return {
+            PreparerCode: $("#PreparerCode").val(),
+            Period: $("#Period").val(),
+            DateFrom: $("#DateFrom").val(),
+            DateTo: $("#DateTo").val()
+        };
+    }
+
+    function btnSearchOnClick() {
+        $('#gridPreparerCodeProductivity').data("kendoGrid").dataSource.read();
+    }
+</script>

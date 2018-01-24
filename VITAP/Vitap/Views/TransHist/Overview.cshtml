@@ -1,0 +1,161 @@
+﻿@model IEnumerable<VITAP.Data.PegasysInvoice>
+@using VITAP.Data
+@using VITAP.Data.Models
+
+@{
+    ViewBag.Title = "Overview";
+}
+
+<h2>Overview</h2>
+<hr />
+<div style="width: 94%; margin: auto;">
+    <fieldset style="width: 44%; float: left;">
+        <legend>Unpaid Invoices</legend>
+        @(Html.Kendo().Grid(Model)
+        .Name("grdInvoice")
+        .Columns(columns =>
+        {
+            columns.Command(v => v.Custom("Select").Click("grdInvoiceSelected")).Title("Action");
+            columns.Bound(v => v.INV_KEY_ID).Title("Inv Key ID");
+            columns.Bound(v => v.INVOICE).Title("Invoice #");
+            columns.Bound(v => v.AMOUNT).Title("Invoice Amount").Format("{0:c}").HtmlAttributes(new { style = "text-align: right;" });
+            columns.Bound(v => v.LOGDATE).Title("Log Date").Format("{0:d}");
+            columns.Bound(v => v.PDOCNOPO).Hidden(true).Title("PDocNo");
+        })        
+        .Selectable()        
+        .Sortable()        
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .ServerOperation(false)
+         )
+         .Resizable(resize => resize.Columns(true))
+         .Events(events => events.Change("grdInvoiceChanged"))
+        )
+    </fieldset>
+
+    @{
+        List<OverviewRR> overviewRRs = (List<OverviewRR>)ViewBag.OverviewRR;
+        string poBalance = ViewBag.POBalance.ToString("c");        
+        string rrBalance = ViewBag.OverViewRRBalance.ToString("c");
+        string invoiceBalance = ViewBag.InvoiceBalance.ToString("c");
+    }
+
+    <fieldset style="width: 44%; float: left; margin-left: 4px;">
+        <legend>Unliquidated RRs</legend>
+        @(Html.Kendo().Grid(overviewRRs)
+        .Name("grdRR")
+        .Columns(columns =>
+        {
+            columns.Command(v => v.Custom("Select").Click("grdRRSelected")).Title("Action");
+            columns.Bound(v => v.RR_ID).Title("RR ID");
+            columns.Bound(v => v.INVC_NUM).Title("Invoice #");
+            columns.Bound(v => v.UNCLEARED_AM).Title("Uncleared Balance").Format("{0:c}").HtmlAttributes(new { style = "text-align: right;" });
+            columns.Bound(v => v.DOC_DT).Title("Date Received").Format("{0:d}");
+            columns.Bound(v => v.PDOCNOPO).Title("PDocNo");
+        })        
+        .Selectable()               
+        .Sortable()        
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .ServerOperation(false)
+         )
+         .Resizable(resize => resize.Columns(true))
+         .Events(events => events.Change("grdRRChanged"))
+        )
+    </fieldset>
+    <br style="clear: both;" /><br />
+    <fieldset class="searchForm" style="clear: both; width: 44%; float: left; margin-bottom: 4px;">
+        <legend>Summary</legend>
+        <label for="poBalance">Unliquidate PO Balance</label>        
+        @Html.TextBox("poBalance", poBalance, new { disabled = "true", style = "text-align: right; padding: 4px;" })
+        <br />
+        <label for="rrBalance">Unliquidate RR Balance</label>        
+        @Html.TextBox("rrBalance", rrBalance, new { disabled = "true", style = "text-align: right; padding: 4px;" })
+        <br />
+        <label for="invoiceBalance">Unpaid Invoice Balance</label>        
+        @Html.TextBox("invoiceBalance", invoiceBalance, new { disabled = "true", style = "text-align: right; padding: 4px;" })
+    </fieldset>
+    <br style="clear: both;" />
+    <button type="submit" id="btnViewInvs" disabled>View Invs</button>
+    <button type="submit" id="btnViewRR" disabled>View RR</button>
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var grdInvoice = $("#grdInvoice").data("kendoGrid");
+        var grdRR = $("#grdRR").data("kendoGrid");
+        if (grdInvoice != null) {
+            var invoiceGridId = "grdInvoice";
+            MakeKendoGridScrollable(invoiceGridId, "230px");
+        }
+        if (grdRR != null) {
+            var rrGridId = "grdRR";
+            MakeKendoGridScrollable(rrGridId, "230px");
+        }
+    });
+
+    function grdInvoiceChanged() {
+        var grid = $("#grdInvoice").data("kendoGrid");
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        grdInvoiceSelecting(dataItem);
+    }
+
+    function grdInvoiceSelected(e) {
+        // Highlight the row when "Select" button clicked
+        $("#grdInvoice table tr").removeClass('k-state-selected');
+        $(e.currentTarget).closest("tr").addClass('k-state-selected');
+
+        // Get the data from the current row
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        grdInvoiceSelecting(dataItem);
+    }
+
+
+    // When user selects one record in the Invoice grid
+    function grdInvoiceSelecting(dataItem) {
+        // Setup "View PO" button
+        if (dataItem.INV_KEY_ID != null) {
+            $("#btnViewInvs").prop("disabled", false);
+            $("#btnViewInvs").click(function () {
+                location = '@Html.Raw(@Url.Action("ViewInvoice", "TransHist"))' + '?Inv_Key_Id=' + dataItem.INV_KEY_ID;
+            });
+        }
+        else {
+            $("#btnViewInvs").attr("disabled", "disabled");
+        }
+    }
+
+    // When user selects one record in the RR grid
+    function grdRRChanged() {
+        var grid = $("#grdRR").data("kendoGrid");
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        grdRRSelecting(dataItem);
+
+    }
+
+    function grdRRSelected(e) {
+        // Highlight the row when "Select" button clicked
+        $("#grdRR table tr").removeClass('k-state-selected');
+        $(e.currentTarget).closest("tr").addClass('k-state-selected');
+
+        // Get the data from the current row
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        grdInvoiceSelecting(dataItem);
+    }
+
+    function grdRRSelecting(dataItem) {
+        // Setup "View PO" button
+        if (dataItem.RR_ID != null) {
+            $("#btnViewRR").prop("disabled", false);
+            $("#btnViewRR").click(function () {
+                location = '@Html.Raw(@Url.Action("ViewRR", "TransHist"))' + '?rr_Id=' + dataItem.RR_ID;
+            });
+        }
+        else {
+            $("#btnViewRR").attr("disabled", "disabled");
+        }
+    }
+</script>

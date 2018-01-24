@@ -1,0 +1,22 @@
+﻿@model Vitap.Data.Models.TransHist.OfficeAddress
+
+@using (Html.BeginForm())
+{
+    <div class="pad10" style="width:500px; font-weight:bold;">
+        PO Office Address:<br />
+    </div>
+    <div class="pad10" style="width:500px;">
+        @Html.LabelFor(x => x.AddressName)<br />
+        @Html.TextBoxFor(x => x.AddressName, new { @disabled = "", @readonly = "true", style = "font-weight:bold; width:400px;" })
+    </div>
+    <div class="pad10" style="width:500px;">
+        @Html.LabelFor(x => x.Address1)<br />
+        <label for="Address2" class="control-label sr-only">Address2</label>
+        <label for="AddressCSZ" class="control-label sr-only">AddressCSZ</label>
+        @Html.TextBoxFor(x => x.Address1, new { @disabled = "disabled", style="font-weight:bold;" })
+        <br />
+        @Html.TextBoxFor(x => x.Address2, new { @disabled = "disabled", @readonly = true, @class = "textAreaElastic", style="font-weight:bold;", id="Address2" })
+        <br />
+        @Html.TextBoxFor(x => x.AddressCSZ, new { @disabled = "disabled", @readonly = true, @class = "textAreaElastic", style="font-weight:bold;", id = "AddressCSZ" })
+    </div>
+}

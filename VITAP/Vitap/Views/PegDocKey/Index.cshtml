@@ -1,0 +1,140 @@
+﻿@model IEnumerable<object>
+
+
+@{
+    ViewBag.Title = "Pegasys Documents To Be Keyed/Indexed";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var headerAttr = new { @style = "font-weight:bold" };
+    var alignRight = new { style = "text-align: right" };
+    var alignLeft = new { style = "text-align: lef" };
+    
+}
+
+
+@using (Html.BeginForm("Index", "PegDocKey", FormMethod.Post))
+{
+    
+    @Html.AntiForgeryToken()
+
+    List<VITAP.Data.Models.PegasysKeyedIndexedViewModel>
+        keyModel = Model.ToList()[0] as List<VITAP.Data.Models.PegasysKeyedIndexedViewModel>;
+    List<VITAP.Data.Models.PegasysKeyedIndexedViewModel>
+        indModel = Model.ToList()[1] as List<VITAP.Data.Models.PegasysKeyedIndexedViewModel>;
+
+    <div class="container-fluid">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <label style="font: bold; font-size: large">Pegasys Documents To Be Keyed/Indexed</label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="grdPegDocKey">List Of Documents To Be Keyed:</label>
+                        @{
+                            Html.Kendo().Grid
+                            <VITAP.Data.Models.PegasysKeyedIndexedViewModel>
+                                (keyModel)
+                                .Name("grdPegDocKey")
+                                .DataSource(dataSource => dataSource
+                                    .Ajax()
+                                    .PageSize(10)
+                                    .ServerOperation(false)
+                                    .Aggregates(aggregates =>
+                                    {
+                                        aggregates.Add(p => p.NOOFDOCS).Sum();
+
+                                    })
+                                    .Model(model => model.Id(p => p.NOOFDOCS))
+                                )
+                                .Columns(columns =>
+                                {
+                                    columns.Bound(c => c.DOC_TYPE).HeaderHtmlAttributes(headerAttr);
+                                    columns.Bound(c => c.NOOFDOCS).ClientFooterTemplate("Total Records: #= kendo.format('{0:n0}', sum)#").HeaderHtmlAttributes(headerAttr);
+                                    columns.Bound(c => c.STAMPDATE).HeaderHtmlAttributes(headerAttr);
+                                    columns.Bound(c => c.DAYSOLD).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                                }) 
+                                .Sortable()
+                                .ToolBar(tools => tools.Excel())
+                                .Excel(excel => excel
+                                    .FileName("PegDocKeyed.xlsx")
+                                    .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+                                    .AllPages(true)
+                                )
+                                .HtmlAttributes(new { style = "margin-top: 6px;" })
+                                .Pageable(pageable => pageable
+                                    .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                                )
+                                .Render();
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="grdPegDocInd">List Of Documents To Be Indexed:</label>
+                        @{
+                            Html.Kendo().Grid
+                            <VITAP.Data.Models.PegasysKeyedIndexedViewModel>
+                                (indModel)
+                                .Name("grdPegDocInd")
+                                .DataSource(dataSource => dataSource
+                                    .Ajax()
+                                    .PageSize(10)
+                                    .ServerOperation(false)
+                                    .Aggregates(aggregates =>
+                                    {
+                                        aggregates.Add(p => p.NOOFDOCS).Sum();
+
+                                    })
+                                    .Model(model => model.Id(p => p.NOOFDOCS))
+                                )
+                                .Columns(columns =>
+                                {
+                                    columns.Bound(c => c.DOC_TYPE).HeaderHtmlAttributes(headerAttr);
+                                    columns.Bound(c => c.NOOFDOCS).ClientFooterTemplate("Total Records: #= kendo.format('{0:n0}', sum)#").HeaderHtmlAttributes(headerAttr);
+                                    columns.Bound(c => c.STAMPDATE).HeaderHtmlAttributes(headerAttr);
+                                    columns.Bound(c => c.DAYSOLD).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                                })
+                                .HtmlAttributes(new { style = "margin-top: 6px;" })
+                                .Pageable(pageable => pageable
+                                    .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                                )
+                                .Sortable()
+                                .ToolBar(tools => tools.Excel())
+                                .Excel(excel => excel
+                                    .FileName("PegDocIndexed.xlsx")
+                                    .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+                                    .AllPages(true)
+                                )
+                                .Render();
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        ConfigureKendoGridPaginationControlsFor508('grdPegDocKey');
+        MakeKendoGridScrollable('grdPegDocKey', "300px");
+
+        ConfigureKendoGridPaginationControlsFor508('grdPegDocInd');
+        MakeKendoGridScrollable('grdPegDocInd', "300px");
+    });
+</script>
+
+
+
+
+
+
+

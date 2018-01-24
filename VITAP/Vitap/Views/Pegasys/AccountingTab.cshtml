@@ -1,0 +1,58 @@
+﻿@model IEnumerable<VITAP.Data.Models.Pegasys.PegasysPO>
+@using (Html.BeginForm())
+{
+    var textAttr = new Dictionary<string, object> { { "style", "width:140px" }, { "disabled", "" } };
+    var headerAttr = new { @style = "font-weight:bold" };
+
+    @Html.AntiForgeryToken()
+    <style>
+        label
+        {
+            display:inline;
+            float:left;
+            margin-right:4px;
+            vertical-align:top;
+        }
+    </style>
+
+    <div class="form-group">
+        <div style="float: left;">
+            @{
+                Html.Kendo().Grid(Model)
+                    .Name("PurchaseOrders")
+                    .DataSource(dataSource => dataSource.Server()
+                        .Model(model => model.Id(o => o.LNum))
+                        .PageSize(50))
+                    .Columns(columns =>
+                    {
+                        columns.Bound(x => x.LNum).Width(55).HeaderHtmlAttributes(headerAttr);
+                        columns.Bound(x => x.POAmount).Width(100).HeaderHtmlAttributes(headerAttr);
+                        columns.Bound(x => x.Fund).Width(55).HeaderHtmlAttributes(headerAttr);
+                        columns.Bound(x => x.OrgCode).Width(80).HeaderHtmlAttributes(headerAttr);
+                        columns.Bound(x => x.BA).Width(40).HeaderHtmlAttributes(headerAttr);
+                        columns.Bound(x => x.CE).Width(40).HeaderHtmlAttributes(headerAttr);
+                        columns.Bound(x => x.OC).Width(40).HeaderHtmlAttributes(headerAttr);
+                        columns.Bound(x => x.FC).Width(40).HeaderHtmlAttributes(headerAttr);
+                        columns.Bound(x => x.ProjectNumber).Width(80).HeaderHtmlAttributes(headerAttr);
+                        columns.Bound(x => x.CostA).Width(70).HeaderHtmlAttributes(headerAttr);
+                        columns.Bound(x => x.CostB).Width(70).HeaderHtmlAttributes(headerAttr);
+                        columns.Bound(x => x.WI).Width(40).HeaderHtmlAttributes(headerAttr);
+                        columns.Bound(x => x.DocumentNumber).Width(80).HeaderHtmlAttributes(headerAttr);
+                        columns.Bound(x => x.CraftCode).Width(100).HeaderHtmlAttributes(headerAttr);
+                        columns.Bound(x => x.LaborHours).Width(100).HeaderHtmlAttributes(headerAttr);
+                    })
+                    .TableHtmlAttributes(new { style = "width: 1600px"})
+                    .Scrollable(s => s.Height(100))
+                    .Sortable()
+                    .Filterable()
+                    .Pageable(pageable => pageable
+                        .Input(true)
+                        .Numeric(false)
+                        .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                    )
+                    .Render();
+            }
+        </div>
+    </div>
+
+}

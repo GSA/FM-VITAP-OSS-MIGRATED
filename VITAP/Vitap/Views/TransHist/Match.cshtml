@@ -1,0 +1,44 @@
+﻿@model IEnumerable<VITAP.Data.PegasysInvoice>
+
+@{
+    ViewBag.Title = "Match";
+}
+<h2>Match</h2>
+<br />
+@(Html.Kendo().Grid(Model)
+        .Name("grdMatch")
+        .Columns(columns =>
+        {
+            columns.Bound(v => v.INV_KEY_ID).Title("Inv Key ID");
+            columns.Bound(v => v.INVOICE).Title("Invoice");
+            columns.Bound(v => v.INV_STATUS).Title("Invoice Status");
+            columns.Bound(v => v.AMOUNT).Title("Amount").Format("{0:c}").HtmlAttributes(new { style = "text-align: right;" });
+            columns.Bound(v => v.PAY_AMT).Title("Pay Amount").Format("{0:c}").HtmlAttributes(new { style = "text-align: right;" });
+            columns.Bound(v => v.PDOCNORR).Title("PDocNoRR");
+        })        
+        .Sortable()        
+        .Resizable(resize => resize.Columns(true))
+        .Pageable(pageable => pageable
+            .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+         )
+        .ToolBar(tools => tools.Excel())
+        .Excel(excel => excel
+            .FileName("MatchList.xlsx")
+            .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+            .AllPages(true)
+        )
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .PageSize(10)
+            .ServerOperation(false)
+        )
+)
+<script type="text/javascript">
+    $(document).ready(function () {
+        var grdMatch = $("#grdMatch").data("kendoGrid");
+        if (grdMatch != null) {
+            var matchGridId = "grdMatch";
+            ConfigureKendoGridPaginationControlsFor508(matchGridId);
+        }
+    });
+</script>

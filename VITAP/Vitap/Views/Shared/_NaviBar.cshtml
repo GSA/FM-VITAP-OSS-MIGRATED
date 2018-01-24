@@ -1,0 +1,47 @@
+﻿@{
+    Html.Telerik().Menu()
+    .Name("Menu")
+    .Items(menu =>
+    {
+        menu.Add().Text("Data Entry")
+        .Items(item =>
+        {
+            item.Add().Text("Key PegasysPOs").Action("Index", "DataEntry", null);
+            item.Add().Text("Key Pegasys Receipts");
+            item.Add().Text("Key Pegasys TOPS Invoices");
+            item.Add().Text("Key Pegasys NON-TOPS Invoices");
+            item.Add().Text("Key Pegasys Construction Invoices");
+            item.Add().Text("Key Pegasys Non-Constructions Invoices");
+            item.Add().Text("Key UPPS Accrual");
+            item.Add().Text("Maintain Contact");
+            item.Add().Text("Admin Diff Statement -GSAP");
+            item.Add().Text("Reject - GSAP");
+        });
+        menu.Add().Text("Searches")
+        .Items(item =>
+        {
+            item.Add().Text("Vendor Search");
+            item.Add().Text("Index Search");
+            item.Add().Text("Utilites and Other Payments Query");
+        });
+        menu.Add().Text("TransHist").Action("Index", "TransHist", null);
+        menu.Add().Text("Exceptions").Action("Index", "Exceptions", null);
+        menu.Add().Text("Reports")
+        .Items(item =>
+        {
+            item.Add().Text("Management Reports")
+            .Items(entry =>
+            {
+                entry.Add().Text("Entry 1");
+                entry.Add().Text("Entry 2");
+                entry.Add().Text("Entry 3");
+                entry.Add().Text("Entry 4");
+                entry.Add().Text("Entry 5");
+                entry.Add().Text("Entry 6");
+            });
+            item.Add().Text("User Reports");
+            item.Add().Text("Contact Report");
+        });
+    })
+    .Render();
+}

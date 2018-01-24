@@ -1,0 +1,187 @@
+﻿@model VITAP.Data.Models.Pegasys.PegasysPOEdiModel
+
+@{
+    ViewBag.Title = "Pegasys Purchase Order - EDI";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var labelAttrVendor = new { @style = "width: 80px; padding 5px" };
+    var labelAttrBank = new { @style = "width: 100px; padding 5px" };
+    var textAttrBank = new Dictionary<string, object> { { "style", "width:200px; padding 5px" }, { "disabled", "" } };
+    var alignRight = new { @style = "text-align: right" };
+
+    var headerAttr = new { @style = "font-weight:bold" };
+    var textAttr = new Dictionary<string, object> { { "style", "width:140px; padding 5px" }, { "disabled", "" } };
+    var textAttrShort = new Dictionary<string, object> { { "style", "width:80px; padding 5px" }, { "disabled", "" } };
+    var textAttrDiscount = new Dictionary<string, object> { { "style", "width:110px; padding 5px" }, { "disabled", "" } };
+    var textAttrMedium = new Dictionary<string, object> { { "style", "width:200px; padding 5px" }, { "disabled", "" } };
+    var textAttrLong = new Dictionary<string, object> { { "style", "width:300px; padding 5px" }, { "disabled", "" } };
+    var textAreaAttrLong = new Dictionary<string, object> { { "style", "width:280px; padding 5px" }, { "disabled", "" }, { "rows", "2" } };
+}
+
+
+<style>
+    .row {
+        margin-top: 4pt;
+    }
+
+    textarea {
+        width: 100%;
+        max-width: initial;
+        resize: none;
+    }
+</style>
+
+<div class="container">
+    <br />
+    <h1 style="font-weight: bold">Pegasys Purchase Order - EDI</h1>
+    <br />
+
+    <div class="row">
+        <div style="float: left; width: 60%; margin-left: 14px">
+            <br />
+            <label>
+                Pegasys PO Doc No<br />
+                @Html.TextBoxFor(m => m.PegasysDocumentNumber, textAttrLong)
+            </label>
+            <label>
+                Type<br />
+                @Html.TextBoxFor(m => m.PurchaseOrderDocumentType, textAttrShort)
+            </label>
+            <label>
+                Delivery Order Number<br />
+                @Html.TextBoxFor(m => m.DeliveryOrderNumber, textAttrMedium)
+            </label>
+            <br style="clear: left" />
+            <label>
+                Act<br />
+                @Html.TextBoxFor(m => m.ActNumber, textAttrShort)
+            </label>
+            <label>
+                Mod No<br />
+                @Html.TextBoxFor(m => m.ModNumber, textAttrShort)
+            </label>
+            <label>
+                Mod Ind.<br />
+                @Html.TextBoxFor(m => m.ModIndNumber, textAttrShort)
+            </label>
+            <label>
+                Contract No<br />
+                @Html.TextBoxFor(m => m.ContractNumber, textAttrMedium)
+            </label>
+            <label>
+                PO Amount<br />
+                @Html.TextBoxFor(m => m.POAmount, textAttr)
+            </label>
+            <br />
+            <label>
+                Contracting Officer<br />
+                @Html.TextBoxFor(m => m.ContractingOfficer, textAttrLong)
+            </label>
+            <label>
+                Cont. Officer Phone<br />
+                @Html.TextBoxFor(m => m.ContractingOfficerPhone, textAttr)
+            </label>
+            <label>
+                Document Date<br />
+                @Html.EditorFor(m => m.DocumentDate, textAttr)
+            </label>
+            <br style="clear: left" />
+
+            <label>
+                Receiving Officer<br />
+                @Html.TextBoxFor(m => m.ReceivingOfficer, textAttrLong)
+            </label>
+            <label>
+                Recv. Officer Phone<br />
+                @Html.TextBoxFor(m => m.ReceivingOfficerPhone, textAttr)
+            </label>
+            <label>
+                Finance Rec. Date<br />
+                @Html.EditorFor(m => m.FinanceReceivedDate, textAttr)
+            </label>
+            <br style="clear: left" />
+
+            <label>
+                Net Days<br />
+                @Html.TextBoxFor(m => m.NetDays, textAttrDiscount)
+            </label>
+            <label>
+                Discount Days<br />
+                @Html.TextBoxFor(m => m.DiscountDays, textAttrDiscount)
+            </label>
+            <label>
+                Discount %<br />
+                @Html.TextBoxFor(m => m.DiscountPercentage, textAttrDiscount)
+            </label>
+            <label>
+                Tariff Indicator<br />
+                @Html.TextBoxFor(m => m.TariffIndicator, textAttrDiscount)
+            </label>
+            <label>
+                Tax Pmt. Indicator<br />
+                @Html.TextBoxFor(m => m.TaxPaymentIndicator, textAttr)
+            </label>
+            <br style="clear: left" />
+            <Label>
+                FOB: &nbsp;&nbsp;
+                @Html.RadioButtonFor(m => m.FOB, "Origin", new { GroupName = "FOB" })
+                Origin &nbsp;
+                @Html.RadioButtonFor(m => m.FOB, "Destination", new { GroupName = "FOB" })
+                Destination
+            </Label>
+        </div>
+        <div style="float: left; width: 35%">
+            <fieldset>
+                <legend style="font-weight: bold">Remit Vendor:</legend>
+                @Html.LabelFor(m => m.Vendor.VendorTin, labelAttrVendor) @Html.TextBoxFor(m => m.Vendor.VendorTin, textAttr) <br />
+                @Html.LabelFor(m => m.Vendor.VenderName, labelAttrVendor) @Html.TextBoxFor(m => m.Vendor.VenderName, textAttrLong) <br />
+                @Html.LabelFor(m => m.Vendor.VenderAddress, labelAttrVendor) @Html.TextAreaFor(m => m.Vendor.VenderAddress, textAreaAttrLong) <br />
+                @Html.LabelFor(m => m.Vendor.DunsNumber, labelAttrVendor) @Html.TextBoxFor(m => m.Vendor.DunsNumber, textAttr) <br />
+            </fieldset>
+            <fieldset>
+                <legend style="font-weight: bold">Banking Info:</legend>
+                @Html.LabelFor(m => m.RoutingNumber, labelAttrBank) @Html.TextBoxFor(m => m.RoutingNumber, textAttrBank) <br />
+                @Html.LabelFor(m => m.BankAccountNumber, labelAttrBank) @Html.TextBoxFor(m => m.BankAccountNumber, textAttrBank) <br style="clear: left" />
+                @Html.LabelFor(m => m.BankAccountType, labelAttrBank) @Html.TextBoxFor(m => m.BankAccountType, textAttrBank) <br />
+            </fieldset>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <hr />
+            @{
+                Html.Kendo().TabStrip()
+                    .Name("tsTabs")
+                    .Items(items =>
+                    {
+                        items.Add().Text("PO Accounting").HtmlAttributes(headerAttr)
+                            .Content(Html.Partial("AccountingTab", Model.PurchaseOrders).ToHtmlString());
+                        items.Add().Text("PO Office Address").HtmlAttributes(headerAttr)
+                            .Content(Html.Partial("OfficeTab", Model.OfficeAddress).ToHtmlString());
+                        items.Add().Text("Vender Information").HtmlAttributes(headerAttr)
+                            .Content(Html.Partial("VendorTab", Model.Vendor).ToHtmlString());
+                    })
+                    .SelectedIndex(0)
+                    .Render();
+            }
+        </div>
+    </div>
+    <div class="col-sm-12 row">
+        <div style="clear: left">
+            <button type="button" class="btn btn-info">Close</button>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts
+{
+    <script>
+        $(document).ready(function () {
+            // Without this, the navigation bar at the bottom of the grid is way to tall.
+            $('.k-pager-wrap').css('height', '45px');
+        });
+    </script>
+
+}

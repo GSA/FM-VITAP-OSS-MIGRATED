@@ -1,0 +1,39 @@
+﻿@model IEnumerable<VITAP.ViewModels.TransHist.SummaryNote>
+
+@{
+    ViewBag.Title = "Summary Notes";
+}
+
+<h1>@ViewBag.Caption</h1>
+
+@{
+
+    string summaryNote = string.Empty;
+    if (Model != null || Model.Count() > 0)
+    {
+        foreach (var item in Model)
+        {
+            summaryNote += "\r\n" + item.PREPCODE + "  " + item.TRANSDATE + ":\r\n" + item.SN_MEMO + "\r\n";
+        }
+    }
+
+}
+<hr />
+<label for="curMemo">Current Notes:</label>
+<br />
+<textarea id="curMemo" name="curMemo" rows="10" cols="100" disabled>
+    @summaryNote
+</textarea>
+<br />
+<br />
+<label for="SN_MEMO">Add Note:</label>
+<br />
+@using (Html.BeginForm())
+{
+    <textarea id="SN_MEMO" name="SN_MEMO" rows="10" cols="100"></textarea>
+    <br /><br />
+    <button type="submit" id="btnSubmit">Update Notes</button>
+}
+
+
+

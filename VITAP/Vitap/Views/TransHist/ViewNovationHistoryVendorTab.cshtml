@@ -1,0 +1,63 @@
+﻿@model VITAP.ViewModels.TransHist.NovationHistoryVendorModel
+@using (Html.BeginForm())
+{
+	<div class="pad10">
+		@{  Html.Kendo().Grid<VITAP.ViewModels.TransHist.NovationHistoryVendorModel>()
+                .Name("gridVendorHistory")
+                 .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .Aggregates(aggr =>
+                    {
+                        //example
+                        //aggr.Add(p => p.Reject).Sum();
+                    }
+                    )
+                    .Read(r => r
+                        .Action("NovationHistoryVendorRecords", "TransHist")
+                        .Data("GetSearchParametersNovationVendors")
+                    )
+                )
+                .Columns(columns =>
+                {
+                    columns.Bound(x => x.NvtDate).Format("{0:d}");
+                    columns.Bound(x => x.VendorName);
+                    columns.Bound(x => x.VendorId);
+                    columns.Bound(x => x.RemitVendorId);
+                })
+                .Pageable(pageable => pageable
+                    .Input(true)
+                    .Numeric(false)
+                    .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                )
+                .ToolBar(tools => tools.Excel())
+                .Excel(excel => excel
+                    .FileName("NovationHistoryVendorSummary.xlsx")
+                    .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+                    .AllPages(true)
+                )
+                .Render();
+		}
+	</div>
+
+	<script type="text/javascript">
+
+        $(document).ready(function () {
+            MakeKendoGridScrollable('gridVendorHistory', '300px');
+            ConfigureKendoGridPaginationControlsFor508('gridVendorHistory');
+        });
+
+        function GetSearchParametersNovationVendors() {
+
+			// Reserved property names
+			// used by DataSourceRequest: sort, page, pageSize, group, filter
+            return {
+
+                DocNumber: $("#DocNumber").val(),
+                Uidy: $("#Uidy").val()
+			};
+		}
+
+		function btnSearchOnClick() {
+			$('#gridVendorHistory').data("kendoGrid").dataSource.read();
+		}
+	</script>   }

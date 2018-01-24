@@ -1,0 +1,125 @@
+﻿@{
+    ViewBag.Title = "Exception Error Code List";
+}
+
+@(Html.Kendo().Window()
+    .Name("windowCodesList")
+    .Title("Response Codes")
+    .Content(@<text>
+        <div class="container-fluid">
+            <div style="padding:10px">
+                <div class="row">
+                    <div class="col-sm-2 pull-left">
+                        <p>A</p>
+                    </div>
+                    <div class="col-sm-10 pull-left">
+                        <p>Accept</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-2 pull-left">
+                        <p>C</p>
+                    </div>
+                    <div class="col-sm-10 pull-left">
+                        <p>Change</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-2 pull-left">
+                        <p>D</p>
+                    </div>
+                    <div class="col-sm-10 pull-left">
+                        <p>Payment Deleted (Manual) (After Accepted)</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-2 pull-left">
+                        <p>M</p>
+                    </div>
+                    <div class="col-sm-10 pull-left">
+                        <p>Missing Document-Notification (Document request)</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-2 pull-left">
+                        <p>R</p>
+                    </div>
+                    <div class="col-sm-10 pull-left">
+                        <p>Research</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-2 pull-left">
+                        <p>S</p>
+                    </div>
+                    <div class="col-sm-10 pull-left">
+                        <p>Skip</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-2 pull-left">
+                        <p>T</p>
+                    </div>
+                    <div class="col-sm-10 pull-left">
+                        <p>Next Day</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-2 pull-left">
+                        <p>Q</p>
+                    </div>
+                    <div class="col-sm-10 pull-left">
+                        <p>Other or Move to History</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-2 pull-left">
+                        <p>V</p>
+                    </div>
+                    <div class="col-sm-10 pull-left">
+                        <p>Waiting for Vendor</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-2 pull-left">
+                        <p>X</p>
+                    </div>
+                    <div class="col-sm-10 pull-left">
+                        <p>Rejected</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-2 pull-left">
+                        <p>Y</p>
+                    </div>
+                    <div class="col-sm-10 pull-left">
+                        <p>Route</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </text>)
+    .Draggable()
+    .Resizable()
+    .Width(600)
+    .Modal(true)
+    .Visible(false))
+
+
+<script type="text/javascript">
+    function showWindowCodesList() {
+        $("#windowCodesList").data("kendoWindow").open();
+    }
+</script>
+
+

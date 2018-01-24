@@ -1,0 +1,40 @@
+﻿@model VITAP.Data.Models.TransHist
+
+<div class="controls">
+    <button type="submit">List POs</button>
+    <button type="submit"
+            onclick="location.href='@Url.Action("ListRR", "TransHist", new { rr_Id = Model.RR_ID, recur_Id = Model.RECUR_ID, act = Model.ACT, pDocNo = Model.PDOCNO })'">
+        List RRs
+    </button>
+    <button type="submit">List Invs</button>
+    <button type="submit">List EAs</button>
+    <button type="submit">List PAs</button>
+    <button type="submit">Contact</button>
+    <button type="submit">MISC</button>
+    <button type="submit" style="margin-bottom: 2px;">Overview</button>
+    <br />
+    <button type="submit"
+            @(string.IsNullOrEmpty(Model.PO_ID) ? "disabled" : "")>
+        View PO
+    </button>
+    <button type="submit"
+            @(string.IsNullOrEmpty(Model.RR_ID) ? "disabled" : "")
+            onclick="location.href='@Url.Action("ReceivingReport", "TransHist", new { rr_Id = Model.RR_ID })'">
+        View RR
+    </button>
+    <button type="submit"
+            @(string.IsNullOrEmpty(Model.INV_KEY_ID) ? "disabled" : "")>
+        View Invs
+    </button>
+    <button type="submit"
+            @(string.IsNullOrEmpty(Model.AE_ID) ? "disabled" : "")>
+        View EAs
+    </button>
+    <button type="submit"
+            @(string.IsNullOrEmpty(Model.PA_ID) ? "disabled" : "")>
+        View EAs
+    </button>
+    <button type="submit">Summ Notes</button>
+    <button type="submit">Match</button>
+    <button type="submit">Open Items</button>
+</div>

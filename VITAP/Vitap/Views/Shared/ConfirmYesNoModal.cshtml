@@ -1,0 +1,89 @@
+﻿@* MAND MEMO MODAL *@
+@(Html.Kendo().Window()
+    .Name("ConfirmYesNoModal2")
+    .Title("Are you sure?")
+    .Content(@<text>
+        <div class="container-fluid">
+            <div style="padding:10px">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <label id="confirmYesNoModalLabel"></label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div style="margin-bottom: 10px;">
+                            <button type="button" class="btn btn-info btn-fixed-width" id="okConfirm" style="margin-right:5px">OK</button><button type="button" class="btn btn-info btn-fixed-width" id="cancelConfirm">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+	</text>)
+	.Draggable()
+	.Resizable()
+	.Width(600)
+	.Visible(false)
+	.Actions(actions => actions.Pin().Minimize().Maximize().Close())
+	.Events(ev => ev.Close("ConfirmYesNoModalClose"))
+)
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#cancelConfirm').click(function () {
+            window.itemClicked = 'cancel';
+            $("#ConfirmYesNoModal2").data("kendoWindow").close();
+        });
+
+        $('#okConfirm').click(function () {
+            window.itemClicked = 'OK';
+            $("#ConfirmYesNoModal2").data("kendoWindow").close();
+        });
+    });
+
+    var confirmCallback, cancelCallback;
+
+	function ConfirmYesNoModalClose() {
+		if (confirmCallback && window.itemClicked == 'OK') {
+		    confirmCallback("OK");
+		}
+
+        if (cancelCallback && window.itemClicked == 'cancel') {
+            cancelCallback();
+        }
+    }
+
+	function showConfirmYesNoModal(confirmMethod, cancelMethod, titleText, inputLabel, okButtonText, cancelButtonText) {
+
+        if (titleText) {
+            $('.k-window-title').html(titleText);
+        }
+
+        if (inputLabel) {
+            $('#confirmYesNoModalLabel').text(inputLabel);
+        }
+
+        if (okButtonText)
+        {
+            $("#okConfirm").text(okButtonText);
+        }
+        else
+        {
+            $("#okConfirm").text("OK");
+        }
+
+        if (cancelButtonText) {
+            $("#cancelConfirm").text(cancelButtonText);
+        }
+        else
+        {
+            $("#cancelConfirm").text("Cancel");
+        }
+
+        $("#ConfirmYesNoModal2").data("kendoWindow").open();
+        confirmCallback = confirmMethod;
+        cancelCallback = cancelMethod;
+    }
+
+</script>

@@ -1,0 +1,423 @@
+﻿@model VITAP.ViewModels.TransHist.ListPOModel
+@{
+    var textAttr = new Dictionary<string, object> { { "style", "width:140px" }, { "disabled", "" } };
+    var headerAttr = new { @style = "font-weight:bold" };
+    var alignRight = new { style = "text-align: right" };
+    var alignLeft = new { style = "text-align: lef" };
+    //
+    //  URL query string to call this View -- /TransHist/ListPO?act&po_id&pdocno=2B21221978&recur_id=
+    // the parameters to pass in are recur_id, pdocno, act and po_id in the Query String
+    var CurrentPOGridTitle = "";
+    if (Model.CurrentPurchaseOrder.Count > 0)
+    {
+        CurrentPOGridTitle = "Current PO"; }
+
+}
+
+@Html.AntiForgeryToken()
+<style>
+    label {
+        display: inline;
+        float: left;
+        margin-right: 4px;
+        vertical-align: top;
+    }
+
+    div.grid-footer {
+        text-align: right;
+        font-size: 10pt;
+    }
+</style>
+
+<br />
+<h2> @Model.Title </h2>
+<div class="container-fluid" style="float:left">
+    <div style="float: left;">
+
+    </div>
+
+    <div style="clear: left;">
+        <br />
+        @CurrentPOGridTitle
+        @(Html.Kendo().Grid(Model.CurrentPurchaseOrder) //Bind the grid to Current Purchase Order List
+                .Name("grdCurrentPurchaseOrder")
+                .DataSource(dataSource => dataSource
+                                    .Ajax()
+                                    .PageSize(20)
+                                    .ServerOperation(false)
+                                )
+                .Events(x => x.ExcelExport("excelExport"))
+                .Columns(columns =>
+                {
+                    columns.Command(v => v.Custom("Select").Click("grdCurrentPurchaseOrderSelected")).Title("Action").HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(curPO => curPO.act).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("ACT");
+                    columns.Bound(curPO => curPO.po_id).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("PO_ID");
+                    columns.Bound(curPO => curPO.modno).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("Mod No");
+                    columns.Bound(curPO => curPO.po_amount).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("PO Amount").Format("{0:0.00}");
+                    columns.Bound(curPO => curPO.stampdate).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Format("{0:MM/dd/yyyy}").Title("Stamp Date");
+                    columns.Bound(curPO => curPO.po_status).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("Status");
+                    columns.Bound(curPO => curPO.err_code).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("Err Code");
+                    columns.Bound(curPO => curPO.imageid).Width(450).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignLeft).Title("Image ID");
+                    columns.Bound(curPO => curPO.imagebatch).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("Imagebatch");
+                    columns.Bound(curPO => curPO.edi_ind).Width(100).Hidden(true).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("EDI_IND");
+                    columns.Bound(curPO => curPO.inbox_uidy).Width(100).Hidden(true).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("InBox_UIDY");
+                })
+                .Pageable() //Enable the paging.
+                .Sortable() //Enable the sorting.
+                .ToolBar(tools => tools.Excel())
+                .Excel(excel => excel
+                .FileName("ListPO-" + DateTime.Today.ToString("yyyy-MM-dd") + ".xlsx")
+                        .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+                        .AllPages(true)
+                        )
+                .Selectable()
+                .HtmlAttributes(new { style = "width: 1000px" })
+                .Pageable(pageable => pageable
+                    .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                )
+            .Resizable(resize => resize.Columns(true))
+            .Events(events => events.Change("grdCurrentPurchaseOrderChanged"))
+        )
+        All POs
+        @(Html.Kendo().Grid(Model.AllPurchaseOrder) //Bind the grid to All Purchase Order List
+            .Name("grdAllPurchaseOrder")
+                                .DataSource(dataSource => dataSource
+                                .Ajax()
+                                .PageSize(20)
+                                .ServerOperation(false)
+                            )
+            .Events(x => x.ExcelExport("excelExport"))
+            .Columns(columns =>
+            {
+                columns.Command(v => v.Custom("Select").Click("grdAllPurchaseOrderSelected")).Title("Action").HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                columns.Bound(allPO => allPO.act).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("ACT");
+                columns.Bound(allPO => allPO.po_id).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("PO_ID");
+                columns.Bound(allPO => allPO.modno).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("Mod No");
+                columns.Bound(allPO => allPO.po_amount).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("PO Amount").Format("{0:0.00}");
+                columns.Bound(allPO => allPO.stampdate).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Format("{0:MM/dd/yyyy}").Title("Stamp Date");
+                columns.Bound(allPO => allPO.po_status).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("Status");
+                columns.Bound(allPO => allPO.err_code).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("Err Code");
+                columns.Bound(allPO => allPO.imageid).Width(450).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignLeft).Title("Image ID");
+                columns.Bound(allPO => allPO.imagebatch).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("Imagebatch");
+                columns.Bound(allPO => allPO.edi_ind).Width(100).Hidden(true).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("EDI_IND");
+                columns.Bound(allPO => allPO.inbox_uidy).Width(100).Hidden(true).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("InBox_UIDY");
+            })
+            .Pageable() //Enable the paging.
+            .Sortable() //Enable the sorting.
+            .ToolBar(tools => tools.Excel())
+            .Excel(excel => excel
+                .FileName("ListAllPO-" + DateTime.Today.ToString("yyyy-MM-dd") + ".xlsx")
+                .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+                .AllPages(true)
+                )
+            .Selectable()
+            .HtmlAttributes(new { style = "width: 1000px" })
+            .Pageable(pageable => pageable
+                    .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                )
+            .Resizable(resize => resize.Columns(true))
+            .Events(events => events.Change("grdAllPurchaseOrderChanged"))
+
+        )
+    </div>
+    @{
+        <div id="Buttons" style="float: left;min-width: 55%;">
+            <br />
+            <button type="button" class="btn btn-info" style="margin-left: 1px; margin-right: 1px; width: auto" onclick="RefreshClick()">Refresh</button>
+            <button type="button" class="btn btn-info" style="margin-left: 1px; margin-right: 1px; width: auto" onclick="TransHistClick()">View TransHist</button>
+            <button type="button" class="btn btn-info" style="margin-left: 1px; margin-right: 1px; width: auto" onclick="ViewEDIPOClick()">View EDI PO</button>
+            <button type="button" class="btn btn-info" style="margin-left: 1px; margin-right: 1px; width: auto" onclick="ViewPOClick()">View PO</button>
+            <button type="button" id="btnViewImage" class="btn btn-info" style="margin-left: 1px; margin-right: 1px; width: auto" onclick="ViewImageClick()" disabled>View Image</button>
+        </div>
+    }
+
+</div>
+
+@section ModalControls
+    {
+    <div id="dialog"></div>
+}
+
+@section Scripts
+ {
+    <script type="text/javascript">
+
+
+        $(document).ready(function () {
+            $("#btnViewImage").prop("disabled", true);
+
+            var currentPOCount = $("#grdCurrentPurchaseOrder").data("kendoGrid").dataSource.total()
+
+            if (currentPOCount == 0)
+            {
+                $("#grdCurrentPurchaseOrder").hide();
+                var grdPO = $("#grdAllPurchaseOrder").data("kendoGrid");
+                if (grdPO != null)
+                {
+                    grdPO.element.find('tbody tr:first').addClass('k-state-selected');
+                    var poListGridID = "grdAllPurchaseOrder"; // get grid ID
+                    ConfigureKendoGridPaginationControlsFor508(poListGridID);
+                    MakeKendoGridScrollable(poListGridID, "300px");
+                }
+
+                    //var selectedRow = grdPO.dataItem(grdPO.select());
+            }
+            else
+            {
+                    var grdPO = $("#grdCurrentPurchaseOrder").data("kendoGrid");
+                    if (grdPO != null)
+                    {
+                        grdPO.element.find('tbody tr:first').addClass('k-state-selected');
+                        var poListGridID = "grdCurrentPurchaseOrder"; // get grid ID
+                        ConfigureKendoGridPaginationControlsFor508(poListGridID);
+                        MakeKendoGridScrollable(poListGridID, "300px");
+                    }
+            }
+        });
+
+    var exportFlag = false;
+    function excelExport(e) {
+            if (!exportFlag) {
+                e.sender.showColumn(10);
+                e.sender.showColumn(11);
+                e.preventDefault();
+                exportFlag = true;
+                setTimeout(function () {
+                    e.sender.saveAsExcel();
+                });
+            } else {
+                e.sender.hideColumn(10);
+                e.sender.hideColumn(11);
+                exportFlag = false;
+            }
+    }
+    function RefreshClick()
+    {
+        window.location.reload();
+    }
+
+    function TransHistClick() {
+        var currentPOCount = $("#grdCurrentPurchaseOrder").data("kendoGrid").dataSource.total();
+        var allPOCount = $("#grdAllPurchaseOrder").data("kendoGrid").dataSource.total();
+
+        var grid = $('#grdCurrentPurchaseOrder').data('kendoGrid');
+        if (currentPOCount == 0) {
+            grid = $('#grdAllPurchaseOrder').data('kendoGrid');
+        }
+
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        var po_Id = dataItem.po_id;
+        var Act = dataItem.act;
+
+        if (po_Id != null)
+        {
+            window.open("@Url.Action("OraTwo")" + "?searchFor=" + po_Id.encodeUriComponent() + "&searchIn=PO_ID", '_blank');
+        }
+        else
+        {
+            alert("Select a line in the grid before clicking on View TransHist button.");
+        }
+    }
+
+    function ViewPOClick()
+    {
+        var currentPOCount = $("#grdCurrentPurchaseOrder").data("kendoGrid").dataSource.total();
+        var allPOCount = $("#grdAllPurchaseOrder").data("kendoGrid").dataSource.total();
+
+        var grid = $('#grdCurrentPurchaseOrder').data('kendoGrid');
+        if (currentPOCount == 0) {
+            grid = $('#grdAllPurchaseOrder').data('kendoGrid');
+        }
+
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+
+        var Pdocno = dataItem.po_id;
+        //Pdocno = Pdocno.replace("&", "-");
+
+        if (Pdocno != null)
+        {
+            var url = '@Url.Action("ViewPO", "TransHist")';
+            window.location = (url + '?po_Id=' + Pdocno.encodeUriComponent());
+        }
+        else
+        {
+            alert("Select a line in the grid before clicking on View PO button.");
+        }
+    }
+    function ViewEDIPOClick()
+    {
+        var currentPOCount = $("#grdCurrentPurchaseOrder").data("kendoGrid").dataSource.total();
+        var allPOCount = $("#grdAllPurchaseOrder").data("kendoGrid").dataSource.total();
+        var Pdocno = "";
+        var Act = "";
+        var ModNo = "";
+        var InboxUidy = "";
+
+        if (currentPOCount > 0) {
+            Act = GetSelectedCurrentInvoiceKeyID().act.trim();
+            Pdocno = GetSelectedCurrentInvoiceKeyID().po_id;
+            ModNo = GetSelectedCurrentInvoiceKeyID().modno;
+        }
+        else if (allPOCount > 0) {
+            Act = GetSelectedAllInvoiceKeyID().act.trim();
+            Pdocno = GetSelectedAllInvoiceKeyID().po_id;
+            ModNo = GetSelectedAllInvoiceKeyID().modno;
+        }
+
+        if (Pdocno == null || Pdocno.length == 0) {
+            alert("The Pdocno is empty");
+            return;
+        }
+        else
+        {
+            var url = '@Url.Action("ViewEDIPO", "TransHist")';
+            window.location = (url + '?Act=' + Act + '&ModNo=' + ModNo + '&InboxUidy=' + InboxUidy.encodeUriComponent() +
+                '&Po_Id=' + Pdocno + '&');
+        }
+    }
+    function ViewImageClick() {
+        // Local variables for Current Purchase Order List Count
+        // and All Purchase Order List Count
+        var currentPOCount = $("#grdCurrentPurchaseOrder").data("kendoGrid").dataSource.total();
+        var allPOCount = $("#grdAllPurchaseOrder").data("kendoGrid").dataSource.total();
+        var selectedImageID = "";
+
+        // Check Purchase Order List count and decide which Grid to get the selected row
+        if (currentPOCount > 0) {
+            selectedImageID = GetSelectedCurrentInvoiceKeyID().imageid;
+
+        }
+        else if (allPOCount > 0) {
+             selectedImageID = GetSelectedAllInvoiceKeyID().imageid;
+        }
+
+        //alert(selectedImageID);
+        if (selectedImageID != null && selectedImageID.length > 0) {
+            //ViewTiffImage('#dialog', 'Exceptions', 'UserTiffViewer', 'po', selectedImageID);
+            url = '@Url.Action("ViewImageByImageID", "Exceptions")';
+            window.location = url + '?docID=' + selectedImageID;
+        }
+        else {
+            alert("Select a line in the grid before clicking on View Image button.");
+        }
+    }
+
+    function GetSelectedCurrentInvoiceKeyID() {
+        /// This function is to find the selected row's
+        /// Invoice Keyd ID and ImageID
+        var grid = $('#grdCurrentPurchaseOrder').data('kendoGrid');
+        var selectedRows = grid.select();
+        var selected = $.map(selectedRows, function (item) {
+            var checked = $(item).find('.check-box').attr('checked');
+            return {
+                actNumber: $(item).find(':nth-child(2)').text(),
+                po_id: $(item).find(':nth-child(3)').text(),
+                modno: $(item).find(':nth-child(4)').text(),
+                imageID: $(item).find(':nth-child(9)').text()
+            };
+        });
+
+        //alert("find: " + selected[0].imageID);
+
+        return {
+            act: selected[0].actNumber, 
+            po_id: selected[0].po_id,
+            modno: selected[0].modno,
+            imageid: selected[0].imageID
+        };
+    }
+
+    function GetSelectedAllInvoiceKeyID() {
+        /// This function is to find the selected row's
+        /// Purchase Order ID and ImageID
+        var grid = $('#grdAllPurchaseOrder').data('kendoGrid');
+        var selectedRows = grid.select();
+        var selected = $.map(selectedRows, function (item) {
+            var checked = $(item).find('.check-box').attr('checked');
+            return {
+                actNumber: $(item).find(':nth-child(2)').text(),
+                po_id: $(item).find(':nth-child(3)').text(),
+                modno: $(item).find(':nth-child(4)').text(),
+                imageID: $(item).find(':nth-child(9)').text()
+            };
+        });
+
+        //alert("find: " + selected[0].imageID);
+
+        return {
+            act: selected[0].actNumber, 
+            po_id: selected[0].po_id,
+            modno: selected[0].modno,
+            imageid: selected[0].imageID
+        };
+    }
+
+
+    function grdCurrentPurchaseOrderChanged() {
+        var grid = $("#grdCurrentPurchaseOrder").data("kendoGrid");
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        grdCurrentPurchaseOrderSelecting(dataItem);
+    }
+
+    function grdCurrentPurchaseOrderSelected(e) {
+
+        // Highlight the row when "Select" button clicked
+        $("#grdAllPurchaseOrder table tr").removeClass('k-state-selected');
+        $(e.currentTarget).closest("tr").addClass('k-state-selected');
+
+        // Get the data from the current row
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        grdCurrentPurchaseOrderSelecting(dataItem);
+    }
+
+    function grdCurrentPurchaseOrderSelecting(dataItem)
+    {
+        var imageId = $.trim(dataItem.imageid);
+
+        if (imageId.length > 0) {
+            $("#btnViewImage").prop("disabled", false);
+        }
+        else {
+            $("#btnViewImage").prop("disabled", true);
+        }
+
+    }
+
+    function grdAllPurchaseOrderChanged() {
+        var grid = $("#grdAllPurchaseOrder").data("kendoGrid");
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        grdAllPurchaseOrderSelecting(dataItem);
+    }
+
+    function grdAllPurchaseOrderSelected(e) {
+
+        // Highlight the row when "Select" button clicked
+        $("#grdAllPurchaseOrder table tr").removeClass('k-state-selected');
+        $(e.currentTarget).closest("tr").addClass('k-state-selected');
+
+        // Get the data from the current row
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        grdAllPurchaseOrderSelecting(dataItem);
+    }
+
+    function grdAllPurchaseOrderSelecting(dataItem) {
+        var imageId = $.trim(dataItem.imageid);
+
+        if (imageId.length > 0) {
+            $("#btnViewImage").prop("disabled", false);
+        }
+        else
+        {
+            $("#btnViewImage").prop("disabled", true);
+        }
+    }
+
+
+    </script>
+ }
+
+

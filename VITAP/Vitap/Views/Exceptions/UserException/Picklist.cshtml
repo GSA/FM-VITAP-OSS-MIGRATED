@@ -1,0 +1,82 @@
+﻿@model IList<VITAP.Data.Models.Exceptions.PicklistModel>
+
+@{
+    Layout = "~/Views/Shared/_ModalMenuLayout.cshtml";
+}
+
+
+<div>    
+    @(Html.Kendo().Grid(Model)
+        .Name("picklistGrid")
+        .Pageable(pageable => pageable
+            .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+        )
+        .Columns(columns =>
+            {
+                columns.Command(v => v.Custom("TransHist").Click("onChange")).Title("Action");
+                columns.Bound(x => x.INVOICE);
+                columns.Bound(x => x.ACT);
+                columns.Bound(x => x.INV_STATUS);
+                columns.Bound(x => x.INV_KEY_ID);
+                columns.Bound(x => x.AMOUNT);
+                columns.Bound(x => x.INVDATE);
+                columns.Bound(x => x.ERR_CODE);
+                columns.Bound(x => x.PDOCNOPO);
+                columns.Bound(x => x.VEND_CD);
+            }
+        )
+        .ToolBar(tools => tools.Excel())
+        .Excel(excel => excel
+            .FileName("Export.xlsx")
+            .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+            .AllPages(true)
+        )
+        .Selectable()        
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .PageSize(6)
+            .ServerOperation(false)
+            )        
+        .Events(events => events.Change("onChange"))   
+    )
+</div>
+        
+
+@section Scripts {
+    <script type="text/javascript">
+        @*function getPicklistParams() {
+            return {
+                Pdocnopo: "@Model.PDOCNOPO",
+                VEND_CD:  "@Model.VEND_CD"
+            };
+        }*@
+        function onChange(e) {
+            var grid = $("#picklistGrid").data("kendoGrid"),
+                url = '@Html.Raw(Url.Action("Index", "TransHist"))',
+                row = $(e.currentTarget).closest("tr");
+            dataItem = this.dataItem(row);
+            act = dataItem.ACT != null ? dataItem.ACT : "",
+            pdoc = dataItem.PDOCNOPO != null ? dataItem.PDOCNOPO : "",
+            searchIn = "PickList",
+            searchFor = "";
+
+            if (pdoc != "") {
+                searchIn = "pdocno";
+                searchFor = pdoc;
+            }
+            else if (act != "") {
+                searchIn = "act";
+                searchFor = act;
+            }
+
+            url = url + "?act=" + act + "&pDocNo=" + pdoc + "&searchFY=ALL&searchIn=" + searchIn + "&searchFor=" + searchFor;
+            window.open(url, "_blank");
+            window.parent.$("#picklist").data("kendoWindow").close();
+        }
+
+        $(document).ready(function () {
+            ConfigureKendoGridPaginationControlsFor508("picklistGrid");
+            MakeKendoGridScrollable("picklistGrid", "250px");
+        });
+    </script>
+}

@@ -1,0 +1,167 @@
+﻿@model VITAP.ViewModels.TransHist.EDIInvoiceModel
+
+@{
+    ViewBag.Title = "Pegasys EDI Invoice";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using (Html.BeginForm())
+{
+    <div class="container">
+        <br />
+        <h1 class="bold padBottom20">Pegasys EDI Invoice</h1>
+        <div class="row padBottom20">
+            <div class="col-sm-9">
+                <div class="row panel">
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.InvoiceDocNumber)<br />                     
+                        @Html.DisplayFor(x => x.InvoiceDocNumber, new { @disabled = "" })
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.Invoice)<br />                        
+                        @Html.DisplayFor(x => x.Invoice)
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.DocumentDate)<br />
+                         @Html.DisplayFor(x => x.DocumentDate)
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.Contract)<br />
+
+                        @Html.DisplayFor(x => x.Contract)
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.Act)<br />     
+                        @Html.DisplayFor(x => x.Act)
+                    </div>
+                    <div class="col-sm-4">
+                        <br />
+                        ELECTRONIC
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.PoNumber)<br />
+                        @Html.DisplayFor(x => x.PoNumber)
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.Contact)<br />
+                        @Html.DisplayFor(x => x.Contact)
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.Amount)<br />
+                        @Html.DisplayFor(x => x.Amount)
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.Company)<br />
+                        @Html.DisplayFor(x => x.Company)
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.MiscCharges)<br /> 
+                        @Html.DisplayFor(x => x.MiscCharges)
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.Phone)<br />
+                        @Html.DisplayFor(x => x.Phone)
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.Shipping)<br />
+                        @Html.DisplayFor(x => x.Shipping)
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.NetDays)<br />
+                        @Html.DisplayFor(x => x.NetDays)
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.TaxAmount)<br />
+                        @Html.DisplayFor(x => x.TaxAmount)
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.CustomerAccountNumber)<br />
+                        @Html.DisplayFor(x => x.CustomerAccountNumber)
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.DiscountDays)<br />
+                        @Html.DisplayFor(x => x.DiscountDays)
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.ServicePeriodStart)<br />
+                        @Html.DisplayFor(x => x.ServicePeriodStart)
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.DiscountPercent)<br />
+                        @Html.DisplayFor(x => x.DiscountPercent)
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.LabelFor(x => x.ServicePeriodEnd)<br />
+                        @Html.DisplayFor(x => x.ServicePeriodEnd)
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="row panel">
+                    <div class="bold col-sm-12">
+                        <h1 class="bold">Remit Vendor</h1><hr />
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-12">
+                        @Html.LabelFor(x => x.RemitVendorCodeGroup1)<br />
+                        @Html.DisplayFor(x => x.RemitVendorCodeGroup1, new { @disabled = "" })
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-12">
+                        @Html.LabelFor(x => x.RemitVendorName)<br />
+                        @Html.DisplayFor(x => x.RemitVendorName, new { @disabled = "" })
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-12">
+                        <br />
+                        @Html.DisplayFor(x => x.RemitVendorDescription)
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row padBottom20">
+            <div class="col-sm-12">
+                @{Html.Kendo().TabStrip()
+                    .Name("tsTabs")
+                    .Items(items =>
+                    {
+                        items.Add().Text("Invoice Desc")
+                            .Content(Html.Partial("ViewEDIInvoiceDescTab", Model.EDIInvoiceDescriptionModel).ToHtmlString());
+
+                        items.Add().Text("Invoice Detail")
+                            .Content(Html.Partial("ViewEDIInvoiceDetailTab", Model.EDIInvoiceDetailModel).ToHtmlString());
+
+                    })
+                    .SelectedIndex(0)
+                    .Render();
+                }
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                @Html.LabelFor(x => x.Status) @Html.DisplayFor(x => x.Status) @Html.LabelFor(x => x.ErrorCode) @Html.DisplayFor(x => x.ErrorCode)
+            </div>
+        </div>
+    </div>
+
+    @Html.HiddenFor(x => x.BKEY);
+
+                    }
