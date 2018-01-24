@@ -1,0 +1,152 @@
+﻿@model Vitap.Data.Models.TransHist.InboxPermRRH
+
+@{
+    ViewBag.Title = "Pegasys EDI Receiving Report";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm())
+{
+
+    <div class="container md-buffer">
+        <br />
+        <h1 class="bold padBottom20">Pegasys EDI Receiving Report</h1>
+        <div class="row padBottom20">
+            <div class="col-sm-9" style="font-size:12px">
+                <div class="row panel">
+                    <div class="col-sm-4" style="width:200px">
+                        <label for="RR_ID">Pegasys RR Doc #<br /></label>
+                        @Html.TextBoxFor(x => x.RR_ID, new { @disabled = "", style = "width:150px; font-weight:bold;" })
+                    </div>
+                    <div class="col-sm-4" style="width:200px">
+                        <label for="HeaderData_PONUM">Delivery Order #<br /></label>
+                        @Html.TextBoxFor(x => x.HeaderData.PONUM, new { @disabled = "", style = "width:150px; font-weight:bold;" })
+                    </div>
+                    <div class="col-sm-4" style="width:200px">
+                        <label for="HeaderData_ACTNUM">Act<br /></label>
+                        @Html.TextBoxFor(x => x.HeaderData.ACTNUM, new { @disabled = "", style = "width:150px; font-weight:bold;" })
+                    </div>
+                    <div class="col-sm-4" style="width:200px">
+                        <label for="HeaderData_VENDNAME">Vendor Name<br /></label>
+                        @Html.TextBoxFor(x => x.HeaderData.VENDNAME, new { @disabled = "", style = "width:150px; font-weight:bold;" })
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-4" style="width:200px">
+                        <label for="HeaderData_CONTNUM">Contract #</label>
+                        @Html.TextBoxFor(x => x.HeaderData.CONTNUM, new { @disabled = "", style = "width:150px; font-weight:bold;" })
+                    </div>
+                    <div class="col-sm-4" style="width:200px">
+                        <label for="HeaderData_MAXPAY">Max Pay Amt<br /></label>
+                        @Html.TextBoxFor(x => x.HeaderData.MAXPAY, new { @disabled = "", style = "width:150px; font-weight:bold;" })
+                    </div>
+                    <div class="col-sm-4" style="width:200px">
+                        <label for="HeaderData_INVNUM">Invoice Number<br /></label>
+                        @Html.TextBoxFor(x => x.HeaderData.INVNUM, new { @disabled = "", style = "width:150px; font-weight:bold;" })
+                    </div>
+                    <div class="col-sm-4" style="width:200px">
+                        <label for="HeaderData_TYPEDLVR">Delivery Type<br /></label>
+                        @Html.TextBoxFor(x => x.HeaderData.TYPEDLVR, new { @disabled = "", style = "width:150px; font-weight:bold;" })
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-2" style="width:200px">
+                        <label for="HeaderData_RECVDATE">Received Date<br /></label>
+                        @Html.TextBoxFor(x => x.HeaderData.RECVDATE, new { @disabled = "", style = "width:400px; font-weight:bold;" })
+                    </div>
+                    <div class="col-sm-4" style="width:200px">
+                        <label for="HeaderData_LESDEDUCT">Deduction<br /></label>
+                        @Html.TextBoxFor(x => x.HeaderData.LESDEDUCT, new { @disabled = "", style = "width:150px; font-weight:bold;" })
+                    </div>
+                    <div class="col-sm-4" style="width:200px">
+                        <label for="HeaderData_INVDATE">Invoice Date<br /></label>
+                        @Html.TextBoxFor(x => x.HeaderData.INVDATE, new { @disabled = "", style = "width:100px; font-weight:bold;" })
+                    </div>
+                    <div class="col-sm-4" style="width:200px">
+                        <label for="HeaderData_RECVRNAME">Receiver Name<br /></label>
+                        @Html.TextBoxFor(x => x.HeaderData.RECVRNAME, new { @disabled = "", style = "width:200px; font-weight:bold;" })
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-4" style="width:200px">
+                        <label for="HeaderData_ACCPTDATE">Acceptance Date<br /></label>
+                        @Html.TextBoxFor(x => x.HeaderData.ACCPTDATE, new { @disabled = "", style = "width:200px; font-weight:bold;" })
+                    </div>
+                    <div class="col-sm-4" style="width:200px">
+                        <label for="HeaderData_MAXAMTAP">Max Amt Approved<br /></label>
+                        @Html.TextBoxFor(x => x.HeaderData.MAXAMTAP, new { @disabled = "", style = "width:150px; font-weight:bold;" })
+                    </div>
+                    <div class="col-sm-4" style="width:200px">
+                        <label for="HeaderData_OFFSYM">Office Sym<br /></label>
+                        @Html.TextBoxFor(x => x.HeaderData.OFFSYM, new { @disabled = "", style = "width:150px; font-weight:bold;" })
+                    </div>
+                    <div class="col-sm-4" style="width:200px">
+                        <label for="HeaderData_RECVRPHN">Receiver Phone<br /></label>
+                        @Html.TextBoxFor(x => x.HeaderData.RECVRPHN, new { @disabled = "", style = "width:100px; font-weight:bold;" })
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row padBottom20">
+            <div class="col-sm-12" style="font-size:12px">
+                @{
+                    Html.Kendo().Grid(Model.RRDetail)
+                        .Name("grdRRDetail")
+                        .DataSource(dataSource => dataSource
+                            .Ajax()
+                            .Model(model => model.Id(item => item.MDL))
+                        )
+                        .Pageable(pageable => pageable
+                            .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                        )
+                        .Columns(columns =>
+                        {
+                            columns.Bound(v => v.MDL).Title("MDL");
+                            columns.Bound(v => v.ORGCODE).Title("Org Code");
+                            columns.Bound(v => v.BA).Title("BA");
+                            columns.Bound(v => v.FC).Title("FC");
+                            columns.Bound(v => v.CE).Title("CE");
+                            columns.Bound(v => v.STOCKNO).Title("Stock #");
+                            columns.Bound(v => v.QTY).Title("Qty");
+                            columns.Bound(v => v.TOTMDLAMT).Title("Total MDL Amt");
+                            columns.Bound(v => v.DEDUCTAMT).Title("Deduction");
+                            columns.Bound(v => v.NETMDLAMT).Title("Net MDL Amt");
+                        })
+                        .Resizable(r => r.Columns(true))
+                        .ToolBar(tools => tools.Excel())
+                        .Excel(excel => excel
+                            .FileName("RRList.xlsx")
+                            .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+                            .AllPages(true)
+                        )
+                        .Sortable()
+                        .Render();
+                }
+            </div>
+        </div>
+        <div class="row" style="width:600px;">
+            <div class="col-sm-12" style="width:150px;">
+                <label for="HeaderData_STATUS">Status: </label>
+            </div>
+            <div class="col-sm-12" style="width:800px;">
+                @Html.TextBoxFor(x => x.HeaderData.STATUS, new { @disabled = "", style = "width:500px; font-weight:bold;" })<br />
+            </div>
+        </div>
+        <div class="row" style="width:600px;">
+            <div class="col-sm-12" style="width:150px;">
+                <label for="HeaderData_DESCRIP">Description: </label>
+            </div>
+            <div class="col-sm-12" style="width:800px;">
+                @Html.TextBoxFor(x => x.HeaderData.DESCRIP, new { @disabled = "", style = "width:500px; font-weight:bold;" })
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+		$(document).ready(function () {
+		    ConfigureKendoGridPaginationControlsFor508('grdRRDetail');
+		    MakeKendoGridScrollable('grdRRDetail', "150px");
+		});
+    </script>
+    }

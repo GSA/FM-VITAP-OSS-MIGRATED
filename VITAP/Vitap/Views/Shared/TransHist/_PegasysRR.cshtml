@@ -1,0 +1,114 @@
+﻿@model IEnumerable<VITAP.Data.Models.PegasysRR>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.RR_ID)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.RR_STATUS)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ACT)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DOCPAGE)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.EDI_IND)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.IMAGEBATCH)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.IMAGEID)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.INDEXDATE)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.INDEXPC)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.KEYDATE)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.PDOCNOAE)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.PDOCNOPO)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.PODTYP)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.PREPCODE)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.STAMPDATE)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.INBOX_UIDY)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ADJDATE)
+        </th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.RR_ID)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.RR_STATUS)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ACT)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.DOCPAGE)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.EDI_IND)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IMAGEBATCH)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IMAGEID)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.INDEXDATE)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.INDEXPC)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.KEYDATE)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.PDOCNOAE)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.PDOCNOPO)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.PODTYP)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.PREPCODE)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.STAMPDATE)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.INBOX_UIDY)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ADJDATE)
+        </td>
+    </tr>
+}
+
+</table>

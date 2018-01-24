@@ -1,0 +1,239 @@
+﻿@model VITAP.Data.Models.Exceptions.P039ReceiptsTabModel
+
+    <div class="container-fluid">
+        <div class="row panel-body">
+            <h1>Multiple RR Exception</h1>
+        </div>
+        <div class="row panel-body">
+            <div class="col-md-6" style="box-sizing:border-box">
+                <div class="row">
+                    <div class="col-md-6">
+                        <br />
+                        <h3> Not Included in Payment: </h3>
+                    </div>
+                    <div class="col-md-6">
+                        <label>
+                            Invoice Total <br />
+                            @Html.TextBoxFor(x => x.InvoiceTotal, new Dictionary<string, object> { { "class", "text-primary" } }) 
+                        </label>
+                    </div>
+                </div>
+                <div class="row panel-body">
+                    @{
+                        Html.Kendo().Grid<VITAP.Data.Models.Exceptions.NoRRArray>()
+                        .Columns(c =>
+                        {
+                            c.Command(x => x.Custom("Select").Click("NoRRGridSelectRow")).Title("Action").Width(85);
+                            c.Bound(x => x.Dates);
+                            c.Bound(x => x.XSYS_DOC_NUM);
+                            c.Bound(x => x.DOC_NUM);
+                            c.Bound(x => x.ROUNDED_AMT);
+                        })
+                        .Name("grid1")
+                        .DataSource(dataSource => dataSource
+                            .Ajax()
+                            .Read(r => r
+                                .Action("GetP039NoRRArray", "Exceptions", new { pdocno = Model.PDocNo, act = Model.Act})
+                            )
+                        )
+                        .Events(x => x.DataBound("RowDataBound"))
+                        .Selectable()
+                        .Render();
+                    }
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <br />
+                        <h3>For RR Selected Above:</h3>
+                    </div>
+                    <div class="col-md-6">
+                        <label>
+                            @Html.TextBoxFor(x => x.Total1, new { @class = "total1 text-right" })
+                        </label>
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-md-12">
+                        <button onclick="viewNoRr()" type="button" class="btn btn-info">View RR</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6" style="box-sizing:border-box">
+                <div class="row">
+                    <div class="col-md-6">
+                        <br />
+                        <h3> To be Included in Payment: </h3>
+                    </div>
+                    <div class="col-md-6">
+                        <label>
+                            Invoice Number <br />
+                            @Html.TextBoxFor(x => x.InvoiceNumber, new Dictionary<string, object> { { "class", "text-primary" } })
+                        </label>
+                    </div>
+                </div>
+                <div class="row panel-body">
+                    @{
+                        Html.Kendo().Grid(Model.YesRRArray)
+                        .Columns(c =>
+                        {
+                            c.Command(x => x.Custom("Select").Click("YesRRGridSelectRow")).Title("Action").Width(85);
+                            c.Bound(x => x.Dates);
+                            c.Bound(x => x.XSYS_DOC_NUM);
+                            c.Bound(x => x.DOC_NUM);
+                            c.Bound(x => x.ROUNDED_AMT);
+                        })
+                        .DataSource(dataSource => dataSource
+                                .Server()
+                                .Model(model => model.Id(p => p.Dates))
+                            )
+                        .Name("grid2")
+                        .Selectable()
+                        .Render();
+                    }
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <br />
+                        <h3>For RR Selected Above:</h3>
+                    </div>
+                    <div class="col-md-6">
+                        <label>
+                            @Html.TextBoxFor(x => x.Total2, new { @class = "total2 text-right" })
+                        </label>
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-md-12">
+                        <button onclick="viewYesRr()" type="button" class="btn btn-info">View RR</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <script>
+      $(document).ready(function () {
+        $("input").attr('disabled', true);
+        $('textarea').attr('disabled', true);
+
+        var grid1 = $("#grid1").data("kendoGrid");
+        var grid2 = $("#grid2").data("kendoGrid");
+        var dataSource1 = grid1.dataSource;
+        var dataSource2 = grid2.dataSource;
+
+
+        $(grid1.element).kendoDraggable({
+          filter: "tr",
+          hint: function (e) {
+            var item = $('<div class="k-grid k-widget" style="background-color: DarkOrange; color: black;"><table><tbody><tr>' + e.html() + '</tr></tbody></table></div>');
+              return item;
+          },
+          group: "gridGroup1",
+        });
+
+        $(grid2.element).kendoDraggable({
+          filter: "tr",
+          hint: function (e) {
+            var item = $('<div class="k-grid k-widget" style="background-color: MediumVioletRed; color: black;"><table><tbody><tr>' + e.html() + '</tr></tbody></table></div>');
+              return item;
+          },
+          group: "gridGroup2",
+        });
+
+
+        grid1.table.kendoDropTarget({
+            drop: function (e) {
+                var dataItem = dataSource2.getByUid(e.draggable.currentTarget.data("uid"));
+                dataSource2.remove(dataItem);
+                dataSource1.add(dataItem);
+                calcSums();
+            },
+            group: "gridGroup2",
+        });
+
+        grid2.table.kendoDropTarget({
+            drop: function (e) {
+                var dataItem = dataSource1.getByUid(e.draggable.currentTarget.data("uid"));
+                dataSource1.remove(dataItem);
+                dataSource2.add(dataItem);
+                calcSums()
+            },
+                group: "gridGroup1",
+            });
+        });
+
+      function viewYesRr() {
+          var grid = $('#grid2').data('kendoGrid');
+
+          viewRR(grid);
+      }
+
+        function viewNoRr() {
+            var grid = $('#grid1').data('kendoGrid');
+
+            viewRR(grid);
+        }
+
+        function viewRR(grid)
+        {
+            if (grid.dataSource._data.length > 0) {
+                var row = grid.select();
+                var dataItem = grid.dataItem(row);
+
+                if (dataItem && dataItem.DOC_NUM) {
+                    window.location.href = '@Url.Action("ViewRR", "TransHist")' + '?rr_id=' + dataItem.DOC_NUM;
+                }
+            }
+
+            //alert('No RR to View');
+            return false;
+        }
+
+        function calcSums() {
+            var dataSource1 = $("#grid1").data("kendoGrid").dataSource,
+                dataSource2 = $("#grid2").data("kendoGrid").dataSource,
+                sum = 0;
+            $.each(dataSource1.data(), function (index, rec) {
+                sum += rec.ROUNDED_AMT;
+            })
+            var total1 = numberWithCommas(parseFloat(Math.round(sum * 100) / 100).toFixed(2));
+            $(".total1").val(total1);
+
+            sum = 0;
+            $.each(dataSource2.data(), function (index, rec) {
+                sum += rec.ROUNDED_AMT;
+            })
+            var total2 = numberWithCommas(parseFloat(Math.round(sum * 100) / 100).toFixed(2));
+            $(".total2").val(total2);
+        }
+
+        function numberWithCommas(x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        function RowDataBound() {
+            calcSums();
+        }
+
+        function YesRRGridSelectRow(e) {
+            SelectGridRow(e, "#grid2 table tr")
+        }
+
+        function NoRRGridSelectRow(e) {
+            SelectGridRow(e, "#grid1 table tr")
+        }
+
+        function SelectGridRow(e, selector)
+        {
+            e.preventDefault();
+            $(selector).removeClass('k-state-selected');
+            $(e.currentTarget).closest("tr").addClass('k-state-selected');
+            //var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+            //Don't need to run any actions based on selected row
+        }
+    </script>

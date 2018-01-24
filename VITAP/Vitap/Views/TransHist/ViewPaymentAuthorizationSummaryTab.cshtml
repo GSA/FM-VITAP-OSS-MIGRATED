@@ -1,0 +1,69 @@
+﻿
+@using (Html.BeginForm())
+{
+    <div class="pad10">
+        @{
+            Html.Kendo().Grid<VITAP.ViewModels.TransHist.PaymentAuthorizationDisbursementSummaryModel>()
+                .Name("paymentAuthSummaryGrid")
+                 .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .Aggregates(aggr =>
+                    {
+                        //example
+                        //aggr.Add(p => p.Reject).Sum();
+                    }
+                    )
+                    .Read(r => r
+                        .Action("PaymentAuthorizationSummaryRecords", "TransHist")
+                        .Data("GetSearchParametersPaymentAuthorizationSummaryRecords")
+                    )
+                )
+                .Columns(columns =>
+                {
+
+                columns.Bound(x => x.item_lnum).Title("ITEM_LNUM").Title("Item LNUM");
+                columns.Bound(x => x.lnum).Title("LNUM");
+                columns.Bound(x => x.LineAmt).Title("Line Amount").Format("{0:N2}").HtmlAttributes(new { style = "text-align:right;" }).HeaderHtmlAttributes(new { style = "text-align:right;" });
+                columns.Bound(x => x.chek_trc_num).Title("Check Trace #");
+                columns.Bound(x => x.pay_date).Title("Pay Date").Format("{0:d}");
+                columns.Bound(x => x.schl_num).Title("Schedule #");
+                columns.Bound(x => x.schl_typ).Title("Schedule Type");
+                columns.Bound(x => x.schd_dt).Title("Schedule Date").Format("{0:d}");
+                })
+                .Pageable(pageable => pageable
+                    .Input(true)
+                    .Numeric(false)
+                   .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                )
+                .Resizable(r => r.Columns(true))
+                 .ToolBar(tools => tools.Excel())
+                .Excel(excel => excel
+                    .FileName("PaymentAuthorizationSummary.xlsx")
+                    .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+                    .AllPages(true)
+                )
+                .Render();
+        }
+    </div>
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            MakeKendoGridScrollable('paymentAuthSummaryGrid', '600px');
+            ConfigureKendoGridPaginationControlsFor508('paymentAuthSummaryGrid');
+        });
+
+        function GetSearchParametersPaymentAuthorizationSummaryRecords() {
+
+			// Reserved property names
+			// used by DataSourceRequest: sort, page, pageSize, group, filter
+			return {
+			    VpaQueryUidy: $("#VpaQueryUidy").val()
+			};
+		}
+
+		function btnSearchOnClick() {
+		    $('#paymentAuthSummaryGrid').data("kendoGrid").dataSource.read();
+		}
+    </script>
+            }

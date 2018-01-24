@@ -1,0 +1,43 @@
+﻿@using VITAP.ViewModels.TransHist;
+@model List<RecurringMasterDocumentModel>
+
+
+<div class="pad10">
+    @{
+        Html.Kendo().Grid(Model)
+            .Name("grdDocuments")
+            .Columns(columns =>
+            {
+                columns.Bound(x => x.DocType);
+                columns.Bound(x => x.PDN);
+                columns.Bound(x => x.Amount);
+                columns.Bound(x => x.Category);
+                columns.Bound(x => x.DocDate);
+                columns.Bound(x => x.Status);
+                columns.Bound(x => x.PerfStartDate);
+                columns.Bound(x => x.PerfEndDt);
+                columns.Bound(x => x.DocumentActive);
+
+            })
+            .Selectable()            
+            .Sortable()            
+            .DataSource(dataSource => dataSource
+                .Ajax()                
+                .ServerOperation(false)
+                .Model(model => model.Id(item => item.Uidy))
+            )            
+            .Events(events => events.Change("grdDocumentsChange"))
+            .Render();
+    }
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var grdDocuments = $("#grdDocuments").data("kendoGrid");
+        if (grdDocuments != null) {
+            var documentsGridId = "grdDocuments";
+            ConfigureKendoGridPaginationControlsFor508(documentsGridId);
+            MakeKendoGridScrollable(documentsGridId, "190px");
+        }        
+    });
+</script>
+

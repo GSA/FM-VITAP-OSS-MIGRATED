@@ -1,0 +1,548 @@
+﻿@model VITAP.Models.Reports.DataEntryProductivityReportViewModel
+
+@{
+	ViewBag.Title = "Data Entry Productivity Report - Keyed/Indexed Detail";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    input, select, textarea {
+        max-width: 100%;
+    }
+</style>
+
+<div class="container-fluid">
+	<div class="row panel-body">
+		<div class="col-md-12">
+			<div class="row panel">
+				<div class="col-md-6">
+					<label>To Be Keyed:</label>
+				</div>
+				<div class="col-md-6">
+					<label>To Be Indexed:</label>
+				</div>
+			</div>
+			<!-- FIRST SECTION -->
+			<div class="row panel">
+				<!-- LEFT MAIN COL -->
+				<div class="col-md-6">
+					<div class="row panel">
+						<div class="col-md-5">
+							<label>Pegasys</label>
+						</div>
+						<div class="col-md-3">
+							<label>Oldest Scan Date</label>
+						</div>
+						<div class="col-md-4">
+						</div>
+					</div>
+					<div class="row panel">
+						<div class="col-md-2">
+							Non-Tops/Const:
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.NonTopsKeyed, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.NonTopsScanDateKeyed, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-4">
+							Count for Inv's
+							@Html.TextBoxFor(x => x.CountsInvKeyed, new { @class = "textBoxSmall text-right" })
+						</div>
+					</div>
+					<div class="row panel">
+						<div class="col-md-2">
+							Tops/Const:
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.TopsKeyed, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.TopsScanDateKeyed, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-4">
+							Count for PO's
+							@Html.TextBoxFor(x => x.CountsPoKeyed, new { @class = "textBoxSmall text-right" })
+						</div>
+					</div>
+					<div class="row panel">
+						<div class="col-md-2">
+							PO:
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.PoKeyed, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.PoScanDateKeyed, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-4">
+						</div>
+					</div>
+					<div class="row panel">
+						<div class="col-md-2">
+							VCPO:
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.VcpoKeyed, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.VcpoScanDateKeyed, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-4">
+						</div>
+					</div>
+					<div class="row panel">
+						<div class="col-md-2">
+							RR:
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.RrKeyed, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.RrScanDateKeyed, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-4">
+						</div>
+					</div>
+					<div class="row panel">
+						<div class="col-md-2">
+							MISC:
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.MiscKeyed, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.MiscScanDateKeyed, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-4">
+						</div>
+					</div>
+					<div class="row panel">
+						<div class="col-md-2">
+							Total:
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.TotalKeyed, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-3">
+						</div>
+						<div class="col-md-4">
+						</div>
+					</div>
+				</div>
+				<!-- RIGHT MAIN COL -->
+				<div class="col-md-6">
+					<div class="row panel">
+						<div class="col-md-5">
+							<label>Pegasys</label>
+						</div>
+						<div class="col-md-3">
+							<label>Oldest Scan Date</label>
+						</div>
+						<div class="col-md-4">
+						</div>
+					</div>
+					<div class="row panel">
+						<div class="col-md-2">
+							Non-Tops/Const:
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.NonTopsIndexed, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.NonTopsScanDateIndexed, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-4">
+							Count for Inv's
+							@Html.TextBoxFor(x => x.CountsInvIndexed, new { @class = "textBoxSmall text-right" })
+						</div>
+					</div>
+					<div class="row panel">
+						<div class="col-md-2">
+							Tops/Const:
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.TopsIndexed, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.TopsScanDateIndexed, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-4">
+							Count for PO's
+							@Html.TextBoxFor(x => x.CountsPoIndexed, new { @class = "textBoxSmall text-right" })
+						</div>
+					</div>
+					<div class="row panel">
+						<div class="col-md-2">
+							PO:
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.PoIndexed, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.PoScanDateIndexed, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-4">
+						</div>
+					</div>
+					<div class="row panel">
+						<div class="col-md-2">
+							VCPO:
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.VcpoIndexed, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.VcpoScanDateIndexed, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-4">
+						</div>
+					</div>
+					<div class="row panel">
+						<div class="col-md-2">
+							RR:
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.RrIndexed, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.RrScanDateIndexed, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-4">
+						</div>
+					</div>
+					<div class="row panel">
+						<div class="col-md-2">
+							MISC:
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.MiscIndexed, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.MiscScanDateIndexed, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-4">
+						</div>
+					</div>
+					<div class="row panel">
+						<div class="col-md-2">
+							Total:
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.TotalIndexed, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-3">
+						</div>
+						<div class="col-md-4">
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- SECOND SECTION -->
+			<div class="row panel">
+				<!-- LEFT MAIN COL -->
+				<div class="col-md-6">
+					<div class="row panel">
+						<div class="col-md-5">
+							<label>Pegasys Priority</label>
+						</div>
+						<div class="col-md-3">
+							<label>Oldest Scan Date</label>
+						</div>
+						<div class="col-md-4">
+						</div>
+					</div>
+					<div class="row panel">
+						<div class="col-md-2">
+							Non-Tops/Const:
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.NonTopsKeyedPriority, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.NonTopsScanDateKeyedPriority, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-4">
+							Count for Inv's
+							@Html.TextBoxFor(x => x.CountsInvKeyedPriority, new { @class = "textBoxSmall text-right" })
+						</div>
+					</div>
+					<div class="row panel">
+						<div class="col-md-2">
+							Tops/Const:
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.TopsKeyedPriority, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.TopsScanDateKeyedPriority, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-4">
+							Count for PO's
+							@Html.TextBoxFor(x => x.CountsPoKeyedPriority, new { @class = "textBoxSmall text-right" })
+						</div>
+					</div>
+					<div class="row panel">
+						<div class="col-md-2">
+							PO:
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.PoKeyedPriority, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.PoScanDateKeyedPriority, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-4">
+						</div>
+					</div>
+					<div class="row panel">
+						<div class="col-md-2">
+							VCPO:
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.VcpoKeyedPriority, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.VcpoScanDateKeyedPriority, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-4">
+						</div>
+					</div>
+					<div class="row panel">
+						<div class="col-md-2">
+							RR:
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.RrKeyedPriority, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.RrScanDateKeyedPriority, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-4">
+						</div>
+					</div>
+					<div class="row panel">
+						<div class="col-md-2">
+							MISC:
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.MiscKeyedPriority, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.MiscScanDateKeyedPriority, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-4">
+						</div>
+					</div>
+					<div class="row panel">
+						<div class="col-md-2">
+							Total:
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.TotalKeyedPriority, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-3">
+						</div>
+						<div class="col-md-4">
+						</div>
+					</div>
+				</div>
+				<!-- RIGHT MAIN COL -->
+				<div class="col-md-6">
+					<div class="row panel">
+						<div class="col-md-5">
+							<label>Pegasys Priority</label>
+						</div>
+						<div class="col-md-3">
+							<label>Oldest Scan Date</label>
+						</div>
+						<div class="col-md-4">
+						</div>
+					</div>
+					<div class="row panel">
+						<div class="col-md-2">
+							Non-Tops/Const:
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.NonTopsIndexedPriority, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.NonTopsScanDateIndexedPriority, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-4">
+							Count for Inv's
+							@Html.TextBoxFor(x => x.CountsInvIndexedPriority, new { @class = "textBoxSmall text-right" })
+						</div>
+					</div>
+					<div class="row panel">
+						<div class="col-md-2">
+							Tops/Const:
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.TopsIndexedPriority, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.TopsScanDateIndexedPriority, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-4">
+							Count for PO's
+							@Html.TextBoxFor(x => x.CountsPoIndexedPriority, new { @class = "textBoxSmall text-right" })
+						</div>
+					</div>
+					<div class="row panel">
+						<div class="col-md-2">
+							PO:
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.PoIndexedPriority, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.PoScanDateIndexedPriority, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-4">
+						</div>
+					</div>
+					<div class="row panel">
+						<div class="col-md-2">
+							VCPO:
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.VcpoIndexedPriority, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.VcpoScanDateIndexedPriority, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-4">
+						</div>
+					</div>
+					<div class="row panel">
+						<div class="col-md-2">
+							RR:
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.RrIndexedPriority, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.RrScanDateIndexedPriority, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-4">
+						</div>
+					</div>
+					<div class="row panel">
+						<div class="col-md-2">
+							MISC:
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.MiscIndexedPriority, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.MiscScanDateIndexedPriority, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-4">
+						</div>
+					</div>
+					<div class="row panel">
+						<div class="col-md-2">
+							Total:
+						</div>
+						<div class="col-md-3">
+							@Html.TextBoxFor(x => x.TotalIndexedPriority, new { @class = "textBoxSmall text-right" })
+						</div>
+						<div class="col-md-3">
+						</div>
+						<div class="col-md-4">
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- THIRD SECTION -->
+			<div class="row panel">
+				<div class="col-md-6">
+					<label>To Be Keyed Grand Total:</label> @Html.TextBoxFor(x => x.GrandTotalKeyed, new { @class = "textBoxSmall text-right" })
+				</div>
+				<div class="col-md-6">
+					<label>To Be Indexed Grand Total:</label> @Html.TextBoxFor(x => x.GrandTotalIndexed, new { @class = "textBoxSmall text-right" })
+				</div>
+			</div>
+
+			<!-- FOURTH SECTION -->
+			<div class="row panel">
+				<div class="col-md-6">
+					<button type="button" class="btn btn-info" onclick="printForm();">Print</button>
+                </div>
+                <div class="col-md-6">
+                    <button type="button" class="btn btn-info" onclick="location.href='@Url.Action("DataEntryProductivityReport", "Reports")'">Cancel</button>
+                </div>
+            </div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+    });
+
+    function printForm() {
+        var win = window.open('', '', 'width=800, height=500, resizable=1, scrollbars=1'),
+            doc = win.document.open();
+
+        var htmlStart =
+                '<!DOCTYPE html>' +
+                '<html>' +
+                '<head>' +
+                '<meta charset="utf-8" />' +
+                '<title>To Be Keyed And Indexed Pegasys Images Report</title>' +
+                '<style>' +
+                'body { font-family: sans-serif }' +
+                'h1, h2 { text-align: center }' +
+                'th { font-size: 13pt; width: 25% }' +
+                'td { font-size: 11pt }' +
+                '</style>' +
+                '</head>' +
+                '<body><h1>To Be Keyed And Indexed Pegasys Images Report</h1>' +
+                '<h2>Documents To Be Keyed, Indexed and Their Oldest Scan Dates</h2>';
+
+        var htmlEnd =
+                '</body>' +
+                '</html>';
+
+        var keyedHeader = '<h1>To Be Keyed:<h1>';
+        var keyedFooter = '<h1>To Be Keyed Grand Total: @(Model.GrandTotalKeyed)</h1>';
+        var keyedTable = '<div>' +
+                        '<table style="width:100%;">' +
+                        '<tr><th colspan="2">Total Docs</th><th>Oldest Scan Date</th><th colspan="2">Priority Docs</th><th>Oldest Scan Date</th></tr>' +
+                        '<tr><td>INV</td><td>@(Model.NonTopsKeyed)</td><td>@(Model.NonTopsScanDateKeyed)</td><td>INV</td><td>@(Model.NonTopsKeyedPriority)</td><td>@(Model.NonTopsScanDateKeyedPriority)</td></tr>' +
+                        '<tr><td>TOPS</td><td>@(Model.TopsKeyed)</td><td>@(Model.TopsScanDateKeyed)</td><td>TOPS</td><td>@(Model.TopsKeyedPriority)</td><td>@(Model.TopsScanDateKeyedPriority)</td></tr>' +
+                        '<tr><td>PO</td><td>@(Model.PoKeyed)</td><td>@(Model.PoScanDateKeyed)</td><td>PO</td><td>@(Model.PoKeyedPriority)</td><td>@(Model.PoScanDateKeyedPriority)</td></tr>' +
+                        '<tr><td>VCPO</td><td>@(Model.VcpoKeyed)</td><td>@(Model.VcpoScanDateKeyed)</td><td>VCPO</td><td>@(Model.VcpoKeyedPriority)</td><td>@(Model.VcpoScanDateKeyedPriority)</td></tr>' +
+                        '<tr><td>RR</td><td>@(Model.RrKeyed)</td><td>@(Model.RrScanDateKeyed)</td><td>RR</td><td>@(Model.RrKeyedPriority)</td><td>@(Model.RrScanDateKeyedPriority)</td></tr>' +
+                        '<tr><td>MISC</td><td>@(Model.MiscKeyed)</td><td>@(Model.MiscScanDateKeyed)</td><td>MISC</td><td>@(Model.MiscKeyedPriority)</td><td>@(Model.MiscScanDateKeyedPriority)</td></tr>' +
+                        '<tr><td>Total docs:</td><td>@(Model.TotalKeyed)</td><td>&nbsp;</td><td>Total Priority:</td><td>@(Model.TotalKeyedPriority)</td><td>&nbsp;</td></tr>' +
+                        '</table>' +
+                        '</div>';
+        var indexHeader = '<h1>To Be Indexed:<h1>';
+        var indexFooter = '<h1>To Be Indexed Grand Total: @(Model.GrandTotalIndexed)</h1>';
+        var indexTable = '<div>' +
+                        '<table style="width:100%;">' +
+                        '<tr><th colspan="2">Total Docs</th><th>Oldest Scan Date</th><th colspan="2">Priority Docs</th><th>Oldest Scan Date</th></tr>' +
+                        '<tr><td>INV</td><td>@(Model.NonTopsIndexed)</td><td>@(Model.NonTopsScanDateIndexed)</td><td>INV</td><td>@(Model.NonTopsIndexedPriority)</td><td>@(Model.NonTopsScanDateIndexedPriority)</td></tr>' +
+                        '<tr><td>TOPS</td><td>@(Model.TopsIndexed)</td><td>@(Model.TopsScanDateIndexed)</td><td>TOPS</td><td>@(Model.TopsIndexedPriority)</td><td>@(Model.TopsScanDateIndexedPriority)</td></tr>' +
+                        '<tr><td>PO</td><td>@(Model.PoIndexed)</td><td>@(Model.PoScanDateIndexed)</td><td>PO</td><td>@(Model.PoIndexedPriority)</td><td>@(Model.PoScanDateIndexedPriority)</td></tr>' +
+                        '<tr><td>VCPO</td><td>@(Model.VcpoIndexed)</td><td>@(Model.VcpoScanDateIndexed)</td><td>VCPO</td><td>@(Model.VcpoIndexedPriority)</td><td>@(Model.VcpoScanDateIndexedPriority)</td></tr>' +
+                        '<tr><td>RR</td><td>@(Model.RrIndexed)</td><td>@(Model.RrScanDateIndexed)</td><td>RR</td><td>@(Model.RrIndexedPriority)</td><td>@(Model.RrScanDateIndexedPriority)</td></tr>' +
+                        '<tr><td>MISC</td><td>@(Model.MiscIndexed)</td><td>@(Model.MiscScanDateIndexed)</td><td>MISC</td><td>@(Model.MiscIndexedPriority)</td><td>@(Model.MiscScanDateIndexedPriority)</td></tr>' +
+                        '<tr><td>Total docs:</td><td>@(Model.TotalIndexed)</td><td>&nbsp;</td><td>Total Priority:</td><td>@(Model.TotalIndexedPriority)</td><td>&nbsp;</td></tr>' +
+                        '</table>' +
+                        '</div>';
+
+        doc.write(htmlStart + keyedHeader + keyedTable + keyedFooter + '<hr /><hr />' + indexHeader + indexTable + indexFooter + htmlEnd);
+        doc.close();
+        win.focus();
+        win.print();
+        win.close();
+    }
+</script>

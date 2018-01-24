@@ -1,0 +1,81 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<title>VITAP - @ViewBag.Title</title>
+
+	@Scripts.Render("~/Scripts/jquery-1.10.2.js")
+
+	@*Can move to bundle if we want*@
+    <link rel="stylesheet" href="~/Content/kendo/kendo.common.min.css">
+    <link href="~/Content/kendo/kendo.rtl.min.css" rel="stylesheet" />
+    <link href="~/Content/kendo/kendo.blueopal.min.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />    
+    <link href="~/Content/Main.css?v=1" rel="stylesheet" />    
+
+	@RenderSection("Head", false)
+</head>
+<body>
+	<div id="wrapper">
+		<div id="header">
+			<div id="redBar">
+			</div>
+			<div id="wrapper2">
+				<div id="banner">
+				</div>
+			</div>
+			<div id="appTitle">
+				Visual Invoice Tracking and Payment (VITAP)
+			</div>
+		</div>
+		<hr class="bar" style="margin-top: 1px;" />
+		<div id="content">
+			@RenderBody()
+		</div>
+		<div id="footer">
+            <hr />
+			<footer>
+				<p>&copy; @DateTime.Now.Year - VITAP .NET Application</p>
+			</footer>
+		</div>
+	</div>
+
+	<!-- MODAL CONTROLS -->
+    @RenderSection("ModalControls", false)
+    @*@Html.Partial("MandMemoModal")*@
+    @Html.Partial("RejectInvoiceModal")
+    @Html.Partial("ConfirmYesNoModal")
+
+	@*Can move to bundle *@
+	<script src="~/Scripts/bootstrap.min.js"></script>
+	<script src="~/Scripts/modernizr-2.6.2.js"></script>
+    <script src="~/Scripts/site.js?v=8"></script>
+    @Scripts.Render("~/Scripts/kendo/jszip.min.js")
+	@Scripts.Render("~/Scripts/kendo/kendo.all.min.js")
+	@Scripts.Render("~/Scripts/kendo/kendo.aspnetmvc.min.js")
+
+	@RenderSection("Scripts", false)
+
+	<!-- Example how to call modal control and get return value to caller -->
+	<script type="text/javascript">
+
+		$(document).ready(function () {
+			//uncomment to test modal demo
+			// showWindowMandMemo(confirmCallback, cancelCallback, "7BC Base Form", 'txtentered', 'Label1');
+		    //showWindowRejectInvoice(confirmCallback, cancelCallback, "Reject Invoice", "selected value");		    
+		});
+
+		function confirmCallback(data) {
+			alert('Confirm: ' + data);
+		}
+
+		function cancelCallback(data) {
+		    alert('Cancel: ' + data);
+		}
+
+	</script>
+
+</body>
+</html>

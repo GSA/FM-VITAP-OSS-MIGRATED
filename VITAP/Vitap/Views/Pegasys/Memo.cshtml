@@ -1,0 +1,91 @@
+﻿@using VITAP.Data.Models.Pegasys
+
+@{
+    var textAttr = new Dictionary<string, object> { { "style", "width:140px" }, { "disabled", "" } };
+    var headerAttr = new { @style = "font-weight:bold" };
+}
+
+<div class="form-group">
+    <div style="float: left; width: 820px">
+        @{
+            Html.Kendo().Grid<PegasysMemo>()
+                .Name("gridPegMemos")
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .Read(r => r
+                        .Action("GetMemos", "Pegasys")
+                        .Data("GetSearchParameters")
+                    )
+                )
+                .Columns(columns =>
+                {
+                    columns.Bound(x => x.Text).Width(40).Hidden(true).HtmlAttributes(new { id = "memo" });
+                    columns.Bound(x => x.Id).Width(55).Hidden(true);
+                    columns.Command(c => c.Custom("Select").Click("Select")).Width(120);
+                    columns.Bound(x => x.Subject).Width(160).HeaderHtmlAttributes(headerAttr);
+                    columns.Bound(x => x.MemoDate).Width(55).Format("{0:MM/dd/yyyy}").HeaderHtmlAttributes(headerAttr);
+                    columns.Bound(x => x.CreatedBy).Width(140).HeaderHtmlAttributes(headerAttr);
+                })
+                .Resizable(r => r.Columns(true))
+                .TableHtmlAttributes(new { style = "width: 800px" })
+                .Selectable()
+                .Sortable()
+                .ToolBar(tools => tools.Excel())
+                .Excel(excel => excel
+                    .FileName("PegMemos-" + DateTime.Today.ToString("yyyy-MM-dd") + ".xlsx")
+                    .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase"))
+                    .AllPages(true)
+                )
+                .Pageable(p => p.PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 }))
+                .Events(events => events
+                    .Change("onMemoRowChange")
+                    .DataBound("onRefresh")
+                )
+                .Render();
+
+        }
+        <br />
+    </div>
+    <div style="clear:left;width: 100%;">
+        <label for="PegMemoText">Notes:<br /></label>
+        <textarea id="PegMemoText" style="width: 820px; max-width: 100%;" rows="4" disabled="disabled"></textarea>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        ConfigureKendoGridPaginationControlsFor508('gridPegMemos');
+        MakeKendoGridScrollable('grdMemo', "100px");
+        $('.k-pager-wrap').css('height', '45px');
+    });
+
+    function onMemoRowChange(e) {
+        var row = $('#gridPegMemos').data('kendoGrid').select();
+        $('#PegMemoText').val($('#memo', row).text());
+    }
+
+    function onRefresh(e) {
+        var grid = $('#gridPegMemos').data('kendoGrid');
+        if (grid == null || grid.dataSource.total() == 0)
+            return;
+
+        grid.element.find('tbody tr:first').addClass('k-state-selected');
+        onMemoRowChange();
+    }
+
+    function Select(e) {
+        e.preventDefault();
+        $("#gridPegMemos table tr").removeClass('k-state-selected');
+        $(e.currentTarget).closest("tr").addClass('k-state-selected');
+        var row = this.dataItem($(e.currentTarget).closest("tr"));
+        $('#PegMemoText').val($('#memo', row).text());
+    }
+
+    function GetSearchParameters() {
+        // Reserved property names
+        // used by DataSourceRequest: sort, page, pageSize, group, filter
+        return {
+            id: pegMemoId
+        };
+    }
+</script>

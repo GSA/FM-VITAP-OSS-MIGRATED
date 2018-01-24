@@ -1,0 +1,293 @@
+﻿@model VITAP.Data.Models.PreparerCodeProductivityViewModel
+@{
+    ViewBag.Title = "Preparer Code Productivity Report";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var headerAttr = new { @style = "font-weight:bold; overflow: visible; white-space: normal;" };
+}
+
+@using (Html.BeginForm("Index", "PreparerCodeProductivity", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    <br />
+        <h1 style="font-weight: bold">Preparer Code Productivity Report</h1>
+        <br />
+
+        <div class="container-fluid">
+            <div class="col-md-12">
+
+                <div class="row" style="clear: left;">
+                    <div class="col-md-2">
+                        <label for="SearchValue" class="control-label">
+                            Prep Code:
+                        </label><br />
+                    </div>
+                </div>
+                <div class="row" style="clear: left;">
+                    <div class="col-md-2">
+                        @(Html.Kendo().TextBoxFor(model => model.SearchValue)
+                    .HtmlAttributes(new { @class = "form-control" }).Enable(false))
+                    </div>
+                </div>
+                <div class="row" style="clear: left;"><br /></div>
+
+                <label for="Answer" class="control-label">
+                    Transactions for period:
+                </label><br />
+
+                @(Html.Kendo().RadioButton()
+                    .Name("Answer")
+                    .Checked(Model.Answer == "1")
+                    .HtmlAttributes(new { @name = "Answer" })
+                    .Value("1")
+                    .Label("All"))
+
+                @(Html.Kendo().RadioButton()
+                        .Name("Answer")
+                        .Checked(Model.Answer == "2")
+                        .HtmlAttributes(new { @name = "Answer" })
+                        .Value("2")
+                        .Label("Today"))
+
+                @(Html.Kendo().RadioButton()
+                    .Name("Answer")
+                    .Checked(Model.Answer == "3")
+                    .HtmlAttributes(new { @name = "Answer" })
+                    .Value("3")
+                    .Label(">= 7 days old"))
+
+                @(Html.Kendo().RadioButton()
+                    .Name("Answer")
+                    .Checked(Model.Answer == "4")
+                    .HtmlAttributes(new { @name = "Answer" })
+                    .Value("4")
+                    .Label(">= 30 days old"))
+                @(Html.Kendo().RadioButton()
+                    .Name("Answer")
+                    .Checked(Model.Answer == "5")
+                    .HtmlAttributes(new { @name = "Answer" })
+                    .Value("5")
+                    .Label("Range"))
+
+            </div>
+            <div class="col-md-6 ">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="From" class="control-label">Date From:</label>
+                            @(Html.Kendo().DatePickerFor(x => x.From)
+                            .HtmlAttributes(new { @class = "form-control" })
+                            .Format("MM/dd/yyyy")
+                            .Enable(Model.Answer == "5")
+                            )
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="To" class="control-label">Date To:</label>
+                            @(Html.Kendo().DatePickerFor(x => x.To)
+                            .HtmlAttributes(new { @class = "form-control" })
+                            .Format("MM/dd/yyyy")
+                            .Enable(Model.Answer == "5")
+                            )
+                        </div>
+                    </div>
+                </div>
+            </div>
+                @*<div class="row" style="clear: left;">
+                    <div class="col-md-2 ">
+                        @Html.RadioButton("Answer", "1", new { @class = "radio-inline" }) <span>All</span> <br />
+                        @Html.RadioButton("Answer", "2", new { @class = "radio-inline" }) <span>Today</span> <br />
+                        @Html.RadioButton("Answer", "3", new { @class = "radio-inline" }) <span>>= 7 days old</span> <br />
+                        @Html.RadioButton("Answer", "4", new { @class = "radio-inline" }) <span>>= 30 days old</span> <br />
+                        @Html.RadioButton("Answer", "5", new { @class = "radio-inline" }) <span>Range</span> <br />
+                        <br />
+
+                    </div>
+                    <div class="col-md-6 ">
+                        <div class="row, hidden" id="dt" style="clear: left;">
+                            <div class="col-md-3 ">
+                                <label>
+                                    Date From:<br />
+                                </label>
+                                @Html.Kendo().DatePicker().Name("From").HtmlAttributes(new { style = "width: 110px" })
+                            </div>
+                            <div class="col-md-3 ">
+                                <label>
+                                    Date To:<br />
+                                </label>
+                                @Html.Kendo().DatePicker().Name("To").HtmlAttributes(new { style = "width: 110px" })
+                            </div>
+                        </div>
+                    </div>
+                </div>*@
+                @*<div class="row">
+                    <br /><br />
+                    <input type="submit" name="submitButton" value="Search" class="btn btn-default" />
+
+                </div>
+                <div class="row" style="clear: left;">
+                    <br />
+                    <br />
+                </div>*@
+            <div class="row">
+                <br />
+                <button type="submit" class="btn btn-default" name="btnSearch" id="btnSearch" onclick="return dateSearchValidate()">Search</button>
+                <br />
+            </div>
+            <div class="row" style="clear: left;">
+                <br />
+                <br />
+            </div>
+                <div class="container" style="float:left">
+                    <div class="row">
+                        @{
+                            Html.Kendo().Grid(Model.PCProductivity)
+                                    .Name("grdPrepCodeProd")
+                                    .Columns(columns =>
+                                    {
+                                        columns.Bound(v => v.EXPCODE).Width(70).ClientFooterTemplate("Total :").HeaderHtmlAttributes(headerAttr);
+                                        columns.Bound(v => v.TOTAL).Width(88).ClientFooterTemplate("#= kendo.format('{0:n}', sum)#").HeaderHtmlAttributes(headerAttr);
+                                        columns.Bound(v => v.REJECT).Width(92).ClientFooterTemplate("#= kendo.format('{0:n}', sum)#").HeaderHtmlAttributes(headerAttr);
+                                        columns.Bound(v => v.ACCEPT).Width(88).ClientFooterTemplate("#= kendo.format('{0:n}', sum)#").HeaderHtmlAttributes(headerAttr);
+                                        columns.Bound(v => v.SKIPPED).Width(128).ClientFooterTemplate("#= kendo.format('{0:n}', sum)#").HeaderHtmlAttributes(headerAttr);
+                                        columns.Bound(v => v.NEXT_DAY).Width(90).ClientFooterTemplate("#= kendo.format('{0:n}', sum)#").HeaderHtmlAttributes(headerAttr);
+                                        columns.Bound(v => v.DOC_REQ).Width(90).ClientFooterTemplate("#= kendo.format('{0:n}', sum)#").HeaderHtmlAttributes(headerAttr);
+                                        columns.Bound(v => v.CHANGED).Width(90).ClientFooterTemplate("#= kendo.format('{0:n}', sum)#").HeaderHtmlAttributes(headerAttr);
+                                        columns.Bound(v => v.OTHER).Width(90).ClientFooterTemplate("#= kendo.format('{0:n}', sum)#").HeaderHtmlAttributes(headerAttr);
+                                        columns.Bound(v => v.CLEARED).Width(70).ClientFooterTemplate("#= kendo.format('{0:n}', sum)#").HeaderHtmlAttributes(headerAttr);
+                                    })
+                                 .DataSource(dataSource => dataSource
+                            .Ajax()
+                            .PageSize(10)
+                            .ServerOperation(false)
+                        .Aggregates(aggr =>
+                        {
+                            aggr.Add(p => p.TOTAL).Sum();
+                            aggr.Add(p => p.REJECT).Sum();
+                            aggr.Add(p => p.ACCEPT).Sum();
+                            aggr.Add(p => p.SKIPPED).Sum();
+                            aggr.Add(p => p.NEXT_DAY).Sum();
+                            aggr.Add(p => p.DOC_REQ).Sum();
+                            aggr.Add(p => p.CHANGED).Sum();
+                            aggr.Add(p => p.OTHER).Sum();
+                            aggr.Add(p => p.CLEARED).Sum();
+                        })
+                        //.Model(model => model.Id(p => p.INV_KEY_ID))
+
+
+                        )
+                                 @*.DataSource(dataSource => dataSource
+                                     .Ajax()
+                                
+                                 @*.Aggregates(aggr =>
+                                 {
+                                     aggr.Add(p => p.TOTAL).Sum();
+                                     //aggr.Add(p => p.REJECT).Sum();
+                                     //aggr.Add(p => p.ACCEPT).Sum();
+                                     //aggr.Add(p => p.SKIPED).Sum();
+                                     //aggr.Add(p => p.NEXT_DAY).Sum();
+                                     //aggr.Add(p => p.DOC_REQ).Sum();
+                                     //aggr.Add(p => p.CHANGED).Sum();
+                                     //aggr.Add(p => p.OTHER).Sum();
+                                     //aggr.Add(p => p.CLEARED).Sum();
+                                 }*@
+                             //)
+                             //.Model(model => model.Id(p => p.EXP_CODE)*@
+                             //    .PageSize(50)
+                             //    .ServerOperation(false)
+                             //)
+                             .ToolBar(tools => tools.Excel())
+                             .Excel(excel => excel
+                                 .FileName("PreparerCodeProductivity.xlsx")
+                                 .ProxyURL(Url.Action("Excel_Export_Save", "Grid"))
+                                 .AllPages(true)
+                            )
+                            .Pageable(pageable => pageable
+                                .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                            )
+                            .Render();
+                        }
+                    </div>
+                </div>
+            </div>
+            <div><br /><br /></div>
+        @*</div>*@
+                            }
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#From").change(function () {
+            dateChanged(this);
+        });
+
+        $("#To").change(function () {
+            dateChanged(this);
+        });
+
+        ConfigureKendoGridPaginationControlsFor508('grdPrepCodeProd');
+        MakeKendoGridScrollable('grdPrepCodeProd', "300px");
+    });
+
+    $(document).on("change", "input[name=Answer]", function () {
+        if (this.value == "5") {
+                disableDateRangeFields(false);
+            } else {
+                disableDateRangeFields(true);
+            }
+        })
+
+        function dateChanged(e) {
+            if (e.value) {
+                var result = true;
+                var message = "";
+                var date = kendo.parseDate(e.value);
+                if (!date) {
+                    result = false;
+                    message = e.value + " is an invalid date."
+                }
+                if (!result) {
+                    kendoAlert(message, "Verify Date");
+                }
+            }
+        }
+
+        function disableDateRangeFields(disabled) {
+
+            $('#From').prop("disabled", disabled);
+            $('#From').data('kendoDatePicker').enable(!disabled);
+            $('#To').prop("disabled", disabled);
+            $('#To').data('kendoDatePicker').enable(!disabled);
+        }
+
+        function dateSearchValidate(event) {
+
+            // Range search requires dates.
+            var optionValue = $('input[name=Answer]:checked').val()
+
+
+            if (optionValue == "5") {
+
+                var message = "";
+                if ($('#From').val() == "01/01/0001") {
+                    alert('inside' + optionValue)
+                    message = "Date From<br>";
+                }
+                if ($('#To').val() == "01/01/0001") {
+                    message = "Date To<br>";
+                }
+                if (message) {
+                    kendoAlert(message, "Missing Date Fields");
+                    return false;
+                }
+            }
+            return true;
+        }
+
+</script>
+
+
+
+

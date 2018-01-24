@@ -1,0 +1,221 @@
+﻿@model VITAP.ViewModels.TransHist.PaymentAuthorizationModel
+
+@{
+    ViewBag.Title = "Pegasys Payment Authorization";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using (Html.BeginForm())
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $('button').click(function () {
+                var command = $(this).attr('command');
+
+                if (command == "viewImage") {
+                    var url = '@Url.Action("ViewImageByImageID", "Exceptions", new { docId = Model.ImageId })';
+                    window.location.href = url;
+                    return false;
+                }
+                else if (command == "viewTj") {
+                     window.location.href = '@Url.Action("viewtj", "transhist", new { pDocNo = Model.PaId })';
+                    return false;
+                }
+
+                $('#Command').val(command);
+                $('form').submit();
+            });
+
+            if ('@Model.ShowViewTJ' == 'True') {
+                $("#viewTj").attr("disabled", false);
+            }
+            if ('@Model.ImageId'.length > 0) {
+                $("#viewImage").attr("disabled", false);
+            }
+
+        });
+    </script>
+
+    <div class="container">
+        <br />
+        <h1 class="bold padBottom20">Pegasys Payment Authorization</h1>
+        <div class="row padBottom20">
+            <div class="col-sm-9">
+                <div class="row panel">
+                    <div class="col-sm-4">
+                        <label>Pegasys PO Doc #</label><br />
+                        @Html.DisplayFor(x => x.InvoiceDocNumber, new { @disabled = "" })
+                    </div>
+                    <div class="col-sm-4">
+                        <label>ACT</label><br />
+                        @Html.DisplayFor(x => x.ACT)
+                    </div>
+                    <div class="col-sm-4">
+                        <label>Batch #</label><br />
+                        @Html.DisplayFor(x => x.BatchId)
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-4">
+                        <label>Ref Doc #</label><br />
+                        @Html.DisplayFor(x => x.PoDocNumber)
+                    </div>
+                    <div class="col-sm-4">
+                    </div>
+                    <div class="col-sm-4">
+                        <label>Schedule Date</label><br />
+                        @Html.DisplayFor(x => x.ScheduledPayDate)
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="bold col-sm-12">
+                        <h1 class="bold">Amounts</h1><hr />
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-4">
+                        <label>Orig Payment</label><br />
+                        @Html.DisplayFor(x => x.NetAmount)
+                    </div>
+                    <div class="col-sm-4">
+                        <label>Ref Inv Doc #</label><br />
+                        @Html.DisplayFor(x => x.RefInvDocNo)
+                    </div>
+                    <div class="col-sm-4">
+                    </div>
+                </div>
+
+                <div class="row panel">
+                    <div class="col-sm-4">
+                        <label>Applied Credits</label><br />
+                        @Html.DisplayFor(x => x.AppliedCredits)
+                    </div>
+                    <div class="col-sm-4">
+                        <label>Interest / Discount</label><br />
+                        @Html.DisplayFor(x => x.Interest)
+                    </div>
+                    <div class="col-sm-4">
+                        <label>Net Payment</label><br />
+                        @Html.DisplayFor(x => x.NetAmount)
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="bold col-sm-12">
+                        <h1 class="bold">Period of Performance</h1><hr />
+                    </div>
+                    <div class="col-sm-4">
+                        <label>Start Date</label><br />
+                        @Html.DisplayFor(x => x.ServicePeriodStart)
+                    </div>
+                    <div class="col-sm-4">
+                        <label>End Date</label><br />
+                        @Html.DisplayFor(x => x.ServicePeriodEnd)
+                    </div>
+                    <div class="col-sm-4">
+
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-4">
+                        <label>Disc Days</label><br />
+                        @Html.DisplayFor(x => x.DiscDays)
+                    </div>
+                    <div class="col-sm-4">
+                        <label>Disc Percentage</label><br />
+                        @Html.DisplayFor(x => x.DiscPercent)
+                    </div>
+                    <div class="col-sm-4">
+                        <label>Net Days</label><br />
+                        @Html.DisplayFor(x => x.NetDays)
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-4">
+                        <label>Account #</label><br />
+                        @Html.DisplayFor(x => x.CustomerAccountNumber)
+                    </div>
+                    <div class="col-sm-4">
+                        <label>Service</label><br />
+                        @Html.DisplayFor(x => x.Service)
+                    </div>
+                    <div class="col-sm-4">
+                        <label>Service Month</label><br />
+                        @Html.DisplayFor(x => x.ServiceMonth)
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-sm-3">
+                <div class="row panel">
+                    <div class="bold col-sm-12">
+                        <h1 class="bold">Vendor</h1><hr />
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-12">
+                        @Html.LabelFor(x => x.VendorCode)<br />
+                        @Html.DisplayFor(x => x.VendorCode, new { @disabled = "" }) - @Html.DisplayFor(x => x.VendorAddressCode, new { @disabled = "" })
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-12">
+                        @Html.LabelFor(x => x.VendorName)<br />
+                        @Html.DisplayFor(x => x.VendorName, new { @disabled = "" })
+                    </div>
+                </div>
+                <div class="row panel">
+                    <div class="col-sm-12">
+                        <label for="VendorAddress">Vendor Address</label>
+                        @Html.TextAreaFor(x => x.VendorAddress, new { @disabled = "disabled", @readonly = true, style = "height:95px; width:300px", id = "VendorAddress" })
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row padBottom20">
+            <div class="col-sm-12">
+                @{Html.Kendo().TabStrip()
+                    .Name("tsTabs")
+                    .Items(items =>
+                    {
+                        items.Add().Text("Disbursement Description")
+                            .Content(Html.Partial("ViewPaymentAuthorizationDescriptionTab", Model.DescriptionModel).ToHtmlString());
+
+                        items.Add().Text("Disbursement Accounting Line")
+                            .Content(Html.Partial("ViewPaymentAuthorizationAccountingLineTab", Model.AccountingLineModel).ToHtmlString());
+
+                        items.Add().Text("Disbursement Summary")
+                            .Content(Html.Partial("ViewPaymentAuthorizationSummaryTab", Model.SummaryModel).ToHtmlString());
+                    })
+                    .SelectedIndex(0)
+                    .Render();
+                }
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                <label>Status</label><br />@Html.DisplayFor(x => x.Status)
+            </div>
+            <div class="col-md-2">
+                <label>Cancellation Doc #</label><br />@Html.DisplayFor(x => x.CancellationDocNumber)
+            </div>
+            <div class="col-md-4">
+                <label>Cancelled Amount</label><br />@Html.DisplayFor(x => x.CancelledAmount)
+            </div>
+            <div class="col-sm-4">
+                @*@if (!string.IsNullOrEmpty(Model.ImageId))
+                {*@
+                <button type="button" class="btn btn-info" command="viewImage" id="viewImage" disabled="disabled">View Image</button>
+                @*}*@
+
+                <button type="button" class="btn btn-info" command="viewTj" id="viewTj" disabled="disabled">View TJ</button>
+
+            </div>
+        </div>
+    </div>
+
+    @Html.HiddenFor(x => x.Command)
+                    @Html.HiddenFor(x => x.VpaQueryUidy)
+                    @Html.HiddenFor(x => x.ImageId)
+                        @Html.HiddenFor(x => x.PaId)
+
+                    }

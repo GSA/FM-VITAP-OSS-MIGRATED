@@ -1,0 +1,667 @@
+﻿@model IEnumerable<TransHistViewModel>
+@using VITAP.Data
+@using VITAP.ViewModels.TransHist
+
+@{
+    ViewBag.Title = "TransHist";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@*<script src="~/Scripts/jquery-1.10.2.min.js"></script>*@
+
+@*<button type="submit" id="btnOraTwo">OraTwo</button>*@
+
+<div class="generalContainer">
+    <div class="searchForm" style="width: 490px; float: left;">
+        @using (Html.BeginForm("Index", "TransHist", FormMethod.Get))
+        {
+            <label class="firstCol" for="searchFor">Search for</label>
+            @Html.Kendo().TextBox().Name("searchFor").HtmlAttributes(new { style = "width: 9em;" })
+            <label class="secondCol" for="searchIn">In</label>
+            @(Html.Kendo().DropDownList()
+            .Name("searchIn")
+            .DataTextField("Text")
+            .DataValueField("Value")
+            .BindTo((List<SelectListItem>)ViewBag.SearchKey)
+            )
+            @(Html.Kendo().Button()
+            .Name("btnSearch")
+            .Content("Search")
+            .HtmlAttributes(new { style = "margin-left: 8px; width: 8em;" })
+            )
+            <br />
+            <label class="firstCol" for="searchShow">Show</label>
+            @(Html.Kendo().DropDownList()
+            .Name("searchShow")
+            .DataTextField("Text")
+            .DataValueField("Value")
+            .HtmlAttributes(new { style = "width: 9em;" })
+            .BindTo((List<SelectListItem>)ViewBag.TransHistType)
+            )
+            <label class="secondCol" for="searchFY">FY</label>
+            @(Html.Kendo().DropDownList()
+            .Name("searchFY")
+            .DataTextField("Text")
+            .DataValueField("Value")
+            .BindTo((List<SelectListItem>)ViewBag.FiscalYear)
+            )
+
+        }
+        @if (ViewBag.ValidationError != null)
+        {
+            <ul class="validationWarning">
+                <li>@ViewBag.ValidationError</li>
+            </ul>
+        }
+    </div>
+
+    <div class="controls" style="width: 58%; float: left;">
+        <button type="submit" id="btnListPOs" disabled>List PO's</button>
+        <button type="submit" id="btnListRRs" disabled>List RR's</button>
+        <button type="submit" id="btnListInvs" disabled>List Inv's</button>
+        <button type="submit" id="btnListEAs" disabled>List EA's</button>
+        <button type="submit" id="btnListPAs" disabled>List PA's</button>
+        <button type="submit" id="btnContact" style="width: 86px;" disabled>Contact</button>
+        <button type="submit" id="btnMISC" style="width: 85px; padding: 3px;" disabled>Miscellaneous</button>
+        <button type="submit" id="btnOverview" style="width: 80px; margin-bottom: 2px;" disabled>Overview</button>
+        <br />
+        <button type="submit" id="btnViewPO" formtarget="_blank" disabled>View PO</button>
+        <button type="submit" id="btnViewRR" disabled>View RR</button>
+        <button type="submit" id="btnViewInvs" disabled>
+            View Inv
+        </button>
+        <button type="submit" id="btnViewEAs" disabled>
+            View EA
+        </button>
+        <button type="submit" id="btnViewPAs" disabled>
+            View PA
+        </button>
+        <button type="submit" id="btnSummNotes" style="width: 86px;" disabled>Summ Notes</button>
+        <button type="submit" id="btnMatch" style="width: 85px;" disabled>Match</button>
+        <button type="submit" id="btnOpenItems" style="width: 80px;" disabled>Open Items</button>
+        <button type="submit" id="btnViewRecur" style="width: 78px; display: none;">View Recur</button>
+    </div>
+</div>
+<br style="clear: both;" />
+@if (Model == null || Model.Count() < 1)
+{
+    <span class="validationWarning">@ViewBag.NoResult</span>
+}
+else
+{
+    @(Html.Kendo().Grid((List<TransHistVendorInfo>)ViewBag.VendorInfo)
+                .Name("grdVendorInfo")
+                .Columns(columns =>
+                {
+                    columns.Bound(v => v.VENDORNAME).Title(ViewBag.VendorTitle);
+                    columns.Bound(v => v.CONTRACT);
+                    columns.Bound(v => v.VENDORCODE);
+                    columns.Bound(v => v.ADDRESSCODE);
+                    columns.Bound(v => v.VENDORTYPE);
+                    columns.Bound(v => v.POTYPE);
+                })
+
+    )
+    @(Html.Kendo().Grid(Model)
+            .Name("grdTransHist")
+            .Columns(columns =>
+            {
+                columns.Command(v => v.Custom("Select").Click("grdTransHistSelected")).Title("Action");
+                columns.Bound(v => v.TRANSDATE).Title("Trans Date");
+                columns.Bound(v => v.TRANSDATE).Title("Trans Time").Format("{0:HH:mm:ss}");
+                columns.Bound(v => v.ACT).Title("ACT");
+                columns.Bound(v => v.PDOCNO).Title("PDocNo");
+                columns.Bound(v => v.INVOICE).Title("Invoice");
+                columns.Bound(v => v.PO_ID).Title("PO ID");
+                columns.Bound(v => v.RR_ID).Title("RR ID");
+                columns.Bound(v => v.INV_KEY_ID).Title("INV KEY ID");
+                columns.Bound(v => v.AE_ID).Title("AE ID");
+                columns.Bound(v => v.PA_ID).Title("PA ID");
+                columns.Bound(v => v.AC_ID).Title("AC ID");
+                columns.Bound(v => v.ERR_CODE).Title("Err Code");
+                columns.Bound(v => v.ERR_RESPONSE).Title("Err Response");
+                columns.Bound(v => v.CLEARED_DATE).Title("Cleared Date");                
+                columns.Bound(v => v.PREPCODE).Title("PC");
+                columns.Bound(v => v.ALLPROCESS).Title("All Process");
+            })
+            .HtmlAttributes(new { style = "margin-top: 6px;" })
+            .Pageable(pageable => pageable
+                .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+            )
+            .ToolBar(tools => tools.Excel())
+            .Excel(excel => excel
+                .FileName("TransHistList.xlsx")
+                .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+                .AllPages(true)
+            )
+            .Selectable()
+            .Sortable()
+            .DataSource(dataSource => dataSource
+                .Ajax()
+                .PageSize(10)
+                .ServerOperation(false)                
+             )
+             .Resizable(resize => resize.Columns(true))
+             .Events(events => events.Change("grdTransHistChanged"))
+    )
+
+    <div id="contact" style="display: none;">
+        @(Html.Kendo().Window()
+        .Name("window")
+        .Title("TransHist: Contact Details")
+        .Content(@<text>
+            <div id="msgContact" class="validationWarning">
+                <p id="msg"></p>
+            </div>
+            <div id="contactFields" class="popup">
+                <label for="name">Name</label>
+                @Html.Kendo().TextBox().Name("name").Enable(false)
+                <br />
+                <label for="phone">Phone</label>
+                @Html.Kendo().TextBox().Name("phone").Enable(false)
+                <br />
+                <label for="fax">Fax</label>
+                @Html.Kendo().TextBox().Name("fax").Enable(false)
+                <br />
+                <label for="orgCode">OrgCode</label>
+                @Html.Kendo().TextBox().Name("orgCode").Enable(false)
+                <br />
+                <label for="fund">Fund</label>
+                @Html.Kendo().TextBox().Name("fund").Enable(false)
+                <br />
+                <label for="region">Region</label>
+                @Html.Kendo().TextBox().Name("region").Enable(false)
+                <br />
+                <label for="ba">BA</label>
+                @Html.Kendo().TextBox().Name("ba").Enable(false)
+            </div>
+        </text>)
+        .Draggable()
+        .Resizable()
+        .Width(400)
+        .Actions(actions => actions.Pin().Minimize().Maximize().Close())
+        )
+    </div>    
+    <fieldset>
+        <legend>Memo</legend>
+        <span id="lblMemo"></span>
+    </fieldset>
+    <span id="lblPDocNoFromPoData" style="display: none">@ViewBag.PDocNoFromPoData</span>
+}
+<script type="text/javascript">
+
+    $(document).ready(function () {        
+        var grdTransHist = $("#grdTransHist").data("kendoGrid");
+        if (grdTransHist != null) {
+            var transHistGridId = "grdTransHist";
+            ConfigureKendoGridPaginationControlsFor508(transHistGridId);
+            MakeKendoGridScrollable(transHistGridId, "310px");
+            grdTransHist.element.find('tbody tr:first').addClass('k-state-selected');
+            var selectedRow = grdTransHist.dataItem(grdTransHist.select());
+
+            grdTransHistChanged();
+            EnableButtons();
+        }
+    });
+
+    // When user click "Select" button
+    function grdTransHistSelected(e) {
+
+        // Highlight the row when "Select" button clicked
+        $("#grdTransHist table tr").removeClass('k-state-selected');
+        $(e.currentTarget).closest("tr").addClass('k-state-selected');
+
+        // Get the data from the current row
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        grdTransHistSelecting(dataItem);
+
+    }
+
+    // When user selects one record in the grid
+    function grdTransHistChanged() {
+        var grid = $("#grdTransHist").data("kendoGrid");
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        grdTransHistSelecting(dataItem);
+    }
+
+
+    function grdTransHistSelecting(dataItem) {
+        var pDocNo = GetPDocNo(dataItem);        
+
+        $("#lblMemo").html(dataItem.CUFF_MEMO);
+
+        // Disable all buttons
+        $(".controls button").attr("disabled", "disabled");
+
+        SetupButtonViewPO(dataItem);        
+        SetupButtonViewRecur(dataItem);
+        SetupButtonViewRR(dataItem);
+        SetupButtonViewInvs(dataItem);
+        SetupButtonViewEAs(dataItem);
+        SetupButtonOpenItems(dataItem);
+        SetupButtonViewPAs(dataItem);
+        EnableButtons();
+
+        if (/^UE/i.test(dataItem.AE_ID) && dataItem.PA_ID == null) {
+            $("#btnListPAs").prop("disabled", false);
+        }
+        if (dataItem.PA_ID != null) {
+            $("#btnListPAs").prop("disabled", false);
+        }
+
+        // need to change after Ron checks it again.        
+        SetupActPDocNoDependentButtons(dataItem, pDocNo);
+        SetupActDependentButtons(dataItem, pDocNo);
+
+        SetupButtonListPO(dataItem, pDocNo);
+        SetupButtonListRR(dataItem, pDocNo);
+        SetupButtonListInv(dataItem, pDocNo);
+        SetupButtonListEA(dataItem, pDocNo);
+        SetupButtonListPA(dataItem, pDocNo);
+    }
+
+    // When Contact button click
+    $("#btnContact").on("click", function () {
+        var actPDocNo = new Array();
+        actPDocNo = $(this).val().split(",");
+        var act = actPDocNo[0];
+        var pDocNo = actPDocNo[1];        
+
+        $("p#msg").text("Loading Contact Details .....");
+        $("div#contactFields").hide();
+        $("div#msgContact").show();
+        $("div#contact").show();
+        $("#window").data("kendoWindow").open().center();
+
+        $.ajax({
+            url: '@Url.Action("Contact")' + '?pDocNo=' + pDocNo + '&act=' + act, // to get the right path to controller from TableRoutes of Asp.Net MVC
+            dataType: "json", //to work with json format
+            contentType: 'application/json; charset=utf-8', //define a contentType of your request
+            cache: false, //avoid caching results
+            data: {}, // here you can pass arguments to your request if you need
+            success: function (data) {
+                // data is your result from controller
+                if (data.success) {
+                    if (data.HasRecord) {
+                        $("#window").data("kendoWindow").close();
+                        $("#name").val(data.Name);
+                        $("#phone").val(data.Phone);
+                        $("#fax").val(data.Fax);
+                        $("#orgCode").val(data.OrgCode);
+                        $("#fund").val(data.Fund);
+                        $("#region").val(data.Region);
+                        $("#ba").val(data.BA);
+                        $("div#contact").show();
+                        $("div#msgContact").hide();
+                        $("div#contactFields").show();
+                        $("#window").data("kendoWindow").open().center();
+                    }
+                    else {
+                        $("p#msg").text("No contact details found!");
+                        $("div#contactFields").hide();
+                        $("div#msgContact").show();
+                        $("div#contact").show();
+                        $("#window").data("kendoWindow").open().center();
+                    }
+                }
+            },
+            error: function (data) {
+                if (!data.success) {
+                    alert("Error!");
+                }
+
+            }
+        });
+    });
+    
+    // When Overview button click
+    $("#btnOverview").on("click", function () {
+        var actPDocNo = new Array();
+        actPDocNo = $(this).val().split(",");
+
+        var act = actPDocNo[0];
+        var pDocNo = GetPDocNoWithPoData(actPDocNo[1]);
+        
+        location = "@Url.Action("Overview")" + "?act=" + ConvertNullToEmptyString(act).encodeUriComponent() + "&pDocNo=" + ConvertNullToEmptyString(pDocNo).encodeUriComponent();
+    });
+
+
+    // When Misc button click
+    $("#btnMISC").on("click", function () {
+        var actPDocNo = new Array();
+        actPDocNo = $(this).val().split(",");
+
+        var act = actPDocNo[0];
+        var pDocNo = GetPDocNoWithPoData(actPDocNo[1]);
+
+        location = "@Url.Action("Misc")" + "?act=" + ConvertNullToEmptyString(act).encodeUriComponent() + "&pDocNo=" + ConvertNullToEmptyString(pDocNo).encodeUriComponent();
+    });
+
+
+    // When Summ Notes button click
+    $("#btnSummNotes").on("click", function () {
+        var actPDocNo = new Array();
+        actPDocNo = $(this).val().split(",");
+
+        var act = actPDocNo[0];
+        var pDocNo = GetPDocNoWithPoData(actPDocNo[1]);
+
+        location = "@Url.Action("SummNotes")" + "?act=" + ConvertNullToEmptyString(act).encodeUriComponent() + "&pDocNo=" + ConvertNullToEmptyString(pDocNo).encodeUriComponent();
+    });
+
+
+
+    function GetPDocNo(dataItem) {
+        var pDocNo = $.trim(dataItem.PDOCNO);
+        if (pDocNo != null) {
+            pDocNo = pDocNo.split('&', 1)[0];
+        }
+        return GetPDocNoWithPoData(pDocNo);
+    }
+
+    function GetPDocNoWithPoData(pDocNo) {
+        var pDocNoFromPoData = "";
+        if ($("#lblPDocNoFromPoData").text() != null)
+            pDocNoFromPoData = $("#lblPDocNoFromPoData").text().trim();
+        if (pDocNoFromPoData == "" || pDocNoFromPoData == "null")
+            return pDocNo;
+        return pDocNoFromPoData;
+    }
+
+    function SetupButtonViewPO(dataItem) {
+        var po_Id;
+        var pDocNo;
+        if (dataItem.PO_ID != null) {
+            po_Id = dataItem.PO_ID;
+            pDocNo = "";
+            $("#btnViewPO").prop("disabled", false);            
+        }
+        else {
+            po_Id = "";
+            pDocNo = GetPDocNoWithPoData(dataItem.PDOCNO);            
+        }
+
+        $("#btnViewPO").click(function () {
+            location = '@Html.Raw(@Url.Action("ViewPO", "TransHist"))' + '?po_Id=' + ConvertNullToEmptyString(po_Id).encodeUriComponent() + '&pDocNo=' + ConvertNullToEmptyString(pDocNo).encodeUriComponent();
+        });
+    }
+
+    function SetupButtonViewRecur(dataItem) {
+        if (dataItem.RECUR_ID != null) {
+            $("#btnViewRecur").prop("disabled", false);
+            $("#btnViewRecur").show();
+            $("#btnViewRecur").click(function () {
+                location = '@Html.Raw(@Url.Action("ViewRecurringMaster", "TransHist"))' + '?recur_Id=' + ConvertNullToEmptyString(dataItem.RECUR_ID).encodeUriComponent();
+            });
+        }
+    }
+
+    function SetupButtonViewRR(dataItem) {
+        if (dataItem.RR_ID != null && dataItem.RR_ID.length > 3) {
+            $("#btnViewRR").prop("disabled", false);
+            $("#btnViewRR").click(function () {
+                location = '@Html.Raw(@Url.Action("ViewRR", "TransHist"))' + '?rr_Id=' + ConvertNullToEmptyString(dataItem.RR_ID).encodeUriComponent();
+            });
+        }
+    }
+
+    function SetupButtonViewInvs(dataItem) {
+        if (dataItem.INV_KEY_ID != null && dataItem.INV_KEY_ID.length > 7) {
+            $("#btnViewInvs").prop("disabled", false);
+            $("#btnViewInvs").click(function () {
+                location = '@Html.Raw(@Url.Action("ViewInvoice", "TransHist"))' + '?inv_Key_Id=' + ConvertNullToEmptyString(dataItem.INV_KEY_ID).encodeUriComponent();
+            });
+        }
+    }
+
+    function SetupButtonViewEAs(dataItem) {
+        if (dataItem.AE_ID != null) {
+            $("#btnViewEAs").prop("disabled", false);
+            $("#btnViewEAs").click(function () {
+                location = '@Html.Raw(@Url.Action("ViewEstimatedAccrual", "TransHist"))' + '?ae_Id=' + ConvertNullToEmptyString(dataItem.AE_ID).encodeUriComponent();
+            });
+        }
+    }
+
+    function SetupButtonOpenItems(dataItem) {
+        if (dataItem.ACT != null || dataItem.PDOCNO != null) {            
+            $("#btnOpenItems").prop("disabled", false);
+            $("#btnOpenItems").click(function () {
+                location = '@Html.Raw(@Url.Action("OpenItems", "TransHist"))'
+                    + '?pDocNo=' + ConvertNullToEmptyString(dataItem.PDOCNO).encodeUriComponent()
+                    + '&act=' + ConvertNullToEmptyString(dataItem.ACT).encodeUriComponent();
+            });
+        }
+    }
+
+    function SetupButtonViewPAs(dataItem) {
+        if (dataItem.PA_ID != null) {
+            $("#btnViewPAs").prop("disabled", false);
+            $("#btnViewPAs").click(function () {
+                location = '@Html.Raw(@Url.Action("ViewPAs", "TransHist"))' + '?pa_Id=' + ConvertNullToEmptyString(dataItem.PA_ID).encodeUriComponent();
+            });
+        }
+    }
+
+    function EnableButtons() {
+        $("#btnContact").prop("disabled", false);
+        $("#btnMISC").prop("disabled", false);
+        $("#btnOverview").prop("disabled", false);
+        $("#btnMatch").prop("disabled", false);
+        
+        $("#btnListPOs").prop("disabled", false);
+        $("#btnListRRs").prop("disabled", false);
+        $("#btnListInvs").prop("disabled", false);
+        $("#btnListEAs").prop("disabled", false);
+        $("#btnListPAs").prop("disabled", false);
+
+    }
+
+    function SetupActPDocNoDependentButtons(dataItem, pDocNo) {
+        if (dataItem.ACT == null && pDocNo == null)
+            return;
+        $("#btnSummNotes").prop("disabled", false);
+        $("#btnOpenItems").prop("disabled", false);
+        
+        SetupButtonMatch(dataItem, pDocNo);
+
+        EnableButtons();
+
+        // Setup Overview button
+        $("#btnOverview").attr("value", dataItem.ACT + "," + pDocNo);
+
+        // Setup Summ Notes button
+        $("#btnSummNotes").attr("value", dataItem.ACT + "," + pDocNo);
+
+        // Setup Contact button
+        $("#btnContact").attr("value", dataItem.ACT + "," + pDocNo);
+
+        // Setp Misc button
+        $("#btnMISC").attr("value", dataItem.ACT + "," + pDocNo);        
+    }
+
+
+    function SetupActDependentButtons(dataItem, pDocNo) {        
+        if (dataItem.ACT == null)
+            return;
+
+        $("#btnContact").prop("disabled", false);
+        $("#btnOverview").prop("disabled", false);
+
+        SetupButtonMatch(dataItem, pDocNo);
+
+        EnableButtons();
+
+        // Setup Overview button
+        $("#btnOverview").attr("value", dataItem.ACT + "," + pDocNo);
+
+        // Setup Summ Notes button
+        $("#btnSummNotes").attr("value", dataItem.ACT + "," + pDocNo);
+
+        // Setup Contact button
+        $("#btnContact").attr("value", dataItem.ACT + "," + pDocNo);
+
+        // Setp Misc button
+        $("#btnMISC").attr("value", dataItem.ACT + "," + pDocNo);
+    }
+
+    function SetupButtonMatch(dataItem, pDocNo) {
+        $("#btnMatch").prop("disabled", false);
+        $("#btnMatch").click(function () {
+            location = '@Html.Raw(@Url.Action("Match", "TransHist"))'
+                + '?pDocNo=' + ConvertNullToEmptyString(pDocNo).encodeUriComponent()
+                + '&act=' + ConvertNullToEmptyString(dataItem.ACT).encodeUriComponent();
+        });
+    }
+
+    function SetupButtonListPO(dataItem, pDocNo) {
+        $("#btnListPOs").click(function () {
+            var url = "";
+
+            var act = "";
+            var po_Id = "";
+            var localPDocNo = "";
+            var recur_Id = "";
+
+            //If recur_id is not populated
+            if (dataItem.RECUR_ID == null) {
+                act = dataItem.ACT;
+                po_Id = "";
+                localPDocNo = pDocNo;
+                recur_Id = "";
+
+            }
+                //If recur_id is populated
+            else {
+                act = "";
+                po_Id = "";
+                localPDocNo = pDocNo;
+                recur_Id = dataItem.RECUR_ID;
+            }
+            url = '@Html.Raw(@Url.Action("ListPO", "TransHist"))'
+                + '?act=' + ConvertNullToEmptyString(act).encodeUriComponent()
+                + '&pDocNo=' + ConvertNullToEmptyString(localPDocNo).encodeUriComponent()
+                + '&po_Id=' + ConvertNullToEmptyString(po_Id).encodeUriComponent()
+                + '&recur_Id=' + ConvertNullToEmptyString(recur_Id).encodeUriComponent();
+            location = url;
+        });
+    }
+
+    function SetupButtonListRR(dataItem, pDocNo) {
+        $("#btnListRRs").click(function () {
+            var url = "";
+
+            var act = "";
+            var localPDocNo = "";
+            var recur_Id = "";
+
+            //If recur_id is not populated
+            if (dataItem.RECUR_ID == null) {
+                if (pDocNo.indexOf("RO") == 0) {
+                    act = "";
+                    localPDocNo = pDocNo;
+                    recur_Id = "";
+                }
+                else {
+                    act = dataItem.ACT;
+                    localPDocNo = pDocNo;
+                    recur_Id = "";
+                }
+            }
+
+                //If recur_id is populated
+            else {
+                var answer = confirm("Do you want to list RRs for Recurring Master " + dataItem.RECUR_ID + "?");
+                if (answer) {
+                    act = "";
+                    localPDocNo = "";
+                    recur_Id = dataItem.RECUR_ID;
+                }
+                else {
+                    act = dataItem.ACT;
+                    localPDocNo = pDocNo;
+                    recur_Id = "";
+                }
+            }
+            url = '@Html.Raw(@Url.Action("ListRR", "TransHist"))'
+                + '?act=' + ConvertNullToEmptyString(act).encodeUriComponent()
+                + '&pDocNo=' + ConvertNullToEmptyString(localPDocNo).encodeUriComponent()
+                + '&recur_Id=' + ConvertNullToEmptyString(recur_Id).encodeUriComponent();
+            location = url;
+        });
+    }
+
+    function SetupButtonListInv(dataItem, pDocNo) {
+        $("#btnListInvs").click(function () {
+            var url = "";
+
+            var act = "";
+            var localPDocNo = "";
+            var inv_Key_Id = "";
+            var imageId = "";
+            var recur_Id = "";
+
+            //If recur_id is not populated
+            if (dataItem.RECUR_ID == null) {
+                if (pDocNo.indexOf("RO") == 0) {
+                    act = "";
+                    localPDocNo = pDocNo;
+                    recur_Id = "";
+                }
+                else {
+                    act = dataItem.ACT;
+                    localPDocNo = pDocNo;
+                    recur_Id = "";
+                }
+            }
+
+                //If recur_id is populated
+            else {
+                var answer = confirm("Do you want to list Invs for Recurring Master " + dataItem.RECUR_ID + "?");
+                if (answer) {
+                    act = "";
+                    localPDocNo = "";
+                    recur_Id = dataItem.RECUR_ID;
+                }
+                else {
+                    act = dataItem.ACT;
+                    localPDocNo = pDocNo;
+                    recur_Id = "";
+                }
+            }
+            url = '@Html.Raw(@Url.Action("ListInv", "TransHist"))'
+                + '?act=' + ConvertNullToEmptyString(act).encodeUriComponent()
+                + '&pDocNo=' + ConvertNullToEmptyString(localPDocNo).encodeUriComponent()
+                + '&recur_Id=' + ConvertNullToEmptyString(recur_Id).encodeUriComponent();
+            location = url;
+        });
+    }
+
+    function SetupButtonListEA(dataItem, pDocNo) {
+        $("#btnListEAs").click(function () {
+            var url = "";
+            var act = "";
+            if (dataItem.ACT != null) {
+                dataItem.ACT;
+            }
+            var localPDocNo = pDocNo;
+
+            url = '@Html.Raw(@Url.Action("ListEA", "TransHist"))' +
+                '?act=' + ConvertNullToEmptyString(act).encodeUriComponent() + '&pDocNo=' + ConvertNullToEmptyString(localPDocNo).encodeUriComponent();
+            location = url;
+        });
+    }    
+
+    function SetupButtonListPA(dataItem, pDocNo) {
+        $("#btnListPAs").click(function () {
+            var url = "";
+            var act = dataItem.ACT;
+            var localPDocNo = pDocNo;           
+
+            url = '@Html.Raw(@Url.Action("ListPA", "TransHist"))' +
+                '?act=' + ConvertNullToEmptyString(act).encodeUriComponent() + '&pDocNo=' + ConvertNullToEmptyString(localPDocNo).encodeUriComponent();
+            location = url;
+        });
+    }
+</script>
+

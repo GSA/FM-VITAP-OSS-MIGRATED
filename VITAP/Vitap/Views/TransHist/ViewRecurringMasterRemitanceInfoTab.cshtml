@@ -1,0 +1,43 @@
+﻿@model VITAP.ViewModels.TransHist.RecurringMasterRemitanceInfoModel
+
+@using (Html.BeginForm())
+{
+    <div class="container">
+        <div class="row panel">
+            <div class="col-sm-12" style="padding-top:8px;">
+                @Html.LabelFor(x => x.RemitVendorCode)<br />
+                @Html.TextBoxFor(x => x.RemitVendorCode, new { @disabled = "disabled" })
+            </div>
+        </div>
+        <div class="row panel">
+            <div class="col-sm-12">
+                @Html.LabelFor(x => x.RemitAddressCode)<br />
+                @Html.TextBoxFor(x => x.RemitAddressCode, new { @disabled = "disabled" })
+            </div>
+        </div>
+        <div class="row panel">
+            <div class="col-sm-12">
+                @Html.LabelFor(x => x.RemitVendorName)<br />
+                @Html.TextBoxFor(x => x.RemitVendorName, new { @disabled = "disabled" })
+            </div>
+        </div>
+        <div class="row panel">
+            <div class="col-sm-12">
+                @Html.LabelFor(x => x.RemitAddress)<br />
+                @Html.TextAreaFor(x => x.RemitAddress, new { @disabled = "disabled", rows = "2", cols = "44" })
+            </div>
+        </div>
+        <div class="row panel">
+            <div class="col-sm-12">
+                @Html.LabelFor(x => x.RemitBankId)<br />
+                @Html.TextBoxFor(x => x.RemitBankId, new { @disabled = "disabled" })
+            </div>
+        </div>
+        <div class="row panel">
+            <div class="col-sm-12">
+                @Html.LabelFor(x => x.RemitBankAcctNumber)<br />
+                @Html.TextBoxFor(x => x.RemitBankAcctNumber, new { @disabled = "disabled" })
+            </div>
+        </div>
+    </div>
+}

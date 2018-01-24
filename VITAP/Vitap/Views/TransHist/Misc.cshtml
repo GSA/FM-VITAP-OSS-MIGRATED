@@ -1,0 +1,121 @@
+﻿@model IEnumerable<VITAP.Data.MiscDocs>
+
+@{
+    ViewBag.Title = "Misc";
+}
+@*<script src="~/Scripts/jquery-1.10.2.min.js"></script>*@
+<h1>Miscellaneous Items</h1>
+<hr />
+@(Html.Kendo().Grid(Model)
+        .Name("grdMiscDocs")
+        .Columns(columns =>
+        {
+            columns.Command(v => v.Custom("Select").Click("grdMiscDocsSelected")).Title("Action");
+            columns.Bound(v => v.ACT);
+            columns.Bound(v => v.PDOCNO);
+            columns.Bound(v => v.STAMPDATE).Format("{0:d}");
+            columns.Bound(v => v.VENDNAME);
+            columns.Bound(v => v.INVOICE);
+            columns.Bound(v => v.AMOUNT).Format("{0:c}").HtmlAttributes(new { style = "text-align: right;" });
+            columns.Bound(v => v.TYPE);
+        })
+        .HtmlAttributes(new { style = "width: 68%; float: left" })
+        .Pageable(pageable => pageable
+            .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+         )
+        .ToolBar(tools => tools.Excel())
+        .Excel(excel => excel
+            .FileName("MiscList.xlsx")
+            .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+            .AllPages(true)
+        )
+        .Selectable()
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .PageSize(10)
+            .ServerOperation(false)
+         )
+        .Resizable(resize => resize.Columns(true))
+        .Events(events => events.Change("grdMiscDocsChanged"))
+)
+
+<fieldset class="searchForm" style="width: 30%; float: right; margin-left: 10px;">
+    <h2>Details</h2>
+    <br />
+    @Html.Label("txtInvoice", "Invoice Number")
+    <br />    
+    @Html.TextBox("txtInvoice", null, new { disabled = "true", style = "padding: 4px;" })
+    <br />
+    @Html.Label("txtVendorName", "Vendor Name")
+    <br />
+    @Html.TextBox("txtVendorName", null, new { disabled = "true", style = "width: 99%; padding: 4px;" })
+    @*@Html.Kendo().TextBox().Name("txtVendorName").Enable(false).HtmlAttributes(new { style = "width: 99%" })*@    
+    <br />
+    @Html.Label("txtMiscAmount", "Miscellaneous Amount")
+    <br />
+    @Html.TextBox("txtMiscAmount", null, new { disabled = "true", style = "text-align: right; padding: 4px;" })    
+    <br />
+    @Html.Label("txtStampDate", "Stamp Date")
+    <br />
+    @Html.TextBox("txtStampDate", null, new { disabled = "true", style = "padding: 4px;" })        
+    <br />
+    <br />
+    <button type="submit" id="btnShowImage" disabled>Show Image</button>
+</fieldset>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var grdMiscDocs = $("#grdMiscDocs").data("kendoGrid");
+        if (grdMiscDocs != null) {
+            var miscDocsGridId = "grdMiscDocs";
+            ConfigureKendoGridPaginationControlsFor508(miscDocsGridId);
+            MakeKendoGridScrollable(miscDocsGridId, "210px");
+        }
+    });
+
+    function grdMiscDocsChanged() {
+        var grid = $("#grdMiscDocs").data("kendoGrid");
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        grdMiscDocsSelecting(dataItem);
+    }
+
+    function grdMiscDocsSelected(e) {
+
+        // Highlight the row when "Select" button clicked
+        $("#grdMiscDocs table tr").removeClass('k-state-selected');
+        $(e.currentTarget).closest("tr").addClass('k-state-selected');
+
+        // Get the data from the current row
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        grdMiscDocsSelecting(dataItem);
+    }
+
+    function grdMiscDocsSelecting(dataItem) {
+        var invoice = $.trim(dataItem.INVOICE);
+        var vendorName = $.trim(dataItem.VENDNAME);
+        var miscAmount = "$" + $.trim(dataItem.AMOUNT);
+        var stampDate = new Date($.trim(dataItem.STAMPDATE));
+        // Convert to Short Date
+        stampDate = (stampDate.getMonth() + 1) + "/" + stampDate.getDate() + "/" + stampDate.getFullYear();
+
+        var imageId = $.trim(dataItem.IMAGEID);
+
+        $("#txtInvoice").val(invoice);
+        $("#txtVendorName").val(vendorName);
+        $("#txtMiscAmount").val(miscAmount);
+        $("#txtStampDate").val(stampDate);
+
+        if (imageId.length > 0) {
+            $("#btnShowImage").prop("disabled", false);
+            $("#btnShowImage").val(imageId);
+        }
+    }
+
+    $("#btnShowImage").on("click", function () {
+        url = '@Url.Action("ViewImageByImageID", "Exceptions")';
+        window.location = url + '?docID=' + $(this).val();
+    });
+
+</script>

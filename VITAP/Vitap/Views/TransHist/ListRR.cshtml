@@ -1,0 +1,230 @@
+﻿@*@using VITAP.ViewModels.TransHist
+@model IEnumerable<ListRR>*@
+
+@model VITAP.ViewModels.TransHist.ListRR_ORA
+
+@{
+    ViewBag.Title = "List RR";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var headerAttr = new { @style = "font-weight:bold" };
+}
+
+<div>
+    @Html.Label(Model.RRLABEL)
+</div>
+
+@{
+
+    Html.Kendo().Grid(Model.listrrora)
+        .Name("RRGrid")
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .ServerOperation(false)
+            .Model(model => model.Id(item => item.RR_ID))
+            )
+        .Columns(columns =>
+        {
+            columns.Command(v => v.Custom("Select").Click("grdRRSelected")).Title("Action");
+            columns.Bound(v => v.ACT).Width(70);
+            columns.Bound(v => v.RR_ID).Width(120);
+            columns.Bound(v => v.INVOICE).Title("Invoice").Width(150);
+            columns.Bound(v => v.AMOUNT_CLEARED).Title("Outstanding Balance").Format("{0:n2}").Width(110);
+            columns.Bound(v => v.MAXAPPR).Title("MaxAppr").Format("{0:n2}").Width(110);
+            columns.Bound(v => v.DLVR_DT).Title("Receive Date").Width(128).ClientTemplate("#=kendo.toString(DLVR_DT,'yyyy-MM-dd')#");
+            columns.Bound(v => v.ACCD_DT).Title("Accept Date").Width(120).ClientTemplate("#=kendo.toString(ACCD_DT,'yyyy-MM-dd')#");
+            columns.Bound(v => v.RR_STATUS).Title("Status").Width(128);
+            columns.Bound(v => v.ERR_CODE).Title("Error Code").Width(90);
+            columns.Bound(v => v.IMAGEBATCH).Title("ImageBatch").Width(90);
+            columns.Bound(v => v.IMAGEID).Title("ImageID").Width(130);
+            columns.Bound(v => v.EDI_IND).Title("PDN").Width(80);
+        })
+        .ToolBar(tools => tools.Excel())  
+        .Selectable(s => s.Mode(GridSelectionMode.Single))
+        .Excel(excel => excel
+            .FileName("RRList.xlsx")
+            .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+            .AllPages(true)
+        )
+        .Events(events => events.Change("grdRRChanged"))
+         .Pageable(pageable => pageable
+            .Input(true)
+            .Numeric(false)
+            .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+         )
+        .Sortable()
+        .RowAction(row => row.Selected = row.DataItem.RR_ID.Equals(ViewData["RR_ID"]))
+        .Render();
+    }
+<hr />
+
+@*View NEAR RRs*@
+@*<button type="submit" disabled>
+    View NEAR RRs
+</button>*@
+
+@*Save as XLS Button*@
+@*<button type="submit" disabled>
+    Save as XLS
+</button>*@
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+@*View TransHist Button*@
+<button type="submit" id="btnTransHist" 
+        onclick="TransHist()">
+    View TransHist
+</button>
+
+
+@*View RR Button*@
+<button type="submit" id="btnViewRR" onclick="ViewRR()">
+    View RR
+</button>
+
+
+@*View EDI RR Button*@
+@{
+    List<VITAP.Data.PegasysRR> rrEdi = (List<VITAP.Data.PegasysRR>)ViewBag.RREdi;    
+    <button type="submit" id="btnViewEDIRR" onclick="ViewEDIRR()" disabled>
+        View EDI RR
+    </button>
+   
+}
+
+@*View Image Button*@
+<button type="submit" id="btnViewImage" onclick="ViewImage()">
+        @*@(((rrEdi != null) && (rrEdi.Count() > 0) && !string.IsNullOrEmpty(rrEdi.Single().IMAGEID) ? "onclick=location.href='" + rrEdi.Single().IMAGEID + "'" : "disabled"))>*@
+    View Image
+</button>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var RRGrid = $("#RRGrid").data("kendoGrid");
+        if (RRGrid != null) {
+            var RRGridId = "RRGrid";
+            ConfigureKendoGridPaginationControlsFor508(RRGridId);
+            MakeKendoGridScrollable(RRGridId, "300px");
+        }
+    });
+
+    function ViewRR() {
+        var selectedRR_ID = GetSelectedRRID();
+
+        if (selectedRR_ID != null) {
+            @*location = '@Url.Action("ViewRR", "Transhist")' +
+           '?rrId=' + selectedRR_ID;*@
+            location = '@Html.Raw(@Url.Action("ViewRR", "TransHist"))' + '?rr_Id=' + selectedRR_ID;
+        }
+        else {
+            alter("Select a line in the grid before clicking on View RR button.");
+        }
+    }
+
+    function ViewEDIRR() {
+        var selectedRR_ID = GetSelectedRRID();
+
+        if (selectedRR_ID != null) {
+            location = '@Url.Action("ViewEDIRR", "Transhist")' +
+           '?rrId=' + selectedRR_ID;
+        }
+        else {
+            alter("Select a line in the grid before clicking on View RR button.");
+        }
+    }
+
+    function TransHist() {
+        var selectedRR_ID = GetSelectedRRID();
+        if (selectedRR_ID != null) {
+            var href = '@Url.Action("OraTwo", "TransHist")';
+            href = href + "?searchFor=" + selectedRR_ID.encodeUriComponent() + "&searchIn=RR_ID&searchShow=All&searchFY=All";
+            //location = href;
+            window.open(href, '_blank');
+        }
+    }
+
+    function ViewImage() {
+        var grid = $('#RRGrid').data('kendoGrid');
+        var selectedRows = grid.select();
+        var selectedimageID = "";
+
+        var selected = $.map(selectedRows, function (item) {
+            
+            selectedimageID = $(item).find(':nth-child(12)').text();
+           
+
+        });
+
+        //location.href = '" + selectedRows.dataItem.ImageID + "'
+        var url = '@Url.Action("ViewImageByImageID", "Exceptions")';
+        //var docId = selectedRows.dataItem.ImageID;
+       
+        
+        if (selectedimageID == null) {
+            alert("No image was found!");
+            return;
+        }
+
+        window.location = url + '?docId=' + selectedimageID;
+      
+
+        
+    }
+
+    function GetSelectedRRID() {
+        /// This function is to find the selected row's Receiving Report ID
+
+        var grid = $('#RRGrid').data('kendoGrid');
+        var selectedRows = grid.select();
+        var selected = $.map(selectedRows, function (item) {
+            var checked = $(item).find('.check-box').attr('checked');
+            return {
+                actNumber: $(item).find(':nth-child(2)').text(),
+                RR_ID: $(item).find(':nth-child(3)').text(),
+                INVOICE: $(item).find(':nth-child(4)').text()
+            };
+        });
+
+        return selected[0].RR_ID;
+    }
+
+    function grdRRChanged() {
+        var grid = $('#RRGrid').data('kendoGrid');
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        grdRRSelecting(dataItem);
+    }
+
+    function grdRRSelected(e) {
+
+        // Highlight the row when "Select" button clicked
+        $("#RRGrid table tr").removeClass('k-state-selected');
+        $(e.currentTarget).closest("tr").addClass('k-state-selected');
+
+        // Get the data from the current row
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        grdRRSelecting(dataItem);
+    }
+
+    function grdRRSelecting(dataItem) {        
+
+        var RR_ID = dataItem.RR_ID;
+        if (RR_ID.length > 2) {
+            $("#btnViewRR").prop('disabled', false);
+            $("#btnTransHist").prop('disabled', false);
+        }
+        else {
+            $("#btnViewRR").prop('disabled', true);
+            $("#btnTransHist").prop('disabled', true);
+        }
+
+        if (dataItem.EDI_IND == "T")
+        {
+            $("#btnViewEDIRR").prop('disabled', false);
+        }
+        else
+        {
+            $("#btnViewEDIRR").prop('disabled', true);
+        }
+    }
+</script>

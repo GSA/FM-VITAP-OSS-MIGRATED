@@ -1,0 +1,42 @@
+﻿@model VITAP.ViewModels.TransHist.NovationHistoryModel
+
+@{
+    ViewBag.Title = "Novation History";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using (Html.BeginForm())
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            
+        });
+    </script>
+
+    <div class="container">
+        <br />
+        <h1 class="bold padBottom20">@Model.Status</h1>
+        <div class="row padBottom20">
+            <div class="col-sm-12">
+                @{Html.Kendo().TabStrip()
+                    .Name("tsTabs")
+                    .Items(items =>
+                    {
+                        items.Add().Text("Vendor")
+                            .Content(Html.Partial("ViewNovationHistoryVendorTab", Model.NovationHistoryVendorModel).ToHtmlString());
+
+                        items.Add().Text("Designated Agent")
+                            .Content(Html.Partial("ViewNovationHistoryDesignatedAgentTab", Model.NovationHistoryDesignatedAgentModel).ToHtmlString());
+
+                    })
+                    .SelectedIndex(0)
+                    .Render();
+                }
+            </div>
+        </div>
+    </div>
+
+    @Html.HiddenFor(x => x.DocNumber)
+                    @Html.HiddenFor(x => x.Uidy)
+                    @Html.HiddenFor(x => x.Command)
+
+                    }

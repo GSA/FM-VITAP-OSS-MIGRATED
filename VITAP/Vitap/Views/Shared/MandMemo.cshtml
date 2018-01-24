@@ -1,0 +1,68 @@
+﻿@model VITAP.Data.Models.Exceptions.MandMemoViewModel
+
+<div class="container-fluid">
+    <div style="padding:10px">
+        <fieldset>
+            <legend>@Html.Label(@Model.Title)</legend>
+        </fieldset>
+        <br />
+        <div class="form-group">
+            @Html.TextAreaFor(a => a.NoteValue, new { style = "Width:350px;height:75px", id = "NoteValue" })
+        </div>
+        <br />
+        <div class="pull-left" style="margin-bottom: 10px;">
+            <button type="button" class="btn btn-info btn-fixed-width" id="okMandMemo" onclick="ClickOk()">OK</button>
+        </div>
+        <div class="pull-left" style="margin-bottom: 10px;">
+            <button type="button" class="btn btn-info btn-fixed-width" id="cancelMandMemo" onclick="ClickCancel()">Cancel</button>
+        </div>
+        <br />
+        <div class="form-group validationWarning">
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#cancelMandMemo').click(function () {
+            window.itemClicked = 'cancel';
+            $("#windowMandMemo").data("kendoWindow").close();
+        });
+
+    });
+
+    var confirmCallback, cancelCallback;
+
+    function ClickCancel() {
+        var url = "@Model.Origin";
+        window.location = url;
+    }
+
+    function ClickOk() {
+
+        if (!$('#NoteValue').val()) {
+            $(".validationWarning").html('You must type a memo');
+            return false;
+        }
+        var textNotes = $("#NoteValue").val();
+        var returnAction = "@Model.ReturnAction";
+        var returnController = "@Model.ReturnController";
+        var optionalParam = "@Model.OptionalParam";
+
+        var urlMandMemo = '@Url.Action("FinishMandMemo", "Exceptions")';
+        urlMandMemo = urlMandMemo + "?NoteValue=" + textNotes + "&ReturnAction=" + returnAction + "&ReturnController=" + returnController + '&OptionalParam=' + optionalParam;
+
+        window.location = urlMandMemo;
+    }
+
+    function onMandMemoClose() {
+        var inputValue = $('#windowMandMemoText').val();
+        if (confirmCallback && window.itemClicked == 'OK') {
+            confirmCallback(inputValue);
+        }
+
+        if (cancelCallback && window.itemClicked == 'cancel') {
+            cancelCallback(inputValue);
+        }
+    }
+</script>

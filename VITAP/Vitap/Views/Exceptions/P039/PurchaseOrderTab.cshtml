@@ -1,0 +1,136 @@
+﻿@model VITAP.Data.Models.Exceptions.P039POTabModel
+
+<style>
+    .text-primary
+    {
+        width: 250px;
+    }
+</style>
+
+@{ 
+    var textAttr = new Dictionary<string, object> { { "style", "width:140px" }, { "disabled", "" } };
+    var textAttrRight = new Dictionary<string, object> { { "style", "width:140px; text-align:right;" }, { "disabled", "" } };
+    var textAttrLong = new Dictionary<string, object> { { "style", "width:300px" }, { "disabled", "" } };
+    var textAttrMedium = new Dictionary<string, object> { { "style", "width:200px" }, { "disabled", "" } };
+    var textAttrShort = new Dictionary<string, object> { { "style", "width:80px" }, { "disabled", "" } };
+    var textAttrRightShort = new Dictionary<string, object> { { "style", "width:80px; text-align:right;" }, { "disabled", "" } };
+}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-12">
+                        <label>
+                            Vendor Code <br />
+                            @Html.TextBoxFor(x => x.VendorCode, new Dictionary<string, object> { { "class", "text-primary" }})
+                        </label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="fill">
+                            Remit Vendor: <br />
+                            @Html.TextBoxFor(x => x.VendorName, new { @class = "fill text-primary" })<br />
+                            @Html.TextBoxFor(x => x.VendorAddress1, new { @class = "fill text-primary" })<br />
+                            @Html.TextBoxFor(x => x.VendorAddress2, new { @class = "fill text-primary" })<br />
+                            @Html.TextBoxFor(x => x.VendorAddress3, new { @class = "fill text-primary" })<br />
+                            @Html.TextBoxFor(x => x.VendorCityStateZip, new { @class = "fill text-primary" })
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-12">
+                        <lable>
+                            PO ID <br />
+                            @Html.TextBoxFor(x => x.POID, new Dictionary<string, object> { { "class", "text-primary" } })
+                        </lable>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <lable>
+                            PO Number <br />
+                            @Html.TextBoxFor(x => x.PONum, new Dictionary<string, object> { { "class", "text-primary" } })
+                        </lable>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label>
+                            Contract <br />
+                            @Html.TextBoxFor(x => x.Contract, new Dictionary<string, object> { { "class", "text-primary" } })
+                        </label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label>
+                            PO Total <br />
+                            @Html.TextBoxFor(x => x.POTotal, new Dictionary<string, object> { { "class", "text-primary" } })
+                        </label>
+                        <label>
+                            PPA <br />
+                            @Html.TextBoxFor(x => x.PPA, new Dictionary<string, object> { { "class", "text-primary" }, { "style", "width:75px" } })
+                        </label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label>
+                            PO Balance <br />
+                            @Html.TextBoxFor(x => x.POBalance, new Dictionary<string, object> { { "class", "text-primary" } })
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-12">
+                        <label>
+                            ACT Number <br />
+                            @Html.TextBoxFor(x => x.ActNumber, new Dictionary<string, object> { { "class", "text-primary" } })
+                        </label>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label>
+                               VCPO <br />
+                                @Html.CheckBoxFor(x => x.VCPO)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div>Period of Performance</div>
+                        <div class="col-md-6">
+                            <label>
+                                Start <br />
+                                @Html.TextBoxFor(x => x.PeriodOfPerformanceStart, new Dictionary<string, object> { { "class", "text-primary" } })
+                            </label>
+                        </div>
+                        <div class="col-md-6">
+                            <label>
+                                End <br />
+                                @Html.TextBoxFor(x => x.PeriodOfPerformanceEnd, new Dictionary<string, object> { { "class", "text-primary" } })
+                            </label>
+                        </div>
+                    </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 col-md-offset-8">
+                <button onclick="viewPo()" type="button" class="btn btn-info">View PO</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    function viewPo() {
+        window.location.href = '@Url.Action("ViewPO", "TransHist", new { po_Id = Model.POID}, null)';
+    }
+</script>

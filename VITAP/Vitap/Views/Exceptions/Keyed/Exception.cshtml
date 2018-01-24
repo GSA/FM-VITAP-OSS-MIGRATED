@@ -1,0 +1,188 @@
+﻿@model VITAP.Data.Models.Exceptions.ExceptionKeyedViewModel
+@using VITAP.Data.Models.Exceptions;
+@using VITAP.Data;
+
+@{
+    ViewBag.Title = "Pegasys Exception (" + Model.Err_Code + ")";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section ModalControls
+{
+    @Html.Partial("ConfirmYesNoModal")
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        validateFields();
+    });
+
+    $('.btn-img').click(function () {
+        ViewTiffImage('#dialog', 'Exceptions', 'InvoiceTiffViewer', $(this).data("imagetype"), $(this).data("tiffid"))
+    })
+
+    function enableDisable() {
+        // Disable all input
+        $("input:not(.btn)").prop(disabled = "disabled");
+        $(".btn").attr(disabled = "disabled");
+
+        var exCode = $('#ExceptionCode').val();
+    }
+
+    function validateFields() {
+        var invalid = false;
+        return !invalid;
+    }
+
+    function doSubmit() {
+        var valid = validateFields();
+        if (!valid)
+            alert('You need to type in the mandatory fields.');
+        return valid;
+    }
+
+    function Accept() {
+        if ("@Model.InvKeyID" == $("#newInvKeyID").val()) {
+            alert("The New Pegasys Invoice Doc Number must be changed before clicking Accept!");
+            return;
+        }
+
+        window.location = ('@Url.Action("AcceptKeyedException", "Exceptions",  new { newInvKeyId = "NEWINVKEYID" })').replace("NEWINVKEYID", $("#newInvKeyID").val());
+    }
+
+    function UnMatch() {
+        window.location = ('@Url.Action("UnMatch", "Exceptions", new
+                       {
+                           exceptionId = @Model.Ex_Id,
+                           invKeyId = @Model.InvKeyID
+                       })');
+    }
+
+    function Skip() {
+        window.location = ('@Url.Action("Skip", "Exceptions", new
+                           {
+                               exceptionId = @Model.Ex_Id,
+                               PDocNo = @Model.Pdocnopo
+                           })');
+    }
+
+</script>
+
+<div class="container-fluid">
+    <br />
+    <h1 style="font-weight: bold">@string.Format("{0} | Pegasys Exception ({1}) - {2}", Model.InvKeyID, Model.Err_Code, Model.Memo)</h1>
+    <br />
+    <div class="row panel-body">
+        <div class="col-md-6">
+            @Html.TextBoxFor(x => x.VendName, new Dictionary<string, 
+                object> { { "class",  "form-control newInvKeyID" }, { "disabled",  "" }, { "style",  "width:400px" } })
+        </div>
+        <div class="col-md-6">
+            <h1>Invoice Details</h1>
+        </div>
+    </div>
+    <p class="row panel-body">
+        Please enter the document into Pegasys, recording the Document Number assigned by Pegasys, and click on
+        "PROCESS" in Pegasys (verifying that there are no errors) before clicking "ACCEPT" button on this screen.<br />
+        You cannot ACCEPT this until the document is in the Pegasys system with the number EXACTLY as you have keyed.
+    </p><br />
+    <div class="row">
+        <div class="col-md-6">
+            <label>
+                Document Type<br />
+                @Html.TextBoxFor(x => x.DocType, new Dictionary<string, object> { { "class",  "form-control newInvKeyID" }, { "disabled",  "" }, { "style",  "width:200px" } })
+            </label>
+        </div>
+        <div class="col-md-6">
+            <label>
+                New Pegasys Invoice Doc Number<br />
+                @Html.TextBoxFor(x => x.InvKeyID, new Dictionary<string, object> { { "id",  "newInvKeyID" }, { "style",  "width:280px" } })
+            </label>
+        </div>
+    </div>
+    <div class="row ">
+        <div class="col-md-6">
+            <label>
+                Document Title (ACT)<br />
+                @Html.TextBoxFor(x => x.DocTitle, new Dictionary<string, object> { { "class",  "form-control newInvKeyID" }, { "disabled",  "" }, { "style",  "width:200px" } })
+            </label>
+        </div>
+        <div class="col-md-6" style="width:100px">
+            <label>
+                Vendor Code<br />
+                @Html.TextBoxFor(x => x.VendCode, new Dictionary<string, object> { { "class", "form-control newInvKeyID" }, { "disabled", "" }, { "style", "width:95px" } })
+            </label>
+        </div>
+        <div class="col-md-6" style="width:75px">
+            <label>
+                <br />
+                @Html.TextBoxFor(x => x.VendAddr, new Dictionary<string, object> { { "class", "form-control newInvKeyID" }, { "disabled", "" }, { "style", "width:65px" } })
+            </label>
+            
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <label>
+                Copy Forward Document Type<br />
+                @Html.TextBoxFor(x => x.PODTyp, new Dictionary<string, object> { { "class",  "form-control newInvKeyID" }, { "disabled",  "" }, { "style",  "width:200px" } })
+            </label>
+        </div>
+        <div class="col-md-6">
+            <label>
+                Invoice Number<br />
+                @Html.TextBoxFor(x => x.Invoice, new Dictionary<string, object> { { "class",  "form-control newInvKeyID" }, { "disabled",  "" }, { "style",  "width:200px" } })
+            </label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <label>
+                Copy Forward Document #<br />
+                @Html.TextBoxFor(x => x.Pdocnopo, new Dictionary<string, object> { { "class",  "form-control newInvKeyID" }, { "disabled",  "" }, { "style",  "width:200px" } })
+            </label>
+        </div>
+        <div class="col-md-6">
+            <label>
+                Invoice Date<br />
+                @Html.TextBoxFor(x => x.InvDate, new Dictionary<string, object> { { "class",  "form-control newInvKeyID" }, { "disabled",  "" }, { "style",  "width:120px" } })
+            </label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <label>
+                Invoice Amount<br />
+                @Html.TextBoxFor(x => x.InvoiceAmt, new Dictionary<string, object> { { "class",  "form-control newInvKeyID" }, { "disabled",  "" }, { "style",  "width:200px; text-align:right" } })
+            </label>
+        </div>
+        <div class="col-md-6">
+            <label>
+                Log Date<br />
+                @Html.TextBoxFor(x => x.StampDate, new Dictionary<string, object> { { "class",  "form-control newInvKeyID" }, { "disabled",  "" }, { "style",  "width:120px" } })
+            </label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12" style="padding-top:10px;">
+            <br />
+            <div class="row">
+                <div class="col-md-3">
+
+                </div>
+                <div class="col-md-2">
+                    <button id="btnAccept" name="btnAccept" type="submit" class="btn btn-info btn btn-fixed-width-small" onclick="return Accept()">Accept</button>
+                </div>
+                <div class="col-md-2">
+                    <button id="btnUnMatch" name="btnUnMatch" type="submit" class="btn btn-info btn btn-fixed-width-small" onclick="return UnMatch()">UnMatch</button>
+                </div>
+                <div class="col-md-2">
+                    <button id="btnSkip" name="btnSkip" type="submit" class="btn btn-info btn btn-fixed-width-small" onclick="return Skip()">Skip</button>
+                </div>
+                <div class="col-md-3">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

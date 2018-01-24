@@ -1,0 +1,224 @@
+﻿
+@model VITAP.Data.Models.AssoProdViewModel
+
+@{
+    ViewBag.Title = "Associate Productivity Report";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var headerAttr = new { @style = "font-weight:bold" };
+    var rightAlignAttr = new { @style = "text-align:right" };
+}
+
+    @using (Html.BeginForm("Index", "AssoProd", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+
+        <br />
+        <h1 style="font-weight: bold">Associate Productivity Report</h1>
+        <br />
+
+        <div class="container-fluid">
+            <div class="col-md-12">
+                
+                <div class="row" style="clear: left;">
+                    <div class="form-group">
+                        <label for="Answer" class="control-label">
+                            Transactions for period:
+                        </label><br />
+
+                        @(Html.Kendo().RadioButton()
+                    .Name("Answer")
+                    .Checked(Model.Answer == "1")
+                    .HtmlAttributes(new { @name = "Answer" })
+                    .Value("1")
+                    .Label("All"))
+
+                        @(Html.Kendo().RadioButton()
+                        .Name("Answer")
+                        .Checked(Model.Answer == "2")
+                        .HtmlAttributes(new { @name = "Answer" })
+                        .Value("2")
+                        .Label("Today"))
+
+                        @(Html.Kendo().RadioButton()
+                    .Name("Answer")
+                    .Checked(Model.Answer == "3")
+                    .HtmlAttributes(new { @name = "Answer" })
+                    .Value("3")
+                    .Label(">= 7 days old"))
+
+                        @(Html.Kendo().RadioButton()
+                    .Name("Answer")
+                    .Checked(Model.Answer == "4")
+                    .HtmlAttributes(new { @name = "Answer" })
+                    .Value("4")
+                    .Label(">= 30 days old"))
+                        @(Html.Kendo().RadioButton()
+                    .Name("Answer")
+                    .Checked(Model.Answer == "5")
+                    .HtmlAttributes(new { @name = "Answer" })
+                    .Value("5")
+                    .Label("Range"))
+
+                    </div>
+                    <div class="col-md-6 ">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="From" class="control-label">Date From:</label>
+                                    @(Html.Kendo().DatePickerFor(x => x.From)
+                            .HtmlAttributes(new { @class = "form-control" })
+                            .Format("MM/dd/yyyy")
+                            .Enable(Model.Answer == "Range")
+                                    )
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="To" class="control-label">Date To:</label>
+                                    @(Html.Kendo().DatePickerFor(x => x.To)
+                            .HtmlAttributes(new { @class = "form-control" })
+                            .Format("MM/dd/yyyy")
+                            .Enable(Model.Answer == "Range")
+                                    )
+                                </div>
+                            </div>
+                        </div>
+                </div>
+                <div class="row">
+                    <br />
+                    <button type="submit" class="btn btn-default" name="btnSearch" id="btnSearch" onclick="return dateSearchValidate()" >Search</button>                  
+                    <br />
+                </div>
+                <div class="row" style="clear: left;">
+                    <br />
+                    <br />
+                </div>
+                <div class="form-group" style="float:left">
+                    <div class="col-sm-12">
+                        @{
+                            Html.Kendo().Grid(Model.AssociateProd)
+                                .Name("grdAssoProd")
+                                 .DataSource(dataSource => dataSource
+                                .Ajax()
+                                .PageSize(20)
+                                .ServerOperation(false)
+                             )
+                                .Columns(columns =>
+                                {
+                                    columns.Bound(v => v.NAME).Width(150).HeaderHtmlAttributes(headerAttr);
+                                    columns.Bound(v => v.PREPCODE).Width(100).HeaderHtmlAttributes(headerAttr);
+                                    columns.Bound(v => v.CLEARED).Width(90).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(v => v.TOTAL).Width(70).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(v => v.REJECT).Width(70).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(v => v.ACCEPT).Width(90).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(v => v.SKIP).Width(70).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(v => v.NEXT).Width(70).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(v => v.DOC_REQUEST).Width(120).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(v => v.CHANGE).Width(90).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                    columns.Bound(v => v.OTHER).Width(70).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                })
+                                .Sortable()
+                                .ToolBar(tools => tools.Excel())
+                                .HtmlAttributes(new { style = "margin-top: 6px;" })
+                                .Excel(excel => excel
+                                .FileName("AssociateProductivityReport.xlsx")
+                                .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+                                .AllPages(true)
+                                )
+                                .Pageable(pageable => pageable
+                                .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                             )
+                                .Resizable(resize => resize.Columns(true))
+                                .Render();
+                        }
+                    </div>
+
+                </div>
+                   
+            </div>
+               
+        </div>
+            </div>
+    }
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#From").change(function () {
+            dateChanged(this);
+        });
+
+        $("#To").change(function () {
+            dateChanged(this);
+        });
+
+        ConfigureKendoGridPaginationControlsFor508('grdAssoProd');
+        MakeKendoGridScrollable('grdAssoProd', "300px");
+    });
+
+    $(document).on("change", "input[name=Answer]", function () {  
+        if (this.value == "5") {
+                disableDateRangeFields(false);
+            } else {
+                disableDateRangeFields(true);
+            }
+        })
+
+        function dateChanged(e) {
+            if (e.value) {
+                var result = true;
+                var message = "";
+                var date = kendo.parseDate(e.value);
+                if (!date) {
+                    result = false;
+                    message = e.value + " is an invalid date."
+                }
+                if (!result) {
+                    kendoAlert(message, "Verify Date");
+                }
+            }
+        }
+
+        function disableDateRangeFields(disabled) {
+           
+            $('#From').prop("disabled", disabled);
+            $('#From').data('kendoDatePicker').enable(!disabled);
+            $('#To').prop("disabled", disabled);
+            $('#To').data('kendoDatePicker').enable(!disabled);
+        }
+
+        function dateSearchValidate(event) {
+            
+            // Range search requires dates.
+            var optionValue = $('input[name=Answer]:checked').val()
+           
+
+            if (optionValue == "5") {
+                
+                var message = "";
+                if ($('#From').val() == "01/01/0001") {
+                    alert('inside' + optionValue)
+                    message = "Date From<br>";
+                }
+                if ($('#To').val() == "01/01/0001") {
+                    message = "Date To<br>";
+                }
+                if (message) {
+                    kendoAlert(message, "Missing Date Fields");
+                    return false;
+                }
+            }
+            return true;
+        }
+
+</script>
+
+
+
+
+
+
+
+ 
+
+

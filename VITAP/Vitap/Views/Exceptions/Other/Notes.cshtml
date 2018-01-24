@@ -1,0 +1,1445 @@
+﻿@using VITAP.Data.Models.Exceptions
+@model NotesViewModel
+
+@{
+    ViewBag.Title = "Exception Notes";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .radio {
+        margin-left: 10px;
+    }
+
+    input, select, textarea {
+        max-width: 100%;
+    }
+</style>
+
+@using (Html.BeginForm("FinishNotes", "Exceptions", FormMethod.Post))
+{
+    <div class="container-fluid">
+        <div style="padding:10px">
+            <div class="row panel-body">
+                <div class="row">
+                    <div class="col-sm-8" style="border-style:ridge">
+                        <div class="row">
+                            <div class="col-md-12 panel-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <label class="control-label">Exception Reasons: </label>
+                                        <div style="border-style: ridge; padding: 10px;">
+                                            @foreach (var RadioVal in Model.ReasonsItems)
+                                            {
+                                                <div class="radio">
+                                                    <label><input value="@RadioVal.Text" type="radio" name="ReasonsGroup">@RadioVal.Text</label>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    @{
+                                        if (Model.PaymentAmtVis)
+                                        {
+                                            <div class="col-md-6">
+                                                <div style="border-style: ridge; padding: 10px; margin-top: 40px" class="paymentContainer">
+                                                    <!-- Options added via javascript-->
+                                                </div>
+                                            </div>
+                                        }
+
+                                        
+                                        <div class="col-md-6">
+                                           
+                                            <div class="sourceContainer" style="display:none;">
+                                                <label id="sourceLabel" style="margin-top:40px;" class="control-label"></label>
+
+                                                <div style="border-style: ridge; margin-bottom:20px" class="sourceRadioContainer">
+                                                    <!-- Options added via javascript-->
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                    }
+                                    <div class="col-md-6">
+                                        <div style="margin-top:40px;">
+                                            @{
+                                                if (Model.AmtLblVis)
+                                                {
+                                                <label class="control-label">@Model.AmtLbl</label>
+                                                }
+                                                if (Model.AmtVis)
+                                                {
+                                                @Html.TextBoxFor(x => x.Amount, new Dictionary<string, object> { { "class", "form-control txt-amt" } })
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    @{ 
+                                        string cboMiscStyle = "";
+                                        if (!Model.MiscVisible)
+                                        {
+                                            cboMiscStyle = "style = 'display:none;'";
+                                        }
+                                    }
+                                    <div class="cboMiscContainer" @cboMiscStyle>
+                                        @Html.DropDownListFor(
+                                             x => Model.MiscItems,
+                                             new SelectList(Model.MiscItems, "Id", "Text"),
+                                             new { @class = "pull-right form-control misc-cbo", @onchange = "MiscChange(this.value)" }
+                                         )
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    @Html.DropDownListFor(
+                                         x => Model.ContactItems,
+                                         new SelectList(Model.ContactItems, "Id", "Text"),
+                                         new { @class = "pull-right form-control CboContact", @onchange = "ContactChange(this.value)" }
+                                     )
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <label class="control-label">Contact Name</label>
+                                    @Html.TextBoxFor(x => x.ContactName, new Dictionary<string, object> { { "class", "form-control contact-name" }, { "disabled", "" } })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <label class="control-label">Contact Phone</label>
+                                    @Html.TextBoxFor(x => x.ContactPhone, new Dictionary<string, object> { { "class", "form-control contact-phone" }, { "disabled", "" } })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="checkbox">
+                                        <label><input type="checkbox" value="" class="email-chk">Email Notes</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-sm-8">
+                                    <div class="checkbox invisible" >
+                                        <label><input type="checkbox" value="">Suspense Balance</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    @Html.TextBoxFor(x => x.SuspenseTxtBox, new Dictionary<string, object> { { "class", "form-control invisible txt-susp" } })
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-sm-5">
+                                    @{
+                                        if (Model.HoldUntilLblVis)
+                                        {
+                                            <label style="padding-top:5px;" class="control-label">Hold Until</label>
+                                        }
+                                    }
+                                </div>
+                                <div class="col-sm-7">
+                                    @{
+                                        if (Model.HoldUntilLblVis) 
+                                        {
+                                            Html.TextBoxFor(x => x.HoldUntil, new Dictionary<string, object> { { "class", "form-control pull-right hold-until" } });
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <label class="control-label">Internal Notes: </label>
+                        @Html.TextAreaFor(x => x.InternalNotes, new Dictionary<string, object> { { "class", "form-control int-notes" }, { "style", "display:block; height:150px;" } })
+                    </div>
+                </div>
+                <div class="row panel-body">
+                    <div class="col-sm-4">
+
+                    </div>
+                    <div class="col-sm-1">
+                        <button id="btnFinish" type="button" onclick="finish()" class="btn btn-info btn-fixed-width btn-fixed-width-small pull-right">@Model.FinBtnTitle</button>
+                    </div>
+                    <div class="col-sm-1">
+
+                    </div>
+                    <div class="col-sm-1">
+                        <button id="btnCancel" type="button" class="btn btn-info btn-fixed-width btn-fixed-width-small pull-right" onclick="cancel()">Cancel</button>
+                    </div>
+
+                    <div class="col-sm-1">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section ModalControls
+    {
+        <div id="dialog"></div>
+    }
+
+    @section Scripts
+    {
+    <script>
+        $(document).ready(function() {
+            faxNotesInit();
+            setupReasons();
+            setupPaymentAmt();
+        });
+
+        var faxNotesMandatory = @Model.FaxNotesMandatory.ToString().ToLower();
+        ErrCode = '@Model.ErrCode',
+        PrevButton = '@Model.PrevButton',
+        PymtVis = '@Model.PaymentAmtVis',
+        InvKeyId = '@Model.InvKeyId',
+        PoId = '@Model.PoId';
+        //pov216Rem_vend = 'Model.pov216.First().RMIT_VEND_ID';
+        @{
+            string poQueryAmount = "";
+            if (Model.PoQueryNotes != null && Model.PoQueryNotes.Any())
+            {
+                poQueryAmount = Model.PoQueryNotes.First().AMOUNT_UNCLEARED.ToString();
+            }
+         }
+        var poQueryAmount = '@poQueryAmount';
+
+        @{
+            string rrQueryAmount = "";
+            if (Model.RRQueryNotes != null && Model.RRQueryNotes.Any())
+            {
+                rrQueryAmount = Model.RRQueryNotes.First().AMOUNT_UNCLEARED.ToString();
+            }
+        }
+        var rrQueryAmount = '@rrQueryAmount';
+
+        @{
+            string invQueryAmount = "";
+            if (Model.PegInvData != null && Model.PegInvData.AMOUNT.HasValue)
+            {
+                invQueryAmount = Model.PegInvData.AMOUNT.Value.ToString("C");
+            }
+        }
+        var invQueryAmount = '@invQueryAmount';
+
+        @{
+            String p201PoAmount = "";
+            if (Model.PoQueryNotes != null && Model.PoQueryNotes.Any())
+            {
+                var poQueryNotes = Model.PoQueryNotes.First();
+                p201PoAmount = (poQueryNotes.ORDD_AM -  poQueryNotes.INVD_AM).ToString();
+            }
+        }
+        var p201PoAmount = '@p201PoAmount';
+
+        var reasonsGroupButtons =  $('[name="ReasonsGroup"]');
+        $.each(reasonsGroupButtons, function(index, button) {
+            var selIndex = index;
+            button.addEventListener('change',
+                function(e) {
+                    var sel = e.target.value;
+
+                    SetAmountValueForReasons(PrevButton, ErrCode, sel.toUpperCase());
+                    SetPaymentAmtGroupOptionsFromReasonsGroup(PrevButton, ErrCode, sel.toUpperCase());
+                    SetSourceOptionsFromReasonsGroup(PrevButton, ErrCode, sel.toUpperCase());
+                    SetEmailCheckStateFromReasonsGroup(PrevButton, ErrCode, sel);
+                }
+            );
+        });
+
+        $( ".paymentContainer" ).on( "change", '[name="PaymentAmtGroup"]', function(e) {
+            var sel = e.target.value;
+
+            if (ErrCode == "P001" || ErrCode == "P024" || ErrCode ==  "P002" || ErrCode ==  "P004")
+            {
+                if(sel.toUpperCase() == "NEW AMOUNT")
+                {
+                    $("#Amount").val(rrQueryAmount);
+                    $("#Amount").prop("disabled", false);
+                }
+                else if (sel.toUpperCase() == "INVOICE AMOUNT")
+                {
+                    $("#Amount").val(invQueryAmount);
+                    $("#Amount").prop("disabled", true);
+                }
+                else if (sel.toUpperCase() == "RR AMOUNT")
+                {
+                    $("#Amount").val(rrQueryAmount);
+                    $("#Amount").prop("disabled", true);
+                }
+                else if (sel.toUpperCase() == "PO AMOUNT")
+                {
+                    $("#Amount").val(poQueryAmount);
+                    $("#Amount").prop("disabled", true);
+                }
+                else
+                {
+                    $("#Amount").val("0.00");
+                    $("#Amount").prop("disabled", true);
+                }
+            }
+            else if (ErrCode == "P201")
+            {
+                if (sel.toUpperCase() == "INVOICE AMOUNT")
+                {
+                    $("#Amount").val(invQueryAmount);
+                    $("#Amount").prop("disabled", true);
+                }
+                else if (sel.toUpperCase() == "PO AMOUNT")
+                {
+                    $("#Amount").val(p201PoAmount);
+                    $("#Amount").prop("disabled", true);
+                }
+                else
+                {
+                    $("#Amount").val("0.00");
+                    $("#Amount").prop("disabled", false);
+                }
+            }
+        });
+
+
+        function SetAmountValueForReasons(PreviousButton, ErrCode, ExceptionReason)
+        {
+            if (PreviousButton == "ACCEPT")
+            {
+                if (ExceptionReason == "ADDITIONAL GOODS/SERVICES" ||
+                        ExceptionReason == "PARTIAL DUPLICATE INVOICE")
+                {
+                    if (ErrCode == "P004")
+                    {
+                        $("#Amount").val(rrQueryAmount);
+                    }
+                    else
+                    {
+                        $("#Amount").val(poQueryAmount);
+                    }
+
+                    $("#Amount").prop("disabled", true);
+                }
+
+                if (ExceptionReason == "RR DEDUCTION" ||
+                    ExceptionReason == "PARTIAL RR" ||
+                    ExceptionReason == "OTHER")
+                {
+                    if (ErrCode == "P002" || ErrCode == "P004")
+                    {
+                        $("#Amount").prop("disabled", true);
+                        $("#Amount").val(rrQueryAmount);
+                    }
+                }
+
+                if (ExceptionReason == "PARTIAL DUPLICATE" ||
+                    ExceptionReason == "OTHER")
+                {
+                    if (ErrCode == "P001" || ErrCode == "P024" || ErrCode == "P201")
+                    {
+                        $("#Amount").prop("disabled", true);
+                        $("#Amount").val(poQueryAmount);
+                    }
+                }
+
+                if (ErrCode == "P201")
+                {
+                    if (ExceptionReason == "QUANTITY VARIANCE" || ExceptionReason == "FREIGHT")
+                    {
+                        $("#Amount").prop("disabled", true);
+                        $("#Amount").val(invQueryAmount);
+                    }
+
+                    if (ExceptionReason == "ADDITIONAL" || ExceptionReason == "PARTIAL" ||
+                        ExceptionReason == "OTHER")
+                    {
+                        $("#Amount").val(p201PoAmount);
+                        $("#Amount").prop("disabled", true);
+                    }
+                }
+            }
+        }
+
+        function SetPaymentAmtGroupOptionsFromReasonsGroup(PrevButton, ErrCode, ExceptionReason)
+        {
+            if (ErrCode == "P001" || ErrCode == "P024" || ErrCode ==  "P002" || ErrCode ==  "P004")
+            {
+                if (PrevButton == "ACCEPT")
+                {
+                    if (ExceptionReason == "ADDITIONAL GOODS/SERVICES" || ExceptionReason == "PARTIAL DUPLICATE INVOICE")
+                    {
+                        InsertPaymentAmountGroupRadioOptions("PO Amount", "New Amount");
+                    }
+
+                    if ((ErrCode == "P002" || ErrCode == "P004") &&
+                        (ExceptionReason == "RR DEDUCTION" || ExceptionReason == "PARTIAL RR" ||
+                         ExceptionReason == "OTHER"))
+                    {
+                        InsertPaymentAmountGroupRadioOptions("RR Amount", "New Amount");
+                    }
+
+                    if ((ErrCode == "P002" || ErrCode == "P024") &&
+                        (ExceptionReason == "PARTIAL DUPLICATE" || ExceptionReason == "OTHER"))
+                    {
+                        InsertPaymentAmountGroupRadioOptions("PO Amount", "New Amount");
+                    }
+                }
+            }
+            else if (ErrCode == "P201")
+            {
+                if (PrevButton == "ACCEPT")
+                {
+                    if (ExceptionReason == "QUANTITY VARIANCE" || ExceptionReason == "FREIGHT")
+                    {
+                        InsertPaymentAmountGroupRadioOptions("Invoice Amount", "New Amount");
+                    }
+
+                    if (ExceptionReason == "ADDITIONAL" || ExceptionReason == "PARTIAL" || ExceptionReason == "OTHER")
+                    {
+                        InsertPaymentAmountGroupRadioOptions("PO Amount", "New Amount");
+                    }
+                }
+            }
+        }
+
+        var currentPaymentAmountOptions = {option1: '', option2: ''};
+
+        function InsertPaymentAmountGroupRadioOptions(option1, option2)
+        {
+            if (currentPaymentAmountOptions.option1 == option1 &&
+                currentPaymentAmountOptions.option2 == option2)
+            {
+                return;
+            }
+            else
+            {
+                currentPaymentAmountOptions.option1 = option1;
+                currentPaymentAmountOptions.option2 = option2;
+            }
+
+            $(".paymentContainer").html("");
+            var option1Html = '<div class="radio"><input type="radio" name="PaymentAmtGroup" value="' + option1 + '"><label>' + option1 + '</label></div>'
+            var option2Html = '<div class="radio"><input type="radio" name="PaymentAmtGroup" value="' + option2 + '"><label>' + option2 + '</label></div>'
+
+            $(".paymentContainer").append(option1Html);
+
+            if (option2 != "")
+            {
+                $(".paymentContainer").append(option2Html);
+            }
+
+            // Check first option by default.
+            if (option1 != "") $('[name="PaymentAmtGroup"]')[0].checked = true;
+        }
+
+        function SetSourceOptionsFromReasonsGroup(PrevButton, ErrCode, ExceptionReason)
+        {
+            if (ErrCode == "P001" || ErrCode == "P024" || ErrCode ==  "P002" || ErrCode ==  "P004")
+            {
+                if (PrevButton == "ACCEPT")
+                {
+                    if (ExceptionReason == "QUANTITY VARIANCE" || ExceptionReason == "FREIGHT")
+                    {
+                        if (ExceptionReason == "FREIGHT")
+                        {
+                            $("#sourceLabel").text("Type of Freight");
+                        }
+                        else
+                        {
+                            $("#sourceLabel").text("Type of Quantity Variance");
+                        }
+                        $(".sourceContainer").show();
+                        InsertSourceRadioOptions("Authorized", "Not Authorized", "", "");
+                        $('[name="SourceGroup"]')[0].checked = true;
+                        InsertPaymentAmountGroupRadioOptions("Invoice Amount", "New Amount");
+                    }
+                    else
+                    {
+                        if ((ErrCode == "P002" || ErrCode == "P004") &&
+                            (ExceptionReason == "RR DEDUCTION" || ExceptionReason == "PARTIAL RR" ||
+                             ExceptionReason == "OTHER"))
+                        {
+                            InsertPaymentAmountGroupRadioOptions("RR Amount", "New Amount");
+                        }
+                        else
+                        {
+                            InsertPaymentAmountGroupRadioOptions("PO Amount", "New Amount");
+                        }
+                        $(".sourceContainer").hide();
+                    }
+                }
+                else if (PrevButton == "POMOD" || PrevButton == "REJECT")
+                {
+                    if (ExceptionReason == "ERRONEOUS ACT NUMBER" || ExceptionReason == "OTHER")
+                    {
+                        $(".sourceContainer").show();
+                        $("#sourceLabel").text("Reject Source");
+                        InsertSourceRadioOptions("Invoice", "", "", "");
+                    }
+                    else
+                    {
+                        $(".sourceContainer").hide();
+                    }
+                }
+                else if (PrevButton == "CHANGE")
+                {
+                    $(".sourceContainer").show();
+                    $("#sourceLabel").text("Source");
+                    InsertSourceRadioOptions("Invoice", "", "", "");
+                }
+            }
+            else if (ErrCode == "P201")
+            {
+                if (PrevButton == "ACCEPT")
+                {
+                    if (ExceptionReason == "QUANTITY VARIANCE" || ExceptionReason == "FREIGHT")
+                    {
+                        if (ExceptionReason == "FREIGHT")
+                        {
+                            $("#sourceLabel").text("Type of Freight");
+                        }
+                        else
+                        {
+                            $("#sourceLabel").text("Type of Quantity Variance");
+                        }
+                        $(".sourceContainer").show();
+                        InsertSourceRadioOptions("Authorized", "Not Authorized", "", "");
+                        $('[name="SourceGroup"]')[0].checked = true;
+                        InsertPaymentAmountGroupRadioOptions("Invoice Amount", "New Amount");
+                    }
+                    else
+                    {
+                        $(".sourceContainer").hide();
+                        InsertPaymentAmountGroupRadioOptions("PO Amount", "New Amount");
+                    }
+                }
+            }
+            else if (ErrCode == "U043" || ErrCode == "U044")
+            {
+                if (ExceptionReason == "KEYING ERROR")
+                {
+                    $(".sourceContainer").show();
+                    $("#sourceLabel").text("Source of Information");
+                    InsertSourceRadioOptions("Source Document", "", "", "");
+                }
+                else if (ExceptionReason == "CODING ERROR")
+                {
+                    $(".sourceContainer").show();
+                    $("#sourceLabel").text("Source of Information");
+                    InsertSourceRadioOptions("Service Office", "Accounting Control", "Vendor", "Other");
+                }
+                else
+                {
+                    $(".sourceContainer").hide();
+                }
+            }
+            else if (ErrCode == "P060" || ErrCode == "P061")
+            {
+                if (PrevButton == "ACCEPT")
+                {
+                    $(".sourceContainer").show();
+                    $("#sourceLabel").text("Transaction Code");
+
+                    var returnValX = $('#returnValX').val();
+                    var returnValY = $('#returnValY').val();
+                    var dailyLimit = 100;
+
+                    if ((ErrCode == "P060" && returnValX < dailyLimit) || (ErrCode == "P061" && returnValY < dailyLimit))
+                    {
+                        InsertSourceRadioOptions("D1", "", "", "");
+                    }
+                    else
+                    {
+                        InsertSourceRadioOptions("M1", "", "", "");
+                    }
+                }
+            }
+            else
+            {
+                $(".sourceContainer").hide();
+            }
+        }
+
+        function SetEmailCheckStateFromReasonsGroup(PrevButton, ErrCode, ExceptionReason)
+        {
+            var reason = ExceptionReason.toUpperCase();
+                if (PrevButton == "REJECT" && reason.indexOf("DUPLICATE") !== -1)
+                {
+                    //Checkbox remains in prior state
+                }
+                else
+                {
+                    $('.email-chk')[0].disabled = false;
+                }
+        }
+
+        var currentSourceOptions = {option1: '', option2: '', option3: '', option4: ''};
+
+        function InsertSourceRadioOptions(option1, option2, option3, option4)
+        {
+            if (currentSourceOptions.option1 == option1 &&
+                currentSourceOptions.option2 == option2 &&
+                currentSourceOptions.option3 == option3 &&
+                currentSourceOptions.option4 == option4)
+            {
+                return;
+            }
+            else
+            {
+                currentSourceOptions.option1 = option1;
+                currentSourceOptions.option2 = option2;
+                currentSourceOptions.option3 = option3;
+                currentSourceOptions.option4 = option4;
+            }
+
+            $(".sourceRadioContainer").html("");
+            var option1Html = '<div class="radio"><input type="radio" name="SourceGroup" value="' + option1 + '"><label>' + option1 + '</label></div>'
+            var option2Html = '<div class="radio"><input type="radio" name="SourceGroup" value="' + option2 + '"><label>' + option2 + '</label></div>'
+            var option3Html = '<div class="radio"><input type="radio" name="SourceGroup" value="' + option3 + '"><label>' + option3 + '</label></div>'
+            var option4Html = '<div class="radio"><input type="radio" name="SourceGroup" value="' + option4 + '"><label>' + option4 + '</label></div>'
+
+            if (option1 != "")
+            {
+                $(".sourceRadioContainer").append(option1Html);
+            }
+
+            if (option2 != "")
+            {
+                $(".sourceRadioContainer").append(option2Html);
+            }
+
+            if (option3 != "")
+            {
+                $(".sourceRadioContainer").append(option3Html);
+            }
+
+            if (option4 != "")
+            {
+                $(".sourceRadioContainer").append(option4Html);
+            }
+
+            // Select first option by default.
+            if (option1 != "") $('[name="SourceGroup"]')[0].checked = true;
+        }
+
+        $( ".sourceRadioContainer" ).on( "change", '[name="SourceGroup"]', function(e) {
+            var sel = e.target.value;
+
+            if (ErrCode == 'P060' || ErrCode == 'P008' || ErrCode == 'P005' || ErrCode == 'P006') {
+               $('.cboMiscContainer').show();
+            }
+
+            if ((ErrCode == 'P001' || ErrCode == 'P002' || ErrCode == 'P004' || ErrCode == 'P006') && PrevButton == "CHANGE") {
+                if (sel.toUpperCase() == "INVOICE") {
+                    $('#returnValZ').val('INV');
+                } else {
+                    $('#returnValZ').val('RR');
+                }
+            }
+
+            if (ErrCode == 'P001' && PrevButton == "ACCEPT") {
+                var pymtItems = $('[name="PaymentAmtGroup"]');
+
+                if (sel.toUpperCase() == "AUTHORIZED") {
+                    $('.email-chk').attr('checked', false);
+                    $('.email-chk').attr("disabled", true);
+                } else {
+                    $('.email-chk').attr('checked', false);
+                    $('.email-chk').prop("disabled", false);
+                }
+
+                if (sel.toUpperCase() == "AUTHORIZED") {
+                    InsertPaymentAmountGroupRadioOptions("Invoice Amount", "New Amount");
+                }
+                else if (sel.toUpperCase() == "UNAUTHORIZED")
+                {
+                    InsertPaymentAmountGroupRadioOptions("PO Amount", "New Amount");
+                }
+                else if (sel.toUpperCase() == "EXCEEDS AUTHORIZED")
+                {
+                    InsertPaymentAmountGroupRadioOptions("Input Amount", "");
+                }
+            }
+
+            if (ErrCode == "P008") {
+                if (sel.substring(0, 2) == "M9") {
+                    $('.cboMiscContainer').show();
+                } else {
+                    $('.cboMiscContainer').hide();
+                }
+            }
+
+            if ((ErrCode == "P002" || ErrCode == "P004" || ErrCode == "P024") && PrevButton == "ACCEPT") {
+                if (sel.toUpperCase() == "AUTHORIZED") {
+                    InsertPaymentAmountGroupRadioOptions("Invoice Amount", "New Amount");
+                    $("#Amount").prop("disabled", true);
+                    $("#Amount").val(invQueryAmount);
+
+                    $('.email-chk').attr('checked', false);
+                    $('.email-chk').prop("disabled", false);
+                }
+                else if (sel.toUpperCase() == "UNAUTHORIZED")
+                {
+                    var firstPaymentOption = "";
+                    if (ErrCode == "P004" || ErrCode == "P024")
+                    {
+                        firstPaymentOption = "PO Amount";
+                        $("#Amount").val(poQueryAmount);
+                    }
+                    else
+                    {
+                        firstPaymentOption = "RR Amount";
+                        $("#Amount").val(rrQueryAmount);
+                    }
+
+                    InsertPaymentAmountGroupRadioOptions(firstPaymentOption, "New Amount");
+                    $("#Amount").prop("disabled", true);
+
+                    $('.email-chk').attr('checked', false);
+                    $('.email-chk').prop("disabled", false);
+                }
+                else if (sel.toUpperCase() == "EXCEEDS AUTHORIZED")
+                {
+                    if (ErrCode == "P004")
+                    {
+                        InsertPaymentAmountGroupRadioOptions("New Amount", "");
+                        $("#Amount").prop("disabled", false);
+                        $("#Amount").val("0.00");
+                    }
+                }
+                else
+                {
+                    InsertPaymentAmountGroupRadioOptions("", "");
+                    //Maybe need to hide amount here?
+                }
+            }
+
+            if (ErrCode == "P201" && PrevButton == "ACCEPT")
+            {
+                if (sel.toUpperCase() == "AUTHORIZED") {
+                    InsertPaymentAmountGroupRadioOptions("Invoice Amount", "New Amount");
+                }
+                else if (sel.toUpperCase() == "NOT AUTHORIZED")
+                {
+                    InsertPaymentAmountGroupRadioOptions("PO Amount", "New Amount");
+                }
+                else if (sel.toUpperCase() == "EXCEEDS AUTHORIZED")
+                {
+                    if (ErrCode == "P004")
+                    {
+                        InsertPaymentAmountGroupRadioOptions("Input Amount", "");
+                        $("#Amount").prop("disabled", false);
+                    }
+                }
+            }
+        });
+
+        function cancel() {
+            var vm = $('form').serialize();
+            var url = ('@Html.Raw(Url.Action("FinishNotes", "Exceptions", new {
+                           errCode = "ERRCODE",
+                           returnExId = "EXID",
+                           Act = "ACT",
+                           pDocNo = "PDOCNO",
+                           returnVal1 = "CANCEL",
+                           returnVal2 = "ReturnVal2",
+                           returnVal3 = "ReturnVal3",
+                           returnVal4 = "ReturnVal4",
+                           returnVal5 = "ReturnVal5",
+                           returnVal6 = "ReturnVal6",
+                           returnVal7 = "ReturnVal7",
+                           returnVal8 = "ReturnVal8",
+                           returnVal9 = "ReturnVal9",
+                           returnVal10 = "ReturnVal10",
+                           returnValX = "ReturnValX",
+                           returnValY = "ReturnValY",
+                           returnValZ = "ReturnValZ",
+                           ReturnAction = "returnAction",
+                           ReturnContoller = "returnController",
+                       }))')
+                       .replace("ERRCODE", "@Model.ErrCode")
+                        .replace("EXID", encodeURIComponent($('#ExId').val()))
+                        .replace("ACT", encodeURIComponent($('#Act').val()))
+                        .replace("PDOCNO", encodeURIComponent($('#PDocNo').val()))
+                        .replace("ReturnVal2", encodeURIComponent($('#returnVal2').val()))
+                        .replace("ReturnVal3", encodeURIComponent($('#InternalNotes').val()))
+                        .replace("ReturnVal4", encodeURIComponent($('#returnVal4').val()))
+                        .replace("ReturnVal5", encodeURIComponent($('#returnVal5').val()))
+                        .replace("ReturnVal6", encodeURIComponent($('#returnVal6').val()))
+                        .replace("ReturnVal7", encodeURIComponent($('#returnVal7').val()))
+                        .replace("ReturnVal8", encodeURIComponent($('#returnVal8').val()))
+                        .replace("ReturnVal9", encodeURIComponent($('#returnVal9').val()))
+                        .replace("ReturnVal10", encodeURIComponent($('#returnVal10').val()))
+                        .replace("ReturnValX", encodeURIComponent($('#returnValX').val()))
+                        .replace("ReturnValY", encodeURIComponent($('#returnValY').val()))
+                        .replace("ReturnValZ", encodeURIComponent($('#returnValZ').val()))
+                        .replace("returnAction", encodeURIComponent($('#ReturnAction').val()))
+                        .replace("returnController", encodeURIComponent($('#ReturnController').val()));
+            window.location = url;
+        }
+
+        function ContactChange(sel) {
+            if (sel == "VitapContact")
+            {
+                $(".contact-name").val($("#VitapContactName").val());
+                $(".contact-phone").val($("#VitapContactPhone").val());
+            }
+            else if (sel == "Pegasys PO Name")
+            {
+                $(".contact-name").val($("#PegasysContactName").val());
+                $(".contact-phone").val($("#PegasysContactPhone").val());
+            }
+            else if (sel == "Other")
+            {
+                $(".contact-name").prop('disabled', false);
+                $(".contact-phone").prop('disabled', false);
+                $(".contact-name").focus();
+            }
+        }
+
+        function MiscChange(sel) {
+            if (ErrCode == "P060" || ErrCode == "P061" || ErrCode == "P008" || ErrCode == "P005" || ErrCode == "P006") {
+                if (sel == "WIRE") {
+                    $("#btnFinish").html('Next');
+                } else {
+                    $("#btnFinish").html('Finish');
+                }
+            };
+        }
+
+        function P060Fin() {
+            var selSrc = getSelectedRadio("SourceGroup");
+
+            if (selSrc.id == 1) {
+                $('#returnValZ').val('INVOICE');
+            } else if (selSrc.id == 2) {
+                $('#returnValZ').val('RR');
+            } else if (selSrc.id == 3) {
+                $('#returnValZ').val('PO');
+            }
+
+        }
+
+        function setupReasons() {
+            // check first item
+            if($('[name="ReasonsGroup"]')[0] != null)
+            {
+                $('[name="ReasonsGroup"]')[0].checked = true;
+            }
+
+            var selectedReason = getSelectedRadio("ReasonsGroup").val;
+            SetAmountValueForReasons(PrevButton, ErrCode, selectedReason.toUpperCase());
+            SetPaymentAmtGroupOptionsFromReasonsGroup(PrevButton, ErrCode, selectedReason.toUpperCase());
+            SetSourceOptionsFromReasonsGroup(PrevButton, ErrCode, selectedReason.toUpperCase());
+            SetEmailCheckStateFromReasonsGroup(PrevButton, ErrCode, selectedReason);
+        }
+
+        function setupPaymentAmt() {
+            // check first item
+            if($('[name="PaymentAmtGroup"]')[0] != null)
+                $('[name="PaymentAmtGroup"]')[0].checked = true;
+        }
+
+        function getSelectedRadio(name) {
+            var selectedOption = {
+                val: "",
+                id: 0
+            },
+                count = 0;
+
+            $('[name='+ name +']').each(function() {
+                count++;
+                if (this.checked) {
+                    selectedOption.val = this.value;
+                    selectedOption.id = count;
+                }
+            });
+
+            return selectedOption;
+        }
+
+        function U043Fin() {
+            var valid = true,
+                selReas = getSelectedRadio("ReasonsGroup"),
+                selSrc = getSelectedRadio("SourceGroup"),
+                intNotes = $('.int-notes').val(),
+                message = "",
+                retObj = {
+                    valid: true,
+                    message: ""
+                };
+
+            var SrcVis = $(".sourceContainer").is(":visible"); 
+
+            if (selReas.id != 0) {
+                if ($('#returnVal2').val().toUpperCase() == "OTHER" && intNotes == "") {
+                    message = 'You need to type in Internal Note';
+                    valid = false;
+                }
+                if (PrevButton == "CORRECT" && SrcVis && selSrc.id == 0) {
+                    message = 'Source of Information Required';
+                    valid = false;
+                }
+            } else {
+                message = 'You need to select a reason';
+                valid = false;
+            }
+
+            if (SrcVis) {
+                if (selSrc == "Other" && intNotes == "") {
+                    message = 'You need to type an internal note.';
+                    valid = false;
+                }
+            }
+
+            retObj.valid = valid;
+            retObj.message = message;
+
+            return retObj
+        }
+
+        function P001Fin() {
+            var valid = true,
+                selReas = getSelectedRadio("ReasonsGroup"),
+                selSrc = getSelectedRadio("SourceGroup"),
+                intNotes = $('.int-notes').val(),
+                message = "",
+                retObj = {
+                    valid: true,
+                    message: ""
+                };
+
+            var SrcVis = $(".sourceContainer").is(":visible"); 
+
+            $('#returnVal10').val($('.txt-susp').val());
+
+            if (intNotes == '' && (PrevButton == "SKIP" || PrevButton == "NEXTDAY" || PrevButton == "RRREQUEST" || $('#returnVal2').val().toUpperCase() == "OTHER")) {
+                if ($('#returnVal2').val().toUpperCase() == "OTHER") {
+                    message = 'You must type Internal notes when selecting "Other" reason.';
+                } else {
+                    message = 'You must type Internal notes when selecting SKIP or NEXTDAY.';
+                }
+                valid = false;
+            } else {
+                if (PrevButton == "Accept") {
+                    if (getSelectedRadio("PaymentAmtGroup").id == 0) {
+                        message = "Payment amount must be annotated.";
+                        valid = false;
+                    } else if ($('.txt-amt').val() > '@(Model.PegInvData == null || Model.PegInvData.AMOUNT == null ? 0 : Model.PegInvData.AMOUNT)') {
+                        message = "Payment cannot be greater than Invoice Amount.";
+                        valid = false;
+                    } else if ($('.txt-amt').val() != null && $('.txt-amt').is('[disabled]')) {
+                        message = "Payment Amount.";
+                        valid = false;
+                    } else if (SrcVis) {
+                        if (SelSrc.id == 0) {
+                            message = "Type of Quantity Variance.";
+                            valid = false;
+                        }
+                    }
+                } else if (PrevButton == "CHANGE") {
+                    //Creates validation object (o2Valid)
+                    //If returnvalY.Left(1) is not a letter
+                    if (!$('#returnValY').val().match(/[a-z]/i)) {
+                        //If o2Valid.act(returnvalY) = false // txtAmount or NEW ACT
+                        //message = "Invalid ACT number.";
+                        //valid = false;
+                    }
+                    if ((valid && $('#returnValY').val() == "0") || $('#returnValZ').val() == "0") {
+                        message = 'You must type a new ACT number and source when selecting CHANGE.';
+                        valid = false;
+                    }
+                } else if (PrevButton == "REJECT") {
+                    if ($('#returnVal2').val().toUpperCase() == "DUPLICATE INVOICE") {
+                        if (SrcVis) {
+                            if (selSrc.id == 0) {
+                                message = "You must select either Invoice or RR.";
+                                valid = false;
+                            } else if (selSrc.id == 1) {
+                                $('#returnValZ').val('INV');
+                            } else if (selSrc.id == 2) {
+                                $('#returnValZ').val('RR');
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            retObj.valid = valid;
+            retObj.message = message;
+
+            return retObj
+        }
+
+        function P201Fin() {
+            var valid = true,
+                selReas = getSelectedRadio("ReasonsGroup"),
+                selSrc = getSelectedRadio("SourceGroup"),
+                intNotes = $('.int-notes').val(),
+                message = "",
+                retObj = {
+                    valid: true,
+                    message: ""
+                };
+
+            var SrcVis = $(".sourceContainer").is(":visible"); 
+
+            $('#returnVal10').val($('.txt-susp').val());
+
+            if (intNotes == "" && (PrevButton == "SKIP" || $('#returnVal2').val().toUpperCase() == "OTHER")) {
+                if ($('#returnVal2').val().toUpperCase() == "OTHER") {
+                    message = 'You must type Internal notes when selecting "OTHER" reason.';
+                } else {
+                    message = 'You must type Internal notes when selecting "SKIP" or "NEXTDAY".';
+                }
+                valid = false;
+            } else {
+                if (PrevButton == "ACCEPT") {
+                    if (getSelectedRadio("PaymentAmtGroup").id == 0) {
+                        message = "Payment amount must be annotated.";
+                        valid = false;
+                    } else if ($('.txt-amt').val > '@(Model.PegInvData == null || Model.PegInvData.AMOUNT == null ? 0 : Model.PegInvData.AMOUNT)') {
+                        message = 'Payment cannot be greater than Invoice Amount.';
+                        valid = false;
+                    } else if ($('.txt-amt').val() != null && $('.txt-amt').is('[disabled]')) {
+                        message = "Payment Amount.";
+                        valid = false;
+                    } else if (SrcVis) {
+                        if (selSrc.id == 0) {
+                            message = 'Type of Quantity Variance.';
+                            valid = false;
+                        }
+                    }
+                } else if (PrevButton == "REJECT" && $('#returnVal2').val().toUpperCase() != "DUPLICATE INVOICE") {
+                    if (SrcVis && selSrc.id == 0) {
+                        message = 'You must select either Invoice or RR.';
+                        valid = false;
+                    } else {
+                        if (selSrc.val == 1) {
+                            $('#returnValZ').val('INV');
+                        } else if (selSrc.val == 2) {
+                            $('#returnValZ').val('RR');
+                        }
+                    }
+                }
+            }
+
+
+            retObj.valid = valid;
+            retObj.message = message;
+
+            return retObj
+        }
+
+        function finish() {
+            var vm = $('form').serialize(),
+                reason = getSelectedRadio("ReasonsGroup"),
+                miscVal = $('.misc-cbo').val(),
+                selSrc = getSelectedRadio("SourceGroup"),
+                selReas = getSelectedRadio("ReasonsGroup"),
+                intNotes = $('.int-notes').val();
+
+            var SrcVis = $(".sourceContainer").is(":visible"); 
+
+            if (PrevButton == 'ROUTE' && miscVal == 'PEGASYS' && miscVal != 'PEGASYS/NON-VITAP') {
+                var ret = confirm("Are you sure you want to route directly to PEGASYS?");
+
+                if (ret == false) {
+                    alert("Please select a different location for routing");
+                    return;
+                }
+            }
+
+            if (reason.val == "") {
+                alert("Please select a reason before clicking the FINISH button");
+                return;
+            } else {
+                $('#returnVal2').val(reason.val.toUpperCase());
+            }
+            $('#returnVal9').val($('.txt-amt').val());
+
+            if (faxNotesMandatory || $('.email-chk')[0].checked) {
+                if (ErrCode != 'Z237' || ErrCode != 'Z310') {
+                    if ($('#returnVal2').val().toUpperCase() == "DUPLICATE" && PrevButton == "REJECT") {
+                        faxNotesMandatory = false;
+                    } else if ($('#returnVal7').val() == null || $('#returnVal7').val() == "") {
+                        alert('Email/Fax Notes are mandatory');
+
+                        OpenFaxNotes();
+
+                        return;
+
+                        //if ($('#returnVal7').val() == "" /* || or obj_fax_button == "CANCEL"*/ ) {
+                        //    $('form .email-chk')[0].checked = false;
+                        //    return;
+                        //} else {
+                        //    $('form .email-chk')[0].checked = true;
+                        //}
+                    }
+                }
+            }
+
+            if (SrcVis && getSelectedRadio("SourceGroup").val == "") {
+                alert("You are missing a selection.");
+                return;
+            }
+
+            if (getSelectedRadio("ReasonsGroup") == "") {
+                if (PrevButton == "ACCEPT") {
+                    $('#returnVal1').val("FINISH");
+                    $('#returnVal3').val(intNotes);
+                    if ($('.misc-cbo').children('option').length > 0) {
+                        $('#returnVal4').val($('.misc-cbo').val());
+                    }
+                    if (SrcVis) {
+                        ('#returnVal5').val() == getSelectedRadio("ReasonsGroup");
+                        if (ErrCode.substring(0, 1) == "C" && getSelectedRadio("SourceGroup").id != 3) {
+                            $('#returnVal4').val('(' + $('#returnVal5').val() + ')' + $('CboContact').val() + $('CboPhone').val());
+                        }
+                        $('#returnVal6').val($('.hold-until').val());
+                        $('#returnVal9').val($('.txt-amt').val());
+                    }
+                } else {
+                    if (selReas == "OTHER") {
+                        if (intNotes == "") {
+                            alert('You must type Internal notes when selecting the Reason as "OTHER"');
+                            return;
+                        }
+                        $('#returnVal3').val(intNotes);
+                    }
+                }
+            } else {
+                if (ErrCode == "P060" || ErrCode == "P061" /*reason code stuff*/ ) {
+
+                }
+                if (ErrCode.slice(-3) == "230" && PrevButton == "PROCESSED") {
+                    if (selReas == "Other" && intNotes == "") {
+                        alert('You must type Internal notes when selecting the Reason as "OTHER"');
+                        return;
+                    }
+                    $('#returnVal3').val(intNotes);
+                }
+                if (ErrCode == "V216") {
+                    if (InvKeyId != null) {
+                        if (PrevButton == "CHANGE" || PrevButton == "NEW") {
+                            //Creates pegvendorchange object (objscreen) and passes  returnval5, r_act, r_ex_id) then displays screen
+
+                            //If objscreen.r_cancel
+                            //Displays message "Vendor Change not made..."
+                            return;
+                        }
+                        if (PrevButton == "CORRECT" && intNotes == "") {
+                            alert("Internal notes is mandatory");
+                            return;
+                        }
+                    } else if (PoId != null) {
+                        if (PrevButton == "CHANGE") {
+                            //Creates pegvendorchange (objscreen) and passes in returnval5, r_act, r_ex_id) and displays screen
+                            //If objscreen.r_cancel
+                            //Displays message "Vendor Change not made..."
+                            return;
+                        } else if (PrevButton == "CORRECT" && intNotes == "") {
+                            alert("Internal notes is mandatory");
+                            return;
+                        } else if (PrevButton == "REJECT" && selReas.id == 1) {
+                            if (intNotes != "") {
+                                $('int-notes').val($('#returnVal7').val());
+                            } else {
+                                $('int-notes').val(intNotes + "Fax Notes: \r\n" + $('#returnVal7').val());
+                            }
+                        } else if (PrevButton == "ACCEPT" && $('#returnVal7').val() != null) {
+                            if (selReas.id == 2) {
+                                //If (pov216.rmit_vend_id.Substring(6, RAT('&', (pov216.rmit_vend_id.Substring(6), 1) - 1) == (v216_vendid.Substring(6, RAT('&', (v216_vendid).Substring(6), 1) - 1)
+
+                                //Display message “The designated agent cannot have the same TIN as remit vendor/vendor."
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                if (ErrCode == "UO84" && PrevButton == "CHANGE") {
+                    $('#returnVal3').val($('.int-notes').val());
+                    //Creates PegasysPOEdit (objpoacct) and passes in r_po_id, r_err_code
+                    //Displays objpoacct
+                    //If objpoacct.r_cancel
+                    //Displays message "Change not made..."
+
+                    return;
+                }
+
+                if (faxNotesMandatory && selReas.val != "OTHER") {
+                    $('#returnVal3').val(selReas.val + "\n\r" + $('#returnVal7').val());
+                }
+
+                if (ErrCode == "U043" || ErrCode == "U044") {
+                    var ret = U043Fin();
+                    if (!ret.valid) {
+                        alert(ret.message);
+                        return;
+                    }
+                } else if (ErrCode.substring(0, 1) == "C" && (PrevButton == "CHANGE" || PrevButton == "ACCEPT") && selSrc.id == 0) {
+                    alert('You must select a Source of Information before "FINISH"ing.');
+                    return;
+                } else if (ErrCode == "P001" || ErrCode == "P002" || ErrCode == "P004" || ErrCode == "P024") {
+                    var ret = P001Fin();
+                    if (!ret.valid) {
+                        alert(ret.message);
+                        return;
+                    }
+                } else if (ErrCode == "P060" || ErrCode == "P061") {
+                    P060Fin();
+                } else if (ErrCode == "P201") {
+                    var ret = P201Fin();
+
+                    if (!ret.valid) {
+                        alert(ret.message);
+                        return;
+                    }
+                } else {
+                    if (selReas.val == "OTHER" && intNotes == "") {
+                        alert('You must type Internal notes when selecting "OTHER".');
+                        return;
+                    }
+                }
+
+                $('#returnVal1').val("FINISH");
+                $('#returnVal2').val(selReas.val);
+                $('#returnVal3').val(intNotes);
+                if ($('.misc-cbo').children('option').length > 0) {
+                    $('#returnVal4').val($('.misc-cbo').val());
+                }
+                if (SrcVis) {
+                    $('#returnVal5').val(selSrc.val);
+                    if (ErrCode.substring(0, 1) == "C" && selSrc.id == 3) {
+                        $('#returnVal4').val('Source:' + $('#returnVal5').val() + $('.contact-name').val() + $('.contact-phone').val());
+                    }
+                }
+                $('#returnVal6').val($('.hold-until').val());
+                $('#returnVal3').val($('.txt-amt').val());
+            }
+
+            var url = ('@Html.Raw(Url.Action("FinishNotes", "Exceptions", new {
+                        err_Code = "ERRCODE",
+                        returnExId = "EXID",
+                        Act = "ACT",
+                        pDocNo = "PDOCNO",
+                        returnVal1 = "ReturnVal1",
+                        returnVal2 = "ReturnVal2",
+                        returnVal3 = "ReturnVal3",
+                        returnVal4 = "ReturnVal4",
+                        returnVal5 = "ReturnVal5",
+                        returnVal6 = "ReturnVal6",
+                        returnVal7 = "ReturnVal7",
+                        returnVal8 = "ReturnVal8",
+                        returnVal9 = "ReturnVal9",
+                        returnVal10 = "ReturnVal10",
+                        returnValX = "ReturnValX",
+                        returnValY = "ReturnValY",
+                        returnValZ = "ReturnValZ",
+                        ReturnAction = "returnAction",
+                        ReturnContoller = "returnController",
+                        }))')
+                        .replace("ERRCODE", "@Model.ErrCode")
+                        .replace("EXID", encodeURIComponent($('#ExId').val()))
+                        .replace("ACT", encodeURIComponent($('#Act').val()))
+                        .replace("PDOCNO", encodeURIComponent($('#PDocNo').val()))
+                        .replace("ReturnVal1", encodeURIComponent($('#returnVal1').val()))
+                        .replace("ReturnVal2", encodeURIComponent($('#returnVal2').val()))
+                        .replace("ReturnVal3", encodeURIComponent($('#InternalNotes').val()))
+                        .replace("ReturnVal4", encodeURIComponent($('#returnVal4').val()))
+                        .replace("ReturnVal5", encodeURIComponent($('#returnVal5').val()))
+                        .replace("ReturnVal6", encodeURIComponent($('#returnVal6').val()))
+                        .replace("ReturnVal7", encodeURIComponent($('#returnVal7').val()))
+                        .replace("ReturnVal8", encodeURIComponent($('#returnVal8').val()))
+                        .replace("ReturnVal9", encodeURIComponent($('#returnVal9').val()))
+                        .replace("ReturnVal10", encodeURIComponent($('#returnVal10').val()))
+                        .replace("ReturnValX", encodeURIComponent($('#returnValX').val()))
+                        .replace("ReturnValY", encodeURIComponent($('#returnValY').val()))
+                        .replace("ReturnValZ", encodeURIComponent($('#returnValZ').val()))
+                        .replace("returnAction", encodeURIComponent($('#ReturnAction').val()))
+                        .replace("returnController", encodeURIComponent($('#ReturnController').val()));
+
+            window.location = url;
+        }
+
+        $('#returnVal7').val("@HttpUtility.JavaScriptStringEncode(Model.FaxNotes)");
+
+        function faxNotesClose(e) {
+            if ($('#returnVal7').val() != "") {
+                $('.email-chk')[0].checked = true;
+            } else {
+                $('.email-chk')[0].checked = false;
+            }
+        }
+
+        function faxNotesInit() {
+            var notesChecked = @Json.Encode(Model.EmailNotesIsChecked),
+                notesEnabled = @Json.Encode(Model.EmailNotesChkEnabled);
+
+            if (notesChecked) {
+                $('.email-chk')[0].checked = true;
+            } else {
+                $('.email-chk')[0].checked = false;
+            }
+
+            if (notesEnabled) {
+                $('.email-chk')[0].disabled = false;
+            }
+            else {
+                $('.email-chk')[0].disabled = true;
+            }
+        }
+
+        function paymentAmtInit() {
+            @*var paymentEnabled = @Json.Encode(Model.PaymentAmtEnabled);
+
+            if (paymentEnabled) {
+                $('.PaymentAmtGroup')[0].disabled = false;
+            }
+            else {
+                $('.PaymentAmtGroup')[0].disabled = true;
+            }*@
+        }
+
+        $('.email-chk').change(function() {
+            OpenFaxNotes();
+        })
+
+
+        var FaxNotesHasBeenLoaded = false;
+        function OpenFaxNotes()
+        {
+            var window = $("#dialog");
+            if (window.data("kendoWindow")) {
+                $("#dialog").data("kendoWindow").open();
+            } else {
+                $("#dialog").kendoWindow();
+            }
+            var dialog = $("#dialog").data("kendoWindow");
+            dialog.setOptions({
+                width: 800,
+                height: 500,
+                title: "FaxNotes",
+                close: faxNotesClose,
+                actions: {}
+            });
+
+            @{
+                var url = string.Format("{0}://{1}{2}", Request.Url.Scheme, Request.Url.Authority, Url.Action("GetFaxnotesView", new {
+                    exId = Model.ExId
+                }));
+            }
+
+            if (FaxNotesHasBeenLoaded) {
+                dialog.open();
+            } else {
+                dialog.refresh({
+                    url: "@url"
+                });
+
+                FaxNotesHasBeenLoaded = true;
+            }
+
+        }
+
+        $("#Amount").blur(function() {
+            var ammount = $( "#Amount" ).val();
+            if (ErrCode == "P001" || ErrCode == "P002" || ErrCode == "P004" || ErrCode == "P024")
+            {
+                if (PrevButton == "CHANGE")
+                {
+                    $("#returnValY").val(ammount)
+                }
+
+                if (PrevButton == "ACCEPT" || PrevButton == "POMOD")
+                {
+                    if (ammount > rrQueryAmount)
+                    {
+                        alert("Payment cannot be greater than Receipt Amount.");
+
+                        $("#btnFinish").prop("disabled", true);
+                    }
+                    else
+                    {
+                        $("#btnFinish").prop("disabled", false);
+                    }
+                }
+            }
+
+            if (ErrCode == "P201")
+            {
+                if (PrevButton == "ACCEPT")
+                {
+                    if (ammount > p201PoAmount)
+                    {
+                        alert("New Amount cannot be greater than PO Amount (" + p201PoAmount + ")");
+                    }
+                }
+            }
+
+
+        });
+        </script>
+
+        }
+
+        @Html.HiddenFor(m => m.ExceptionCode);
+        @Html.HiddenFor(m => m.Origin);
+        @Html.HiddenFor(m => m.ReturnAction);
+        @Html.HiddenFor(m => m.ReturnController);
+        @Html.HiddenFor(m => m.ErrCode);
+        @Html.HiddenFor(m => m.ExId);
+        @Html.HiddenFor(m => m.Act);
+        @Html.HiddenFor(m => m.PDocNo);
+        @Html.HiddenFor(m => m.PoId);
+
+        @Html.HiddenFor(m => m.returnVal1);
+        @Html.HiddenFor(m => m.returnVal2);
+        @Html.HiddenFor(m => m.returnVal3);
+        @Html.HiddenFor(m => m.returnVal4);
+        @Html.HiddenFor(m => m.returnVal5);
+        @Html.HiddenFor(m => m.returnVal6);
+        @Html.HiddenFor(m => m.returnVal7);
+        @Html.HiddenFor(m => m.returnVal8);
+        @Html.HiddenFor(m => m.returnVal9);
+        @Html.HiddenFor(m => m.returnVal10);
+        @Html.HiddenFor(m => m.returnValX);
+        @Html.HiddenFor(m => m.returnValY);
+        @Html.HiddenFor(m => m.returnValZ);
+
+        @Html.HiddenFor(m => m.VitapContactName);
+        @Html.HiddenFor(m => m.VitapContactPhone);
+        @Html.HiddenFor(m => m.PegasysContactName);
+        @Html.HiddenFor(m => m.PegasysContactPhone);
+
+    }

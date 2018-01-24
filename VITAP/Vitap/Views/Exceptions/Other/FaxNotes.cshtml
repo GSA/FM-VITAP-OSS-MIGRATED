@@ -1,0 +1,72 @@
+﻿@model VITAP.Data.Models.Exceptions.FaxNotesViewModel
+
+@{
+    ViewBag.Title = "Email/Fax Notes";
+    Layout = "~/Views/Shared/_ModalMenuLayout.cshtml";
+}
+
+<style>
+    input, select, textarea {
+        max-width: 100%;
+    }
+</style>
+
+
+@using (Html.BeginForm())
+{
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <label>Note:</label>
+            @Html.TextAreaFor(x => x.FaxNotes, new Dictionary < string, object > { { "class", "form-control" }, { "style", "height:300px;" } })
+        </div>
+    </div>
+    <div class="row panel-body">
+        <div class="col-sm-3">
+
+        </div>
+        <div class="col-sm-1">
+            <button data-btn-type="OK" type="button" class="btn btn-info btn-fixed-width btn-ok">OK</button>
+        </div>
+        <div class="col-sm-1">
+
+        </div>
+        <div class="col-sm-1">
+            <button type="button" class="btn btn-info btn-fixed-width btn-clear">Clear</button>
+        </div>
+
+        <div class="col-sm-1">
+
+        </div>
+        <div class="col-sm-1">
+            <button data-btn-type="Cancel" type="button" class="btn btn-info btn-fixed-width btn-cancel">Cancel</button>
+        </div>
+    </div>
+</div>
+}
+
+@section Scripts
+{
+    <script>
+            $(".btn-clear").click(function (e) {
+                $('#FaxNotes').val("");
+            });
+
+            $(".btn-cancel").click(function (e) {
+                top.window.itemClicked = 'cancel';
+                window.parent.$("#dialog").data("kendoWindow").close();
+            });
+
+            $(".btn-ok").click(function (e) {
+                if ($('#FaxNotes').val() == "") {
+                    alert("Fax Note Required");
+                } else {
+                    top.window.itemClicked = 'OK';
+                    window.parent.$('#returnVal7').val($('#FaxNotes').val());
+                    window.parent.$("#dialog").data("kendoWindow").close();
+                }
+            });
+
+    </script>
+
+}

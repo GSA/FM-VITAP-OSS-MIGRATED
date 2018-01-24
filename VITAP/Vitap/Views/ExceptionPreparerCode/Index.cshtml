@@ -1,0 +1,258 @@
+﻿@model VITAP.Data.Models.ExceptionPrepCodeViewModel
+@{
+    ViewBag.Title = "Exceptions Worked By Preparer Code";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var headerAttr = new { @style = "font-weight:bold; overflow: visible; white-space: normal;" };
+    var rightAlignAttr = new { @style = "text-align:right" };
+}
+    
+@using (Html.BeginForm("Index", "ExceptionPreparerCode", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+
+        <script id="drop-down-template" type="text/x-kendo-template">
+            <div>#: Text #</div>
+        </script>
+
+        <br />
+        <h1 style="font-weight: bold">Exceptions Worked By Preparer Code</h1>
+        <br />
+
+        <div class="container-fluid">
+            <div class="col-md-12">
+                <div class="row" style="clear: left;">
+                    <label for="SearchValue" class="control-label">
+                        Search Criteria:
+                    </label><br />
+                </div>
+                <div class="row" style="clear: left;">
+                    @Html.Kendo().TextBox().Name("SearchValue")
+
+                    @(Html.Kendo().DropDownList()
+            .Name("SearchCriteria")
+            .DataTextField("Text")
+            .DataValueField("Value")
+            .ValueTemplateId("drop-down-template")
+            .BindTo(new List<SelectListItem>() {
+                new SelectListItem{ Text = "Prep Code", Value="PrepCode"},
+                new SelectListItem{ Text = "Cor Symbol", Value="CorSymbol"},
+
+            })
+                    )
+
+                    @*@Html.Label("Sort By: ")*@
+                    <!--<label for="Sort" class="control-label">
+                        Sort By:
+                    </label>-->
+
+                    @*@(Html.Kendo().DropDownList()
+            .Name("Sort")
+            .DataTextField("Text")
+            .DataValueField("Value")
+            .ValueTemplateId("drop-down-template")
+            .BindTo(new List<SelectListItem>() {
+                        new SelectListItem { Text = "Name", Value = "Name" },
+                        new SelectListItem { Text = "Prep Code", Value = "PrepCode" },
+                        new SelectListItem { Text = "WGT Score", Value = "WGTScore" },
+                        new SelectListItem { Text = "Cor Symbol", Value = "CorSymbol" }
+                        })
+                    )*@
+                    <br /><br />
+                    <label for="Answer" class="control-label">
+                        Transactions for period:
+                    </label><br />
+
+                    @(Html.Kendo().RadioButton()
+                    .Name("Answer")
+                    .Checked(Model.Answer == "1")
+                    .HtmlAttributes(new { @name = "Answer" })
+                    .Value("1")
+                    .Label("All"))
+
+                    @(Html.Kendo().RadioButton()
+                        .Name("Answer")
+                        .Checked(Model.Answer == "2")
+                        .HtmlAttributes(new { @name = "Answer" })
+                        .Value("2")
+                        .Label("Today"))
+
+                    @(Html.Kendo().RadioButton()
+                    .Name("Answer")
+                    .Checked(Model.Answer == "3")
+                    .HtmlAttributes(new { @name = "Answer" })
+                    .Value("3")
+                    .Label(">= 7 days old"))
+
+                    @(Html.Kendo().RadioButton()
+                    .Name("Answer")
+                    .Checked(Model.Answer == "4")
+                    .HtmlAttributes(new { @name = "Answer" })
+                    .Value("4")
+                    .Label(">= 30 days old"))
+                    @(Html.Kendo().RadioButton()
+                    .Name("Answer")
+                    .Checked(Model.Answer == "5")
+                    .HtmlAttributes(new { @name = "Answer" })
+                    .Value("5")
+                    .Label("Range"))
+
+                    <br /><br />
+
+                    <div class="col-md-2">
+                        <label for="From" class="control-label">Date From:</label>
+
+                        @(Html.Kendo().DatePickerFor(x => x.From)
+                            .HtmlAttributes(new { @class = "form-control", @style = "width: 110px" })
+                            .Format("MM/dd/yyyy")
+                            .Enable(Model.Answer == "Range")
+                        )
+                    </div>
+                    <div class="col-md-2">
+                        <label for="To" class="control-label">Date To:</label>
+                        @(Html.Kendo().DatePickerFor(x => x.To)
+                            .HtmlAttributes(new { @class = "form-control", @style = "width: 110px" })
+                            .Format("MM/dd/yyyy")
+                            .Enable(Model.Answer == "Range")
+                        )
+                    </div>
+                    
+                </div>
+
+                <br /><br />
+            </div>
+                    <div class="col-md-2">
+                        <button type="submit" id="submitButton" class="btn btn-default">Search</button>
+                    </div>
+
+                   
+
+                <div class="row" style="clear: left;"><br /></div>
+
+
+               
+                <div class="row" style="clear: left;">
+                    <br />
+                    <br />
+                </div>
+                
+                <div class="row" style="float:left">
+                    <div class="col-sm-12">
+                       @{
+                           Html.Kendo().Grid(Model.ExceptPC)
+                               .Name("grdExceptPrepCode")
+                               .DataSource(dataSource => dataSource
+                                    .Ajax()
+                                    .PageSize(50)
+                                    .ServerOperation(false)
+                               )
+                               .Columns(columns =>
+                               {                                       
+                                   columns.Bound(v => v.NAME).Width(70).HeaderHtmlAttributes(headerAttr);
+                                   columns.Bound(v => v.PREPCODE).Width(70).HeaderHtmlAttributes(headerAttr);
+                                   columns.Bound(v => v.CORSYMB).Width(70).HeaderHtmlAttributes(headerAttr);
+                                   columns.Bound(v => v.WGTSCORE).Width(70).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                   columns.Bound(v => v.CLEARED).Width(70).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                   columns.Bound(v => v.TOTAL_WORKED).Width(88).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                   columns.Bound(v => v.REJECT).Width(92).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                   columns.Bound(v => v.ACCEPT).Width(88).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                   columns.Bound(v => v.SKIPPED).Width(128).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                   columns.Bound(v => v.NEXT_DAY).Width(90).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                   columns.Bound(v => v.DOC_REQ).Width(90).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                   columns.Bound(v => v.CHANGED).Width(90).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                                   columns.Bound(v => v.OTHER).Width(90).HeaderHtmlAttributes(headerAttr).HtmlAttributes(rightAlignAttr);
+                               })
+                               .Pageable(pageable => pageable
+                                   .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                               )
+                               .Sortable()
+                               .ToolBar(tools => tools.Excel())
+                               .Excel(excel => excel
+                                   .FileName("ExceptionsByPreparerCode.xlsx")
+                                   .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+                                   .AllPages(true)
+                               ) 
+                               .Resizable(resize => resize.Columns(true))
+                               .Render();
+                        }
+                    </div>
+                </div>
+                @*</div>*@
+                
+            </div>
+    }
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#From").change(function () {
+            dateChanged(this);
+        });
+
+        $("#To").change(function () {
+            dateChanged(this);
+        });
+
+        ConfigureKendoGridPaginationControlsFor508("grdExceptPrepCode");
+        MakeKendoGridScrollable("grdExceptPrepCode", "300px");
+    });
+
+    $(document).on("change", "input[name=Answer]", function () {
+        if (this.value == "5") {
+            disableDateRangeFields(false);
+        } else {
+            disableDateRangeFields(true);
+        }
+    })
+
+    function dateChanged(e) {
+        if (e.value) {
+            var result = true;
+            var message = "";
+            var date = kendo.parseDate(e.value);
+            if (!date) {
+                result = false;
+                message = e.value + " is an invalid date."
+            }
+            if (!result) {
+                kendoAlert(message, "Verify Date");
+            }
+        }
+    }
+
+    function disableDateRangeFields(disabled) {
+
+        $('#From').prop("disabled", disabled);
+        $('#From').data('kendoDatePicker').enable(!disabled);
+        $('#To').prop("disabled", disabled);
+        $('#To').data('kendoDatePicker').enable(!disabled);
+    }
+
+    function dateSearchValidate(event) {
+
+        // Range search requires dates.
+        var optionValue = $('input[name=Answer]:checked').val()
+
+
+        if (optionValue == "5") {
+
+            var message = "";
+            if ($('#From').val() == "01/01/0001") {
+                alert('inside' + optionValue)
+                message = "Date From<br>";
+            }
+            if ($('#To').val() == "01/01/0001") {
+                message = "Date To<br>";
+            }
+            if (message) {
+                kendoAlert(message, "Missing Date Fields");
+                return false;
+            }
+        }
+        return true;
+    }
+
+</script>
+
+
+

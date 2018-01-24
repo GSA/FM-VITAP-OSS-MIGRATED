@@ -1,0 +1,195 @@
+﻿@using VITAP.Models.Reports
+@model DiscountAvailabilityViewModel
+
+@{
+    var title = "Discount Availability and Viability Report";
+    ViewBag.Title = title;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var headerAttr = new { @style = "font-weight:bold; overflow: visible; white-space: normal;" };
+    var textRightAttr = new { @style = "overflow: visible; white-space: normal;text-align:right;" };
+    var textAttr = new { @style = "width: 300px;" };
+    var textSmallAttr = new { @style = "width: 205px;" };
+}
+
+<style type="text/css">
+</style>
+
+<div class="container-fluid">
+    <div class="row no-buffer">
+        <div class="col-md-12">
+            <label style="font: bold; font-size: large">@title</label>
+            <br /><br />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-5 search-param" style="padding-top: 12Px;">
+            @Html.LabelFor(m => m.OrgCode) @Html.TextBoxFor(m => m.OrgCode, textSmallAttr)
+            OR
+            @Html.LabelFor(m => m.Fund) @Html.DropDownListFor(m => m.Fund, Model.Funds)
+        </div>
+        <div class="col-md-2 no-buffer">
+            <button type="button" id="btnSearch" class="btn btn-info no-buffer">Search</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-5 search-param" style="padding-top: 12Px;">
+            @Html.LabelFor(m => m.VendorName) @Html.TextBoxFor(m => m.VendorName, textAttr)
+        </div>
+        <div class="col-md-2 no-buffer">
+            <button type="button" id="btnClear" class="btn btn-info no-buffer">Clear</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <br />
+            <h1 style="color: blue">
+                Search Result:
+            </h1>
+            <br />
+            @{
+                Html.Kendo().Grid<DiscountAvailabilityListing>()
+                    .Columns(c =>
+                    {
+                        c.Bound(x => x.Act).Width(70).HeaderHtmlAttributes(headerAttr);
+                        c.Bound(x => x.PegasysDocumentNumberPO).Width(120).HeaderHtmlAttributes(headerAttr);
+                        c.Bound(x => x.VendorName).Width(190).HeaderHtmlAttributes(headerAttr);
+                        c.Bound(x => x.Invoice).Width(100).HeaderHtmlAttributes(headerAttr);
+                        c.Bound(x => x.Amount).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(textRightAttr);
+                        c.Bound(x => x.DiscDays).Width(80).HeaderHtmlAttributes(headerAttr).HtmlAttributes(textRightAttr);
+                        c.Bound(x => x.DiscPercentage).Format("{0:n4}").Width(80).HeaderHtmlAttributes(headerAttr).HtmlAttributes(textRightAttr);
+                        c.Bound(x => x.InvoiceDate).Width(100).HeaderHtmlAttributes(headerAttr);
+                        c.Bound(x => x.OrgCode).Width(90).HeaderHtmlAttributes(headerAttr);
+                        c.Bound(x => x.BA).Width(55).HeaderHtmlAttributes(headerAttr);
+                        c.Bound(x => x.Contact).Width(100).HeaderHtmlAttributes(headerAttr);
+                        c.Bound(x => x.CostEff).Width(100).HeaderHtmlAttributes(headerAttr);
+                        c.Bound(x => x.InvoiceKeyId).Width(130).HeaderHtmlAttributes(headerAttr);
+                        c.Bound(x => x.StampDate).Width(85).HeaderHtmlAttributes(headerAttr);
+                    })
+                    .Resizable(r => r.Columns(true))
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .Read(r => r
+                            .Action("GetDiscountAvailabilityAndViabilityData", "Reports")
+                            .Data("GetDiscAvailReportParameters")
+                        )
+                    )
+                    .AutoBind(false)
+                    .Name("gridDiscountAvailabilityAndViability")
+                    .HtmlAttributes(new { style = "width: 1100px;" })
+                    .ToolBar(toolbar =>
+                    {
+                        toolbar.Excel();
+                        toolbar.Custom().Text("Print").HtmlAttributes(new { id = "printGrid", @class = "", @style = "height: 30px; width: 100px; background-color: #bfcfdf; border: 1px solid;" });
+                    })
+                    .Excel(excel => excel
+                        .AllPages(true)
+                        .FileName("DiscountAvailabilityReport-" + DateTime.Today.ToString("yyyy-MM-dd") + ".xlsx")
+                        .ProxyURL(Url.Action("Excel_Export_Save", "Reports"))
+                    )
+                    .Pageable(p => p.PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 }))
+                    .Render();
+            }
+            <br />
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        ConfigureKendoGridPaginationControlsFor508('gridDiscountAvailabilityAndViability');
+        MakeKendoGridScrollable('gridDiscountAvailabilityAndViability', "360px");
+    });
+
+    $("#btnSearch").on("click", function (e) {
+        RefreshGrid(false, e);
+    });
+
+    function RefreshGrid(clear, e) {
+        if (clear) {
+            e.preventDefault();
+            $("#gridDiscountAvailabilityAndViability").data('kendoGrid').dataSource.data([]);
+        } else {
+            $('#gridDiscountAvailabilityAndViability').data("kendoGrid").dataSource.read();
+        }
+    }
+
+    $('#btnClear').click(function (e) {
+        $('.search-param').find('input[type=text]').val('');
+        $('#Fund').val('All');
+        RefreshGrid(true, e);
+    });
+
+    function GetDiscAvailReportParameters() {
+        // Reserved property names
+        // used by DataSourceRequest: sort, page, pageSize, group, filter
+        return {
+            OrgCode: $('#OrgCode').val(),
+            Fund: $('#Fund :selected').text(),
+            VendorName: $('#VendorName').val(),
+        };
+    }
+
+    function printGrid() {
+        var gridElement = $('#gridDiscountAvailabilityAndViability'),
+            printableContent = '',
+            win = window.open('', '', 'width=800, height=500, resizable=1, scrollbars=1'),
+            doc = win.document.open();
+
+        var htmlStart =
+                '<!DOCTYPE html>' +
+                '<html>' +
+                '<head>' +
+                '<meta charset="utf-8" />' +
+                '<title>Discount Availability And Viability Report</title>' +
+                '<link href="http://kendo.cdn.telerik.com/' + kendo.version + '/styles/kendo.common.min.css" rel="stylesheet" /> ' +
+                '<style>' +
+                'html { font: 11pt sans-serif; }' +
+                '.k-grid { border-top-width: 0; }' +
+                '.k-grid, .k-grid-content { height: auto !important; }' +
+                '.k-grid-content { overflow: visible !important; }' +
+                'div.k-grid table { table-layout: auto; width: 100% !important; }' +
+                '.k-grid .k-grid-header th { border-top: 1px solid; }' +
+                '.k-grouping-header, .k-grid-toolbar, .k-grid-pager > .k-link { display: none; }' +
+                // '.k-grid-pager { display: none; }' + // optional: hide the whole pager
+                '</style>' +
+                '</head>' +
+                '<body>';
+
+        var htmlEnd =
+                '</body>' +
+                '</html>';
+
+        var gridHeader = gridElement.children('.k-grid-header');
+        if (gridHeader[0]) {
+            var thead = gridHeader.find('thead').clone().addClass('k-grid-header');
+            printableContent = gridElement
+                .clone()
+                    .children('.k-grid-header').remove()
+                .end()
+                    .children('.k-grid-content')
+                        .find('table')
+                            .first()
+                                .children('tbody').before(thead)
+                            .end()
+                        .end()
+                    .end()
+                .end()[0].outerHTML;
+        } else {
+            printableContent = gridElement.clone()[0].outerHTML;
+        }
+
+        doc.write(htmlStart + printableContent + htmlEnd);
+        doc.close();
+        win.focus();
+        win.print();
+        win.close();
+    }
+
+    $('#printGrid').click(function (e) {
+        // Prevent reloading of page and wiping out grid and search params.
+        e.preventDefault();
+        printGrid();
+    });
+
+</script>

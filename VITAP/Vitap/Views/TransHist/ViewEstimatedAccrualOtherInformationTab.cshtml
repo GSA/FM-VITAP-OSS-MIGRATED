@@ -1,0 +1,62 @@
+﻿@model VITAP.ViewModels.TransHist.EstimatedAccrualOtherInformationModel
+@using (Html.BeginForm())
+{
+    <div class="pad10">
+        @{
+            Html.Kendo().Grid<VITAP.ViewModels.TransHist.EstimatedAccrualOtherInformationModel>()
+            .Name("gridAEOther")
+             .DataSource(dataSource => dataSource
+            .Ajax()
+            .Aggregates(aggr =>
+            {
+                //example
+                //aggr.Add(p => p.Reject).Sum();
+            }
+            )
+            .Read(r => r
+                .Action("EstimatedAccrualOtherInformationRecords", "TransHist")
+                .Data("GetSearchParametersOtherAE")
+            )
+        )
+           //.Columns(columns =>
+           //{
+           //  example
+           //	columns.Bound(x => x.ExceptionCode).Width(120).HeaderHtmlAttributes(headerAttr).ClientFooterTemplate("<div class='grid-footer'>Totals</div>");
+           //})
+           .Resizable(r => r.Columns(true))
+           .Pageable(pageable => pageable
+                    .Input(true)
+                    .Numeric(false)
+                    .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                )
+                 .ToolBar(tools => tools.Excel())
+                .Excel(excel => excel
+                    .FileName("EstimatedAccrualOther.xlsx")
+                    .ProxyURL(Url.Action("Excel_Export_Save", "Grid"))
+                    .AllPages(true)
+                )
+            .Render();
+        }
+    </div>
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            MakeKendoGridScrollable('gridAEOther', '600px');
+            ConfigureKendoGridPaginationControlsFor508('gridAEOther');
+        });
+
+        function GetSearchParametersOtherAE() {
+
+            // Reserved property names
+            // used by DataSourceRequest: sort, page, pageSize, group, filter
+            return {
+                AeId: $("#AeId").val()
+            };
+        }
+
+        function btnSearchOnClick() {
+            $('#gridAEOther').data("kendoGrid").dataSource.read();
+        }
+    </script>
+            }

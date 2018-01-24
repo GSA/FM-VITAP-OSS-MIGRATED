@@ -1,0 +1,146 @@
+﻿@model VITAP.ViewModels.TransHist.ListPaymentAuthModel
+@{
+    var textAttr = new Dictionary<string, object> { { "style", "width:140px" }, { "disabled", "" } };
+    var headerAttr = new { @style = "font-weight:bold" };
+    var alignRight = new { style = "text-align: right" };
+    //
+    //  URL query string to call this View -- /TransHist/ListPA?act=&pdocno=2BA200208120229
+    // the parameters to pass in are act and pdocno in the Query String
+}
+
+@Html.AntiForgeryToken()
+<style> 
+    label {
+        display: inline;
+        float: left;
+        margin-right: 4px;
+        vertical-align: top;
+    }
+
+    div.grid-footer {
+        text-align: right;
+        font-size: 10pt;
+    }
+</style>
+
+<br />
+<h1 style="font-weight:bold">List Payment Authorization</h1>
+
+<div class="container-fluid" style="float:left">
+    <div style="float: left;">
+
+    </div>
+
+    <div class="controls" style="width: 100%; float: left;">
+        <br />
+        @{
+            Html.Kendo().Grid(Model.Payments)
+                .Name("gridPaymentAuthorization")
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .PageSize(10)
+                    .ServerOperation(false)
+                )
+                .Columns(columns =>
+                {
+                    columns.Command(c => c.Custom("Select").Click("gridPaymentAuthorizationSelect")).Width(100);
+                    columns.Bound(x => x.ACT).Width(100).Title("ACT");
+                    columns.Bound(x => x.PDOCNOPO).Width(130).HtmlAttributes(alignRight).Title("Ref_Doc_Num");
+                    columns.Bound(x => x.PA_ID).Width(130).HtmlAttributes(alignRight).Title("PA_ID");
+                    columns.Bound(x => x.ACCOUNTNO).Width(130).HtmlAttributes(alignRight).Title("Account #");
+                    columns.Bound(x => x.VENDCODE).Width(150).HtmlAttributes(alignRight).Title("Vendor Code");
+                    columns.Bound(x => x.SERVICE).Width(110).HtmlAttributes(alignRight).Title("Service");
+                    columns.Bound(x => x.SVCMTH).Width(100).HtmlAttributes(alignRight).Title("Service Month");
+                    columns.Bound(x => x.STARTDT).Width(150).HtmlAttributes(alignRight).Title("Start Date");
+                    columns.Bound(x => x.ENDDT).Width(150).HtmlAttributes(alignRight).Title("End Date");
+                    columns.Bound(x => x.AMOUNT).Width(150).HtmlAttributes(alignRight).Format("{0:N2}").Title("Amount");
+                    columns.Bound(x => x.STAMPDATE).Width(150).HtmlAttributes(alignRight).Title("Stamp Date").Format("{0:d}");
+                    columns.Bound(x => x.PA_STATUS).Width(120).HtmlAttributes(alignRight).Title("PA_Status");
+                    columns.Bound(x => x.ERR_CODE).Width(150).HtmlAttributes(alignRight).Title("Err_Code");
+                    columns.Bound(x => x.WAITPDOCNOAE).Width(150).HtmlAttributes(alignRight).Title("WAITPDOCNO");
+                })
+                .Selectable(s => s.Mode(GridSelectionMode.Single))
+                .Sortable()
+                .ToolBar(tools => tools.Excel())
+                .Excel(excel => excel
+                    .FileName("PaymentList_" + DateTime.Today.ToString("yyyy-MM-dd") + ".xlsx")
+                    .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+                    .AllPages(true)
+                )
+                .Pageable(pageable => pageable
+                .Input(true)
+                .Numeric(false)
+                .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                )
+                .Events(events => events.Change("grdListPAChange"))
+                .Render();
+        }
+    </div>
+
+        <div id="Buttons" style="float: left;min-width: 55%;">
+            @{
+                string payments = String.Format("{0:#,###.##}", Model.Total);
+            }
+            <br />
+            <button type="button" id="btnViewPA" class="btn btn-info" style="margin-left: 5px; margin-right: 5px" onclick="ViewPAClick()">View PA</button>
+            Total Amount: 
+            @Html.Kendo().TextBox().Name("payments").Value(payments).Enable(false).HtmlAttributes(new { style = "text-align: right;" })
+            
+        </div>
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var grdViewPA = $("#gridPaymentAuthorization").data("kendoGrid");
+        if (grdViewPA) {
+            grdViewPA.element.find('tbody tr:first').addClass('k-state-selected');
+            var selectedRow = grdViewPA.dataItem(grdViewPA.select());
+            var grdViewPAId = "gridPaymentAuthorization";                 // Get Grid Id
+            ConfigureKendoGridPaginationControlsFor508(grdViewPAId);
+            MakeKendoGridScrollable(grdViewPAId, "300px");
+            grdViewPA.element.find('tbody tr:first').addClass('k-state-selected');
+        }
+        if ($("#PAID").val() == "") {
+            $('#btnViewPA').prop("disabled", true);
+        }
+    });
+
+    function gridPaymentAuthorizationSelect(e) {
+        e.preventDefault();
+        $("#gridPaymentAuthorization table tr").removeClass('k-state-selected');
+        $(e.currentTarget).closest("tr").addClass('k-state-selected');
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        $("#PAID").val(dataItem.PA_ID);
+    }    
+
+    function grdListPAChange() {
+        var grid = $('#gridPaymentAuthorization').data('kendoGrid');
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        $("#PAID").val(dataItem.PA_ID);
+    }
+
+    function ViewPAClick() {
+        var selectedPA_ID = $("#PAID").val();
+
+        if (selectedPA_ID != "")
+        {
+            location = '@Url.Action("ViewPAs", "Transhist")' +
+           '?pa_id=' + selectedPA_ID;
+        }
+        else
+        {
+            alert("Select a line in the grid before clicking on View EA button.");
+        }
+    }
+
+</script>
+@if (Model.Payments != null && Model.Payments.Count > 0)
+{
+    @Html.HiddenFor(m => m.Payments[0].PA_ID, new { id = "PAID" })
+}
+else
+{
+    @Html.Hidden("HiddentPA", "", new { id = "PAID" })
+}

@@ -1,0 +1,50 @@
+﻿
+@{
+    ViewBag.Title = "Reject Reasons - Invoice";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+
+@*<fieldset class="searchForm">*@
+@using (Html.BeginForm("Reject", "DataEntry", FormMethod.Post))
+{
+    <div class="container-fluid">
+        <div class="col-md-12">
+
+            <div class="row" style="float: left;">
+                <br />
+                <label style="font: bold; font-size: large">Reject Reasons - Invoice</label>
+                <br /><br />
+            </div>
+            <div>
+                <br />
+                @(Html.Kendo().RadioButton().Value("1").Label("Incorrect Indexing Information"))
+                <br />
+                @(Html.Kendo().RadioButton().Value("2").Label("Image Not Readable"))
+                <br />
+                @(Html.Kendo().RadioButton().Value("3").Label("Multiple Doc"))
+            </div>
+            <br />
+            <br />
+
+            <div class="pad10" style="width:100%;">
+                Notes (Maximum 900 characters):<br />
+                @Html.TextArea("Description", null, new { @class = "textAreaElastic" })
+                
+            </div>
+        <div>
+            @(Html.Kendo().Button()
+                    .Name("btnFinish")
+                    .Content("Finish")
+                    .HtmlAttributes(new { style = "margin-left: 8px; width: 8em;" }))
+            @(Html.Kendo().Button()
+                    .Name("btnCancel")
+                    .Content("Cancel")
+                    .HtmlAttributes(new { style = "margin-left: 8px; width: 8em;" }))
+        </div>
+            </div>
+        </div>
+            }
+            @*</fieldset>*@
+

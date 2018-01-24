@@ -1,0 +1,62 @@
+﻿@model VITAP.Data.Models.MessageDisplay
+@* Confirm Yes or No with message *@
+
+@{
+    ViewBag.Title = @Model.Title;
+}
+
+<div class="container-fluid">
+    <div style="padding:10px">
+        <div class="row">
+            <div class="col-sm-12">
+                <label id="confirmYesNoModalLabel">@Model.Question</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div style="margin-bottom: 10px;">
+                    <button type="button" class="btn btn-info btn-fixed-width" id="yesConfirm" onclick="" style="margin-right:5px">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+	$(document).ready(function () {
+
+	    $('#yesConfirm').click(function () {
+	        window.itemClicked = 'YES';
+	        @{ Model.Response = true; }
+
+	        var exId = "@Model.ExId".encodeUriComponent();
+	        var url = '@Url.Action("Message", "Exceptions")';
+            url = url + "?ReturnAction=" + "@Model.ReturnAction" + "&ReturnController=" + "@Model.ReturnController" + "&ExId=" + exId + "&ErrCode=" + "@Model.ErrCode" + "&Response = true&"
+	        window.location = url;
+	    });
+	});
+
+	var confirmCallback, cancelCallback;
+
+	
+	function showConfirmYesNoModal(confirmMethod, cancelMethod, titleText, inputLabel) {
+		if (titleText) {
+			$('.k-window-title').html(titleText);
+		}
+
+		if (inputLabel) {
+		    $('#confirmYesNoModalLabel').text(inputLabel);
+		}
+
+		$("#ConfirmYesNoModal").data("kendoWindow").open();
+		confirmCallback = confirmMethod;
+		cancelCallback = cancelMethod;
+	}
+</script>
+
+@Html.HiddenFor(m => m.ReturnAction)
+@Html.HiddenFor(m => m.ReturnController)
+@Html.HiddenFor(m => m.ExId)
+@Html.HiddenFor(m => m.ErrCode)
+

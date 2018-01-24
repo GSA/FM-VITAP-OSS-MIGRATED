@@ -1,0 +1,32 @@
+﻿@model VITAP.Data.Models.Home.HomeModel
+@{
+    ViewBag.Title = "Home";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="WarningMessage">
+</div>
+<div id="appTitle" style="font-variant: small-caps;">The Visual Invoice Tracking and Payment (VITAP) application</div>
+<p style="width: 70%; font-size: 1.1em; padding-left: 10px;">
+    is a front end accounts payable matching system that provides a variety of functionality for GSA Federal Acquisition Service and Public Building Service business lines. 
+</p>
+
+
+<script>
+    $(document).ready(function () {
+        // Show the GSA disclosure if this is a new session.
+        var firstTime = @(Model.firstTime ? "true" : "false");
+        if (firstTime) {
+            var r = confirm(gvt_Warning);
+            if (r == false) {
+                window.location = "@ViewBag.CompanyHomeUrl";
+            }
+        }
+
+        if ('@TempData.Peek("WarningMsg")' != "") {
+            var msg = '@(TempData.Peek("WarningMsg").ToString())';
+            $("#WarningMessage").html(msg);
+            $("#WarningMessage").html($("#WarningMessage").text());
+        }
+    })
+</script>

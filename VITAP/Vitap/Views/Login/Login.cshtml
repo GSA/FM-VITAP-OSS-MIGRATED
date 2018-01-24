@@ -1,0 +1,41 @@
+﻿@model VITAP.Data.Models.Login.LoginModel
+@using VITAP.Library.Strings
+@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/_LayoutWithoutNavi.cshtml";
+}
+@using (Html.BeginForm("Login", "Login", FormMethod.Post))
+{
+    @Html.ValidationSummary(true, "Invalid Credentials. Please try again.");
+    <div>
+        <fieldset>
+            <legend>Login</legend>
+            <div id="ErrorMsg" style="color:red; padding-bottom: 5px;">@ViewBag.ErrorMessage</div>
+            <div class="editor-label" @(Model.SecureAuth ? "hidden" : "")>
+                @Html.LabelFor(u => u.UserName)
+            </div>
+            <div class="editor-field" @(Model.SecureAuth ? "hidden" : "")>
+                @Html.TextBoxFor(u => u.UserName)
+                @Html.ValidationMessageFor(u => u.UserName)
+            </div>
+            <!--<div class="editor-label">
+                @Html.LabelFor(u => u.Password)
+            </div>
+            <div class="editor-field">
+                @Html.PasswordFor(u => u.Password)
+                @Html.ValidationMessageFor(u => u.Password)
+            </div>-->
+            <button type="submit" class="btn btn-info @(Model.SecureAuth ? "hidden" : "")" style="width:auto" name="btnLogin" id="btnLogin">@(Login.LOGIN)</button>
+            <button type="submit" class="btn btn-info @((!Model.SecureAuth || !Model.ShowSecureAuthButton) ? "hidden" : "")" style="width:auto" name="btnLoginSSO" id="btnLoginSSO">@(Login.LOGINSECUREAUTH)</button>
+        </fieldset>
+    </div>
+}
+<script>
+    $(document).ready(function () {
+        var autoLogin = @((Model.SecureAuth && !Model.ShowSecureAuthButton) ? "true" : "false");
+        if (autoLogin) {
+            $("#btnLoginSSO").click();
+            return;
+        }
+    })
+</script>

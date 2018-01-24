@@ -1,0 +1,26 @@
+﻿@model Vitap.Data.Models.TransHist.VendorInfo
+
+@using (Html.BeginForm())
+{
+    <div class="pad10" style="width:100%; font-weight:bold;">
+        Company Vendor:<br />
+    </div>
+    <div class="pad10" style="width:400px;">
+        <label>
+            @Html.LabelFor(x => x.VendorInfoTIN)<br />
+            @Html.TextBoxFor(x => x.VendorInfoTIN, new { @disabled = "", @readonly = true, style = "font-weight:bold;" })
+        </label>
+    </div>
+    <div class="pad10" style="width:400px;">
+        <label>
+            @Html.LabelFor(x => x.VendorInfoName)<br />
+            @Html.TextBoxFor(x => x.VendorInfoName, new { @disabled = "", @readonly = true, style = "font-weight:bold; width:400px" })
+        </label>
+</div>
+    <div class="pad10" style="width:400px;">
+        <label>
+            @Html.LabelFor(x => x.VendorInfoAddress)<br />
+            @Html.TextAreaFor(x => x.VendorInfoAddress, new { @disabled = "", @readonly = true, @class = "textAreaElastic", style = "font-weight:bold;" })
+        </label>
+    </div>
+}

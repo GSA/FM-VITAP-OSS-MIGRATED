@@ -1,0 +1,292 @@
+﻿@model VITAP.Data.Models.Exceptions.MainExceptionModel
+
+@{
+    ViewBag.Title = "Pegasys Exception (" + Model.ErrorCode + " - " + Model.Memo;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var attrHeader = new { @style = "font-weight:bold" };
+    var attrDisabled = new { @class = "form-control", disabled = "disabled" };
+    var attrLabel = new { @class = "control-label" };
+}
+
+
+<style>
+    .row {
+        margin-top: 4pt;
+    }
+</style>
+
+<div id="tabMainEx" class="container peg-main-ex">
+    <br />
+    <h1 style="font-weight: bold">@string.Format("{0} | Pegasys Exception ({1}) - {2}", Model.InvKeyId, Model.ErrorCode, Model.Memo)</h1>
+    <br />
+
+    <div class="row">
+        <div class="col-sm-3">
+            @(Model.ErrorCode.Right(3).InList("230,232,234,3GS") ? Html.Label("Pegasys Errors:", attrLabel) : Html.LabelFor(m => m.Notes, attrLabel))
+            <br />
+            @Html.TextAreaFor(m => m.Notes, 10, 0, attrDisabled)
+        </div>
+        <div class="col-sm-9">
+            <br />
+            @{
+                Html.Kendo().Grid(Model.MainMemos)
+                    .Name("grdMemo")
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .ServerOperation(false)
+                        .Model(model => model.Id(m => m.Act))
+                        )
+                    .Columns(c =>
+                    {
+                        c.Bound(x => x.PegasysDocumentNumber).Width(160).HeaderHtmlAttributes(attrHeader);
+                        c.Bound(x => x.Act).Width(160).HeaderHtmlAttributes(attrHeader);
+                        c.Bound(x => x.Mdl).Width(120).HeaderHtmlAttributes(attrHeader);
+                        c.Bound(x => x.ErrorCode).Width(140).HeaderHtmlAttributes(attrHeader);
+                        c.Bound(x => x.ExceptionDate).Width(160).HeaderHtmlAttributes(attrHeader);
+                        c.Bound(x => x.ErrorResponse).Width(300).HeaderHtmlAttributes(attrHeader);
+                        c.Bound(x => x.ExceptionMemo).Width(300).HeaderHtmlAttributes(attrHeader);
+                    })
+                    .Resizable(r => r.Columns(true))
+                    .ToolBar(tools => tools.Excel())
+                    .Excel(excel => excel
+                        .FileName("Memos-" + DateTime.Today.ToString("yyyy-MM-dd") + ".xlsx")
+                        .ProxyURL(Url.Action("Excel_Export_Save"))
+                        .AllPages(true)
+                    )
+                    .Pageable(p => p.PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 }))
+                    .Render();
+            }
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            @{
+                Html.Kendo().TabStrip()
+                    .Name("tsMainExceptionTabs")
+                    .Items(items =>
+                    {
+                        items.Add().Text("Main").HtmlAttributes(attrHeader)
+                            .Content(Html.Partial("Main/MainTab", Model.TabMain).ToHtmlString());
+
+                        items.Add().Text("Purchase Order").HtmlAttributes(attrHeader)
+                            .Content(Html.Partial("Main/PurchaseOrderTab", Model.TabPO).ToHtmlString())
+                            .Enabled(Model.TabPO.HasData);
+
+                        items.Add().Text("Receiving Report").HtmlAttributes(attrHeader)
+                            .Content(Html.Partial("Main/ReceivingReportTab", Model.TabRR).ToHtmlString())
+                            .Enabled(Model.TabRR.HasData);
+
+                        items.Add().Text("Invoice").HtmlAttributes(attrHeader)
+                            .Content(Html.Partial("Main/InvoiceTab", Model.TabInvoice).ToHtmlString())
+                            .Enabled(Model.TabInvoice.HasData);
+
+                        items.Add().Text("Expense Accrual").HtmlAttributes(attrHeader)
+                            .Content(Html.Partial("Main/ExpenseAccrualTab", Model.TabExpenseAccrual).ToHtmlString())
+                            .Enabled(Model.TabExpenseAccrual.HasData || true);
+
+                        // This might be needed...
+                        //items.Add().Text("Payment Auth").HtmlAttributes(attrHeader)
+                        //    .Content(Html.Partial("Main/PaymentAuthTab", Model.TabPaymentAuth).ToHtmlString());
+
+                    })
+                    .SelectedIndex(0)
+                    .Render();
+            }
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <button id="btnAccept" type="button" 
+                    class="btn btn-main btn-p001 btn-p002 btn-p004 btn-p023 btn-p024 btn-p060 btn-p061 btn-p201" 
+                    style="min-width:140px;">
+                Accept
+            </button>
+            <button id="btnChange" type="button"
+                    class="btn btn-main btn-p001 btn-p024"
+                    style="min-width:140px;">
+                Change
+            </button>
+            <button id="btnReject" type="button" 
+                    class="btn btn-main btn-p001 btn-p002 btn-p004 btn-p024 btn-p060 btn-p201 btn-p230 btn-p231 btn-p232 btn-p234" 
+                    style="min-width:140px;">
+                Reject
+            </button>
+            <button id="btnPoModRequest" type="button" 
+                    class="btn btn-main btn-p001 btn-p004 btn-p024 btn-p201" 
+                    style="min-width:140px;">
+                PO Mod Request
+            </button>
+            <button id="btnRrRequest" type="button" 
+                    class="btn btn-main btn-p001 btn-p002 btn-p004 btn-p023" 
+                    style="min-width:140px;">
+                RR Request
+            </button>
+            <button id="btnRoute" type="button"
+                    class="btn btn-main btn-p230 btn-p231"
+                    style="min-width:140px;">
+                Route
+            </button>
+            <button id="btnReprocess" type="button"
+                    class="btn btn-main btn-p231 btn-p232 btn-p234"
+                    style="min-width:140px;">
+                Reprocess
+            </button>
+            <button id="btnSkip" type="button" 
+                    class="btn btn-main btn-p001 btn-p002 btn-p004 btn-p023 btn-p024 btn-p060 btn-p061 btn-p201 btn-p230 btn-p231 btn-p232 btn-p234" 
+                    style="min-width:140px;">
+                Skip
+            </button>
+            <button id="btnCorrectDE" type="button"
+                    class="btn btn-main"
+                    style="min-width:140px;">
+                Correct D/E
+            </button>
+            <button id="btnProcessed" type="button"
+                    class="btn btn-main btn-p230 btn-p232 btn-p234"
+                    style="min-width:140px;">
+                Processed
+            </button>
+            <button id="btnNotThisOne" type="button"
+                    class="btn btn-main btn-p002 btn-p023"
+                    style="min-width:140px;">
+                Not This One
+            </button>
+            <button id="btnRecycle" type="button"
+                    class="btn btn-main btn-p201"
+                    style="min-width:140px;">
+                Recycle
+            </button>
+            <button id="btnNextDay" type="button"
+                    class="btn btn-main btn-p001 btn-p024"
+                    style="min-width:140px;">
+                Next Day
+            </button>
+        </div>
+    </div>
+</div>
+
+@Html.HiddenFor(m => m.ExceptionId)
+@Html.HiddenFor(m => m.ErrorCode)
+@Html.HiddenFor(m => m.PegasysDocumentNumber)
+@Html.HiddenFor(x => x.PrepCode)
+
+@section Scripts
+{
+    <script>
+        $(document).ready(function () {
+            ConfigureKendoGridPaginationControlsFor508('grdMemo');
+            MakeKendoGridScrollable('grdMemo', "120px");
+            //$('#tabMainEx :input').attr('disabled', 'disabled');
+            ShowButtons();
+        });
+
+        function ShowButtons() {
+            $('.btn-main').hide();
+            var exCode = $('#ErrorCode').val().toLowerCase();
+            $('.btn-' + exCode).show();
+        }
+
+        $("#btnAccept").on("click", function () {
+            var url = '@Url.Action("AcceptMain", "Exceptions", new
+            {
+                pDocNo = Model.PegasysDocumentNumber,
+            })';
+            window.location = url;
+        });
+
+        $("#btnChange").on("click", function () {
+            var url = '@Html.Raw(Url.Action("Change", "Exceptions", new
+            {
+                po_id = Model.PO_ID,
+                rr_id = Model.RR_ID,
+                pDocNo = Model.PegasysDocumentNumber,
+                }))';
+           window.location = url;
+        });
+
+        $("#btnNextDay").on("click", function () {
+            var url = '@Url.Action("NextDay", "Exceptions")';
+           window.location = url;
+        });
+
+
+        $("#btnReject").on("click", function () {
+            var url = '@Html.Raw(Url.Action("Reject", "Exceptions", new
+                  {
+                      allprocess = "",
+                      PDocNo = Model.PegasysDocumentNumber
+                  }))';
+            window.location = url;
+        });
+
+        $("#btnPoModRequest").on("click", function () {
+            var url = '@Html.Raw(Url.Action("POMod", "Exceptions", new
+                  {
+                      Invoice = Model.TabInvoice.InvoiceNumber,
+                      InvAmount = Model.TabMain.NetOrder,
+                      POAmount = Model.TabPO.UnaccruedBalance, //Not sure about this
+                      VendName = Model.TabInvoice.VendorName
+                  }))';
+            window.location = url;
+        });
+
+        $("#btnRrRequest").on("click", function () {
+            var url = '@Url.Action("RRRequest", "Exceptions")';
+            window.location = url;
+        });
+
+        $("#btnRoute").on("click", function () {
+            var url = '@Url.Action("Route", "Exceptions", new { ExId = Model.ExceptionId }, null)';
+            window.location = url;
+        });
+
+        $("#btnReprocess").on("click", function () {
+            var url = '@Url.Action("Reprocess", "Exceptions", new
+                  {
+                      pDocNoPO = Model.TabInvoice.PurchaseOrderNumber,
+                  })';
+            window.location = url;
+        });
+
+        $("#btnSkip").on("click", function () {
+            var url = '@Html.Raw(Url.Action("Skip", "Exceptions", new
+                  {
+                      exceptionId = Model.ExceptionId,
+                      PDocNo = Model.PegasysDocumentNumber
+                  }))';
+            window.location = url;
+        });
+
+        $("#btnCorrectDE").on("click", function () {
+            var url = '@Html.Raw(Url.Action("CorrectDE", "Exceptions", new
+                  {
+                      PDocNo = Model.TabMain.PegasysInvDocNumber,
+                      POExists = Model.TabPO.HasData,
+                      InvExists = Model.TabInvoice.HasData,
+                      RRExists = Model.TabRR.HasData
+                  }))';
+            window.location = url;
+        });
+
+        $("#btnProcessed").on("click", function () {
+            var url = '@Url.Action("Processed", "Exceptions")';
+            window.location = url;
+        });
+
+        $("#btnNotThisOne").on("click", function () {
+            var url = '@Url.Action("NotThisOne", "Exceptions", new
+            {
+                exceptionId = Model.ExceptionId,
+            })';
+            window.location = url;
+        });
+
+        $("#btnRecycle").on("click", function () {
+            var url = '@Url.Action("Recycle", "Exceptions", new { ExId = Model.ExceptionId }, null)';
+            window.location = url;
+        });
+
+    </script>
+
+}

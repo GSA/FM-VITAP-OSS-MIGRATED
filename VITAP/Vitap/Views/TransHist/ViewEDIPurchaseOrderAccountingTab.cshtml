@@ -1,0 +1,85 @@
+﻿@model Vitap.Data.Models.TransHist.InboxPermPOHModel
+
+@using (Html.BeginForm())
+{
+    <div class="pad10">
+        @{
+            Html.Kendo().Grid<Vitap.Data.Models.TransHist.InboxPermPOAModel>()
+                .Name("gridEdiPurchaseOrderAccounting")
+                 .DataSource(dataSource => dataSource
+                .Ajax()
+                .Aggregates(aggr =>
+                {
+                    //example
+                    //aggr.Add(p => p.Reject).Sum();
+                }
+                )
+                .Read(r => r
+                    .Action("EDIPODetailRecords", "TransHist")
+                    .Data("GetInboxParameters")
+                )
+            )
+                .Columns(columns =>
+                {
+                //  example
+                //	columns.Bound(x => x.ExceptionCode).Width(120).HeaderHtmlAttributes(headerAttr).ClientFooterTemplate("<div class='grid-footer'>Totals</div>");
+                columns.Bound(x => x.MdlCode).Title("Line #");
+                columns.Bound(x => x.AmtMdl).Title("PO Amount").Format("{0:N2}").HtmlAttributes(new { style = "text-align:right;" });
+                columns.Bound(x => x.ApprtCode).Title("Fund");
+                columns.Bound(x => x.OrgCode).Title("Organization Code");
+                columns.Bound(x => x.BdgtAct).Title("Budget Activity");
+                columns.Bound(x => x.CostElmt).Title("Cost Element");
+                columns.Bound(x => x.ObjCls).Title("Object Class");
+                columns.Bound(x => x.FuncCode).Title("Function Code");
+                columns.Bound(x => x.ProjNo).Title("Project #");
+                columns.Bound(x => x.CstCtrAth).Title("Cost A");
+                columns.Bound(x => x.CstCtrBn).Title("Cost B");
+                columns.Bound(x => x.WrkItm).Title("Work Item");
+                columns.Bound(x => x.DocNum).Title("Document #");
+                columns.Bound(x => x.CrftCode).Title("Craft Code");
+                columns.Bound(x => x.LabrHrs).Title("Labor Hours");
+
+
+                })
+                .Pageable(pageable => pageable
+                    .Input(true)
+                    .Numeric(false)
+                    .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                )
+                .Selectable()
+                .Render();
+        }
+
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var grdEDIPOList = $("#gridEdiPurchaseOrderAccounting").data("kendoGrid");  // Get Grid itself
+            if (grdEDIPOList != null) {
+                var poEDIListGridId = "gridEdiPurchaseOrderAccounting";                 // Get Grid Id
+                ConfigureKendoGridPaginationControlsFor508(poEDIListGridId);
+                MakeKendoGridScrollable(poEDIListGridId, "300px");
+            }
+        });
+
+        function GetInboxParameters() {
+
+		    var version = '@Model.Version';
+		    var bkey = '@Model.BKey';
+		    // Reserved property names
+			// used by DataSourceRequest: sort, page, pageSize, group, filter
+		    return {
+		        Version: version,
+    		    BKey: bkey
+		};
+		}
+
+		function btnSearchOnClick() {
+			$('#gridEdiPurchaseOrderAccounting').data("kendoGrid").dataSource.read();
+		}
+    </script>
+
+    @Html.HiddenFor(x => x.Version, new { @id = "Version" })
+    @Html.HiddenFor(x => x.BKey, new { @id = "BKey" })
+}
+

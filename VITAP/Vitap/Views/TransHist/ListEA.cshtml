@@ -1,0 +1,160 @@
+﻿@model IEnumerable<VITAP.ViewModels.TransHist.ExpenseAccrualModel>
+@{
+    var textAttr = new Dictionary<string, object> { { "style", "width:140px" }, { "disabled", "" } };
+    var headerAttr = new { @style = "font-weight:bold" };
+    var alignRight = new { style = "text-align: right" };
+    //
+    //  URL query string to call this View -- /TransHist/ListEA?act=&pdocno=2BA200208120229
+    // the parameters to pass in are act and pdocno in the Query String
+}
+
+@Html.AntiForgeryToken()
+<style>
+    label {
+        display: inline;
+        float: left;
+        margin-right: 4px;
+        vertical-align: top;
+    }
+
+    div.grid-footer {
+        text-align: right;
+        font-size: 10pt;
+    }
+</style>
+
+<br />
+<h1 style="font-weight:bold">List Expense Accrual</h1>
+
+<div class="container-fluid" style="float:left">
+    <div style="float: left;">
+    
+    </div>
+
+    <div style="clear: left;">
+        <br />
+        @{
+            Html.Kendo().Grid(Model)
+                .Name("gridExpenseAccrual")
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .PageSize(20)
+                    .ServerOperation(false)
+                )
+                .Columns(columns =>
+                {
+                    columns.Command(v => v.Custom("Select").Click("gridExpenseAccrualSelected")).Title("Action").HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(x => x.ACTNumber).Width(120).HeaderHtmlAttributes(headerAttr);
+                    columns.Bound(x => x.ACPD).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(x => x.AC_ID).Width(150).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title(ViewBag.AEIDColumnHeader);
+                    columns.Bound(x => x.MDL).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(x => x.Ref_AE).Width(150).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(x => x.AdjInd).Width(110).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(x => x.AACAmount).Width(160).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Format("{0:0.00}");
+                    columns.Bound(x => x.AccountNo).Width(150).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(x => x.VendCode).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(x => x.StampDate).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Format("{0:MM/dd/yyyy}");
+                    columns.Bound(x => x.AEStatus).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(x => x.ErrCode).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(x => x.StartDate).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Format("{0:MM/dd/yyyy}");
+                    columns.Bound(x => x.EndDate).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Format("{0:MM/dd/yyyy}");
+                    columns.Bound(x => x.SVCMonth).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(x => x.InBoxUIDY).Width(300).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                })
+    .HtmlAttributes(new { style = "width: 1000px" })
+    .ToolBar(tools => tools.Excel())
+    .Excel(excel => excel
+            .FileName("ListEA-" + DateTime.Today.ToString("yyyy-MM-dd") + ".xlsx")
+            .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+            .AllPages(true)
+            )
+    .Selectable(s => s.Mode(GridSelectionMode.Single))
+    .Sortable()
+    .Pageable(pageable => pageable
+        .PageSizes(new object[] { 0, 20, 50, 100, 200, 500, 1000 })
+    )
+    .Resizable(resize => resize.Columns(true))
+    .Events(events => events.Change("gridExpenseAccrualChanged"))
+    .Render();
+        }
+    </div>
+@{
+    <div id="Buttons" style="float: left;min-width: 55%;">
+        <br />
+        <button type="button" @(ViewBag.TransHistButtonStatus) class="btn btn-info" style="margin-left: 5px; margin-right: 5px" onclick="TransHistClick()">View TransHist</button>
+        <button type="button" @(ViewBag.ViewEAButtonStatus) class="btn btn-info" style="margin-left: 5px; margin-right: 5px" onclick="ViewEAClick()">View EA</button>
+    </div>
+    }
+</div>
+
+@section Scripts
+ {
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var grdPO = $("#gridExpenseAccrual").data("kendoGrid");
+        if (grdPO != null)
+        {
+            grdPO.element.find('tbody tr:first').addClass('k-state-selected');
+            var eaListGridID = "gridExpenseAccrual";
+            ConfigureKendoGridPaginationControlsFor508(eaListGridID);
+            MakeKendoGridScrollable(eaListGridID, "300px");
+        }
+                
+    });
+
+    function TransHistClick(){
+        var selectedAC_ID = GetSelectedEAID();
+        window.open("@Url.Action("OraTwo")" + "?searchFor=" + selectedAC_ID.encodeUriComponent() + "&searchIn=AE_ID", '_blank');
+    }
+    function ViewEAClick() {
+        var selectedAC_ID = GetSelectedEAID();
+
+        if (selectedAC_ID != null)
+        {
+            location = '@Url.Action("ViewEstimatedAccrual", "Transhist")' +
+           '?ae_Id=' + selectedAC_ID;
+        }
+        else
+        {
+            alter("Select a line in the grid before clicking on View EA button.");
+        }
+    }
+
+    function GetSelectedEAID()
+    {
+        /// This function is to find the selected row's Expense Accrual ID
+
+        var grid = $('#gridExpenseAccrual').data('kendoGrid');
+        var selectedRows = grid.select();
+        var selected = $.map(selectedRows, function (item) {
+            var checked = $(item).find('.check-box').attr('checked');
+            return {
+                actNumber: $(item).find(':nth-child(2)').text(),
+                ACPD: $(item).find(':nth-child(3)').text(),
+                AC_ID: $(item).find(':nth-child(4)').text(),
+                MDL: $(item).find(':nth-child(5)').text()
+            };
+        });
+
+        return  selected[0].AC_ID;
+    }
+
+    function gridExpenseAccrualChanged() {
+        var grid = $("#gridExpenseAccrual").data("kendoGrid");
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+    }
+
+    function gridExpenseAccrualSelected(e) {
+
+        // Highlight the row when "Select" button clicked
+        $("#gridExpenseAccrual table tr").removeClass('k-state-selected');
+        $(e.currentTarget).closest("tr").addClass('k-state-selected');
+
+    }
+
+</script>
+    
+ }
+

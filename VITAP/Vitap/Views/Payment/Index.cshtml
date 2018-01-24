@@ -1,0 +1,32 @@
+﻿@model VITAP.Data.Models.UPPSWIP
+@{
+    ViewBag.Title = "Index";
+    //Layout = "~/Views/Shared/_NaviBar.cshtml";
+}
+
+<fieldset class="searchForm">
+    <legend>Utilities and Other Payments Query</legend>
+    @using (Html.BeginForm("Index", "Payments", FormMethod.Post))
+    {
+        <br />
+        @(Html.Kendo().RadioButtonFor(model => model.ACT).Value("UnMatched").Label("UnMatched"))
+        <br />
+        @(Html.Kendo().RadioButtonFor(model => model.ACT).Value("Matched").Label("Matched"))
+        <br />
+        @(Html.Kendo().RadioButtonFor(model => model.ACT).Value("All").Label("All"))
+
+        <br />
+        <br />
+
+        @(Html.Kendo().Button()
+                    .Name("btnSearch")
+                    .Content("Search")
+                    .HtmlAttributes(new { style = "margin-left: 8px; width: 8em;" }))
+
+    }
+</fieldset>
+
+
+
+
+

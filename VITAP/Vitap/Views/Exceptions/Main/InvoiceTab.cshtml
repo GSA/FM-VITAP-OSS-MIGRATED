@@ -1,0 +1,144 @@
+﻿@model VITAP.Data.Models.Exceptions.MainExInvoiceTabModel
+
+@{
+    var attrHeader = new { @style = "font-weight:bold" };
+    var attrTextAlignRight = new { @style = "text-align:right;", @class = "" };
+    var attrText = new { @class = "" };
+    var attrLabel = new { @class = "label-control" };
+}
+
+<div id="tabInvoice" class="container-fluid peg-main-ex">
+  <div class="row no-buffer">
+        <div class="col-xs-2 sm-buffer">
+            @Html.LabelFor(m => m.InvoiceNumber, attrLabel)<br />
+            @Html.TextBoxFor(m => m.InvoiceNumber, attrText)<br />
+            @Html.LabelFor(m => m.InvoiceDate, attrLabel)<br />
+            @Html.TextBoxFor(m => m.InvoiceDate, attrText)<br />
+            @Html.LabelFor(m => m.InvoiceTotal, attrLabel)<br />
+            @Html.TextBoxFor(m => m.InvoiceTotal, attrTextAlignRight)<br />
+            @Html.LabelFor(m => m.Tax, attrLabel)<br />
+            @Html.TextBoxFor(m => m.Tax, attrTextAlignRight)<br />
+        </div>
+        <div class="col-xs-2 sm-buffer">
+            @Html.LabelFor(m => m.ActNumber, attrLabel)<br />
+            @Html.TextBoxFor(m => m.ActNumber, attrText)<br />
+            @Html.LabelFor(m => m.PurchaseOrderNumber, attrLabel)<br />
+            @Html.TextBoxFor(m => m.PurchaseOrderNumber, attrText)<br />
+            @Html.LabelFor(m => m.StampDate, attrLabel)<br />
+            @Html.TextBoxFor(m => m.StampDate, attrText)<br />
+            @Html.LabelFor(m => m.Tarrif, attrLabel)<br />
+            @Html.TextBoxFor(m => m.Tarrif, attrTextAlignRight)<br />
+        </div>
+        <div class="col-xs-2 sm-buffer">
+            @Html.LabelFor(m => m.VendorName, attrLabel)<br />
+            @Html.TextBoxFor(m => m.VendorName, attrText)<br />
+            @Html.LabelFor(m => m.VendorAddress1, attrLabel)<br />
+            @Html.TextBoxFor(m => m.VendorAddress1, attrText)<br />
+            <label for="VendorAddress2" class="control-label sr-only">Remit Vendor Address 2</label>
+            @Html.TextBoxFor(m => m.VendorAddress2, attrText)<br />
+            <label for="VendorAddress3" class="control-label sr-only">Remit Vendor Address 3</label>
+            @Html.TextBoxFor(m => m.VendorAddress3, attrText)<br />
+            <label for="VenderCityStateZip" class="control-label sr-only">Remit Vendor City State Zipcode</label>
+            @Html.TextBoxFor(m => m.VendorCityStateZip, attrText)
+        </div>
+        <div class="col-xs-2 sm-buffer" style="margin-left: 10px">
+            @Html.LabelFor(m => m.VendorCode, attrLabel)<br />
+            @Html.TextBoxFor(m => m.VendorCode, attrText)<br />
+            <div class="row no-buffer">
+                <div class="col-xs-7 no-buffer">
+                    @Html.LabelFor(m => m.OrgCode, new { @class = "control-label", @style = "margin-right: 25px" })<br />
+                    @Html.TextBoxFor(m => m.OrgCode, new { @class = "", @style = "width: 80px" })
+                </div>
+                <div class="col-xs-2 no-buffer">
+                    @Html.LabelFor(m => m.BA, attrLabel)<br />
+                    @Html.TextBoxFor(m => m.BA, new { @class = "", @style = "width: 40px" })
+                </div>
+            </div>
+            <div class="row no-buffer">
+                @Html.LabelFor(m => m.InvoiceStatus, new { @class = "control-label", @style = "min-width: 200px" })<br />
+                @Html.TextBoxFor(m => m.InvoiceStatus, new { @class = "", @style = "width: 80px" })<br />
+                <label for="DiscAmount" class="control-label sr-only">Discount Amount</label>
+                @Html.TextBoxFor(m => m.DiscAmount, new { @class = " text-right", @style = "width: 60px" })
+            </div>
+        </div>
+        <div class="col-xs-3 sm-buffer">
+            @Html.LabelFor(m => m.StartDate, new { @class = "control-label", @style = "width: 90px" })<br />
+            @Html.TextBoxFor(m => m.StartDate, attrText)<br />
+            @Html.LabelFor(m => m.DailyInterestAmount, attrLabel)<br />
+            @Html.TextBoxFor(m => m.DailyInterestAmount, attrTextAlignRight)<br />
+            @Html.LabelFor(m => m.TotalInterestToDate, new { @class = "control-label", @style = "width: 90px" })<br />
+            @Html.TextBoxFor(m => m.TotalInterestToDate, attrTextAlignRight)
+            <br />
+            <button type="button" id="btnViewInvoice" class="btn sm-buffer" style="width:70px;">View Invoice</button>
+            <button type="button" id="btnViewImage" class="btn sm-buffer" style="width:70px;">View Image</button>
+        </div>
+    </div>
+    <div class="row" style="margin-left: 0px">
+        <br/>
+        <h3>All Invoices for this ACT:</h3>
+    </div>
+    <div class="row" style="margin:0px; padding:0px">
+        <div class="col-xs-12" style="margin:0px; padding:0px">
+            @{
+                Html.Kendo().Grid(Model.Invoices)
+                    .Name("grdInvoices")
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .PageSize(10)
+                        .ServerOperation(false)
+                     )
+                    .Columns(columns =>
+                    {
+                        columns.Bound(x => x.Act).Width(100).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.Invoice).Width(120).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.Amount).Width(120).HeaderHtmlAttributes(attrHeader).HtmlAttributes(attrTextAlignRight);
+                        columns.Bound(x => x.InvoiceDate).Width(150).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.PDocNo).Width(150).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.InvoiceStatus).Width(150).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.OrgCode).Width(120).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.BA).Width(120).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.InvoiceDate).Width(140).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.StampDate).Width(130).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.KeyDate).Width(120).HeaderHtmlAttributes(attrHeader);
+                        columns.Bound(x => x.PaidDate).Width(120).HeaderHtmlAttributes(attrHeader);
+                    })
+                    .Resizable(r => r.Columns(true))
+                    .ToolBar(tools => tools.Excel())
+                    .Excel(excel => excel
+                        .FileName("Invoices-" + DateTime.Today.ToString("yyyy-MM-dd") + ".xlsx")
+                        .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase"))
+                        .AllPages(true)
+                    )
+                    .Pageable(p => p.PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 }))
+                    .Render();
+            }
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $().ready(function () {
+        ConfigureKendoGridPaginationControlsFor508('grdInvoices');
+        MakeKendoGridScrollable('grdInvoices', "120px");
+        $('#tabInvoice :input').attr('disabled', 'disabled');
+        if ('@Model.BtnInvoice.Enabled' != 'True')
+            $('#btnViewInvoice').attr('disabled', 'disabled');
+        else
+            $('#btnViewInvoice').removeAttr('disabled');
+        if ('@Model.BtnInvoiceImage.Enabled' != 'True')
+            $('#btnViewImage').attr('disabled', 'disabled');
+        else
+            $('#btnViewImage').removeAttr('disabled');
+        $('.k-grid-excel').removeAttr('disabled');
+    });
+
+    $("#btnViewInvoice").on("click", function () {
+            var url = '@Url.Action("ViewInvoice", "TransHist", new { inv_Key_Id = Model.BtnInvoice.Id })';
+            window.location = url;
+    });
+
+    $("#btnViewImage").on("click", function () {
+        var url = '@Url.Action("ViewImageByImageID", "Exceptions", new { docId = Model.BtnInvoiceImage.Id })';
+        window.location = url;
+    });
+</script>

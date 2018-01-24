@@ -1,0 +1,107 @@
+﻿@* REJECT INVOICE MODAL *@
+<style type="text/css">
+	select {
+		max-width: 100%;
+	}
+</style>
+
+@(Html.Kendo().Window()
+	.Name("windowRejectInvoice")
+	.Title("Reject Invoice")
+	.Content(@<text>
+		<div class="container-fluid">
+			<div style="padding:5px">
+				<div class="row panel">
+					<div class="col-sm-12">
+                        <span id="lblRejectreason">Reject Reason</span>
+                        <br /><br />
+						<select style="width:100%;" id="ddlReason">
+						</select>
+					</div>
+				</div>
+				<div class="row panel">
+					<div class="col-sm-3">
+						<button type="button" class="btn btn-info btn-fixed-width" id="okRejectInvoice">OK</button>
+					</div>
+					<div class="col-sm-3">
+						<button type="button" class="btn btn-info btn-fixed-width" id="cancelRejectInvoice">Cancel</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</text>)
+	.Draggable()
+	.Resizable()
+	.Width(600)
+	.Visible(false)
+	.Actions(actions => actions.Pin().Minimize().Maximize().Close())
+	.Events(ev => ev.Close("RejectInvoiceModalClose"))
+)
+
+<script type="text/javascript">
+
+    var _confirmCallback;
+
+    $(document).ready(function () {
+	    $('#cancelRejectInvoice').click(function () {
+			$("#windowRejectInvoice").data("kendoWindow").close();
+		});
+
+		$('#okRejectInvoice').click(function () {
+		    if ($('#ddlReason :selected').text() == '') {
+		        alert('You must select a Reason.');
+		        return;
+		    }
+
+            // Save the result to the "global" variable defined in the layout.
+		    resultRejectInvoiceModal = $('#ddlReason :selected').text();
+
+		    $("#windowRejectInvoice").data("kendoWindow").close();
+		});
+	});
+
+    function RejectInvoiceModalClose() {
+
+	    if (_confirmCallback) {
+	        _confirmCallback($('#ddlReason :selected').text());
+	    }
+	}
+
+    function showWindowRejectInvoice(confirmCallback) {
+        _confirmCallback = confirmCallback;
+
+	    populateReasons();
+		$("#windowRejectInvoice").data("kendoWindow").open();
+	}
+
+	function populateReasons()
+	{
+	    var reasons = "<option></option>"
+            + "<option>Invalid / Improper Invoice - Missing ACT No. / PO Number</option>"
+            + "<option>Invalid / Improper Invoice - Missing GSA Preferred Order Number</option>"
+            + "<option>Invalid / Improper Invoice - Missing Service Period</option>"
+            + "<option>Invalid / Improper Invoice - Duplicate</option>"
+            + "<option>Invalid / Improper Invoice - Billed to Wrong Agency</option>"
+            + "<option>Invalid / Improper Invoice - Illegible</option>"
+            + "<option>Invalid / Improper Invoice - Billed to Wrong Designated Billing Office</option>"
+            + "<option>Invoice Exceeds Order Value</option>"
+            + "<option>Invoicing Missing Client certification</option>"
+            + "<option>Goods / Services Have Not Been Received / Accepted</option>"
+            + "<option>Goods Returned To Vendor</option>"
+            + "<option>Defective Goods</option>"
+            + "<option>PrePayment is Unauthorized</option>"
+            + "<option>Purchase Order Has Been Paid in Full</option>"
+            + "<option>Service Period Billed is Outside Terms of Contract</option>"
+            + "<option>Items Billed Are Not Authorized On Purchase Order</option>"
+            + "<option>Partial Payment is Not Authorized Under Purchase Order</option>"
+            + "<option>Incorrect ACT or PDN Number</option>"
+            + "<option>Vendor Name and/or Address on the Invoice Does Not Match the PO</option>"
+            + "<option>Proper Supporting Documentation Has Not Been Received by Designated Office</option>"
+            + "<option>Invoice not in IT-Solutions as per contract</option>"
+            + "<option>DHS</option>"
+            + "<option>Other</option>";
+	    $('#ddlReason').html(reasons);
+	    $('#ddlReason').val('Invalid / Improper Invoice - Missing ACT No. / PO Number');
+	}
+
+</script>

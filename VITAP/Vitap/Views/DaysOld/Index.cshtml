@@ -1,0 +1,176 @@
+﻿@model VITAP.Data.Models.DaysOldInvoiceViewModel
+@{
+    ViewBag.Title = "Day's Old Report - Pegasys Invoices";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var headerAttr = new { @style = "font-weight:bold; overflow: visible; white-space: normal;" };
+    var alignRight = new { style = "text-align: right" };
+
+}
+
+@using (Html.BeginForm("Index", "DaysOld", FormMethod.Post))
+{
+
+    @Html.AntiForgeryToken()
+
+    <br />
+    <h1 style="font-weight: bold">Day's Old Report - Pegasys Invoices</h1>
+    <br />
+
+    <div class="container-fluid">
+        <div class="col-md-12">
+                <div class="row" id="dt" style="clear: left;">
+                    <div class="col-md-3">
+                        <label class="firstCol" for="From">From:</label>
+                        @Html.Kendo().TextBox().Name("From").Value("20").HtmlAttributes(new { style = "width: 9em;" })
+                    </div>
+                    <div class="col-md-3">
+                        <label class="firstCol" for="To">To:</label>
+                        @Html.Kendo().TextBox().Name("To").Value("999").HtmlAttributes(new { style = "width: 9em;" })
+                    </div>
+                    <div class="col-md-3">
+                        <label class="firstCol" for="SearchBy">Search By:</label>
+                        @(Html.Kendo().DropDownList()
+                .Name("SearchBy")
+                .DataTextField("Text")
+                .DataValueField("Value")
+                .BindTo(new List<SelectListItem>() {
+                    
+                    new SelectListItem { Text = "FTS, Network Services", Value = "FTS, Network Services" },
+                    new SelectListItem { Text = "192X, VCPO only", Value = "192X, VCPO only" },
+                    new SelectListItem { Text = "192X, Non-Recurring", Value = "192X, Non-Recurring" },
+                    new SelectListItem { Text = "192X, All", Value = "192X, All" },
+                    new SelectListItem { Text = "PBS, 442", Value = "PBS, 442" },
+                    new SelectListItem { Text = "Other", Value = "Other" },
+                    new SelectListItem { Text = "All", Value = "All" }
+                })
+                        )
+                    </div>
+                    <div class="col-md-3">
+                        <label class="firstCol" for="OrderBy">Order By:</label>
+                        @(Html.Kendo().DropDownList()
+     .Name("OrderBy")
+     .DataTextField("Text")
+     .DataValueField("Value")
+     .BindTo(new List<SelectListItem>() {
+                new SelectListItem { Text = "None", Value = "None" },
+                new SelectListItem { Text = "Days Old", Value = "Days Old" },
+                new SelectListItem { Text = "Amount", Value = "Amount" },
+                new SelectListItem { Text = "ACT #", Value = "ACT #" },
+                new SelectListItem { Text = "INV #", Value = "INV #" },
+                new SelectListItem { Text = "Start Date/Log Date", Value = "Start Date/Log Date" },
+                new SelectListItem { Text = "OrgCode", Value = "OrgCode" },
+                new SelectListItem { Text = "Vendor", Value = "Vendor" },
+                new SelectListItem { Text = "Cumulative Interest", Value = "Cumulative Interest" },
+                new SelectListItem { Text = "Daily Interest", Value = "Daily Interest" },
+                new SelectListItem { Text = "PDocNoPo", Value = "PDocNoPo" },
+                new SelectListItem { Text = "Inv Key Id", Value = "Inv Key Id" }
+        })
+                        )
+                       
+                    </div>
+
+                    
+                    <div class="row" id="dt" style="clear: left;">
+                        
+                        <div class="col-md-3 ">
+                            <br /><br />
+                            <button type="submit" class="btn btn-default" name="submitButton" id="btnSearch" >Search</button>                            
+                            
+                        </div>
+                        <div >
+                            <br />
+                            <br />
+
+                        </div>
+                        </div>
+                        
+                    </div>
+            @*</div>*@
+            
+            
+
+            <div class="container" style="float:left">
+                <div>
+                    <br />
+                    <br />
+
+                </div>
+                <div class="row" style="float: left">
+                    <div class="col-md-12">
+                        @{
+                            Html.Kendo().Grid(Model.DaysOldInv)
+                                    .Name("grdDaysOldInv")
+                                    .Columns(columns =>
+                                    {
+                                        columns.Bound(v => v.ACT).Width(65).HeaderHtmlAttributes(headerAttr);
+                                        columns.Bound(v => v.VCPO).Width(70).HeaderHtmlAttributes(headerAttr);
+                                        columns.Bound(v => v.PDOCNOPO).Width(120).HeaderHtmlAttributes(headerAttr);
+                                        columns.Bound(v => v.DAYSOLD).Width(88).HeaderHtmlAttributes(headerAttr);
+                                        columns.Bound(v => v.INV_KEY_ID).Width(120).HeaderHtmlAttributes(headerAttr);
+                                        columns.Bound(v => v.AMOUNT).Width(100).ClientFooterTemplate("Total Amount: #= kendo.format('{0:c}', sum)#").HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).FooterHtmlAttributes(alignRight);
+                                        columns.Bound(v => v.INVOICE).Width(150).ClientFooterTemplate("Total Invoices: #=count#").HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).FooterHtmlAttributes(alignRight);
+                                        columns.Bound(v => v.LOGDATE).Width(200).HeaderHtmlAttributes(headerAttr);
+                                        columns.Bound(v => v.ORGCODE).Width(90).HeaderHtmlAttributes(headerAttr);
+                                        columns.Bound(v => v.BA).Width(50).HeaderHtmlAttributes(headerAttr);
+                                        columns.Bound(v => v.VENDNAME).Width(150).HeaderHtmlAttributes(headerAttr);
+                                        columns.Bound(v => v.DAILYINT).Width(100).ClientFooterTemplate("Total Daily Int: #= kendo.format('{0:n2}', sum)#").HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).FooterHtmlAttributes(alignRight);
+                                        columns.Bound(v => v.CUMINT).Width(90).ClientFooterTemplate("Total Cum Int: #= kendo.format('{0:n2}', sum)#").HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).FooterHtmlAttributes(alignRight);
+                                        columns.Bound(v => v.ERR_CODE).Width(90).HeaderHtmlAttributes(headerAttr);
+                                        columns.Bound(v => v.KEYDATE).Width(90).HeaderHtmlAttributes(headerAttr);
+                                        columns.Bound(v => v.CONTACTNAME).Width(180).HeaderHtmlAttributes(headerAttr);
+                                        columns.Bound(v => v.CONTACTPHONE).Width(90).HeaderHtmlAttributes(headerAttr);
+                                        columns.Bound(v => v.EMAIL).Width(150).HeaderHtmlAttributes(headerAttr);
+                                        columns.Bound(v => v.CONTRACT).Width(100).HeaderHtmlAttributes(headerAttr);
+                                    })
+                                .HtmlAttributes(new { style = "margin-top: 6px;" })
+                                .Pageable(pageable => pageable
+                                    .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                                 )
+                                 .Selectable()
+                                 .Sortable()
+                                 .Resizable(resize => resize.Columns(true))
+                                            .DataSource(dataSource => dataSource
+                                            .Ajax()
+                                            .PageSize(20)
+                                            .ServerOperation(false)
+                            .Aggregates(aggregates =>
+                            {
+                                aggregates.Add(p => p.INVOICE).Count();
+                                aggregates.Add(p => p.AMOUNT).Sum();
+                                aggregates.Add(p => p.DAILYINT).Sum();
+                                aggregates.Add(p => p.CUMINT).Sum();
+                            })
+                            .Model(model => model.Id(p => p.INV_KEY_ID))
+
+
+                            )
+                            .ToolBar(tools => tools.Excel())
+                                 .Excel(excel => excel
+                                     .FileName("DaysOldInvoice.xlsx")
+                                     .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+                                     .AllPages(true)
+                                )
+                             .Render();
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+                        }
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var grdDaysOldInv = $("#grdDaysOldInv").data("kendoGrid");
+        if (grdDaysOldInv != null) {
+            var grdDaysOldInvId = "grdDaysOldInv";
+            ConfigureKendoGridPaginationControlsFor508(grdDaysOldInvId);
+            MakeKendoGridScrollable(grdDaysOldInvId, "400px");          
+        }
+    });
+
+    
+</script>
+
+

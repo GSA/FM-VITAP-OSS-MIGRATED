@@ -1,0 +1,376 @@
+﻿@using VITAP.ViewModels.TransHist;
+@model RecurringMasterModel
+
+@{
+    ViewBag.Title = "Pegasys Recurring Master";
+}
+
+<div class="container">
+    <br />
+    <h1 class="bold padBottom20">Pegasys Recurring Master</h1>
+    <div class="row padBottom20">
+        <div class="col-sm-3">
+            <div class="row panel">
+                <div class="col-sm-12">
+                    @Html.LabelFor(x => x.MainModel.Code)<br />
+                    @Html.TextBoxFor(x => x.MainModel.Code, new { @disabled = "disabled" })
+                </div>
+            </div>
+            <div class="row panel">
+                <div class="col-sm-12">
+                    @Html.LabelFor(x => x.MainModel.ShortName)<br />
+                    @Html.TextBoxFor(x => x.MainModel.ShortName, new { @disabled = "disabled" })
+                </div>
+            </div>
+            <div class="row panel">
+                <div class="col-sm-12">
+                    @Html.LabelFor(x => x.MainModel.Name)<br />
+                    @Html.TextBoxFor(x => x.MainModel.Name, new { @disabled = "disabled" })
+                </div>
+            </div>
+            <div class="row panel">
+                <div class="col-sm-12">
+                    @Html.LabelFor(x => x.MainModel.SucceededSupersededLease)<br />
+                    @Html.TextBoxFor(x => x.MainModel.SucceededSupersededLease, new { @disabled = "disabled" })
+                </div>
+            </div>
+            <div class="row panel">
+                <div class="col-sm-12">
+                    @Html.LabelFor(x => x.MainModel.SucceededSupersededBy)<br />
+                    @Html.TextBoxFor(x => x.MainModel.SucceededSupersededBy, new { @disabled = "disabled" })
+                </div>
+            </div>
+            <div class="row panel">
+                <div class="col-sm-12">
+                    @Html.LabelFor(x => x.MainModel.SecurityOrg)<br />
+                    @Html.TextBoxFor(x => x.MainModel.SecurityOrg, new { @disabled = "disabled" })
+                </div>
+            </div>
+            <div class="row panel">
+                <div class="col-sm-12">
+                    @Html.CheckBoxFor(x => x.MainModel.Active, new { @disabled = "disabled" })
+                    @Html.LabelFor(x => x.MainModel.Active)
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="row panel">
+                <div class="col-sm-12">
+                    @Html.LabelFor(x => x.MainModel.Description)<br />
+                    @Html.TextAreaFor(x => x.MainModel.Description, new { @disabled = "disabled", rows = "7", cols = "44" })
+                </div>
+            </div>
+            <div class="row panel">
+                <div class="col-sm-12">
+                    <fieldset>
+                        <legend>Effective Dates</legend>
+                        @Html.LabelFor(x => x.MainModel.EffectiveDateFrom)
+                        <br />
+                        @(Html.Kendo().DatePickerFor(x => x.MainModel.EffectiveDateFrom).Enable(false))
+                        <br />
+                        @Html.LabelFor(x => x.MainModel.EffectiveDateTo)
+                        <br />
+                        @(Html.Kendo().DatePickerFor(x => x.MainModel.EffectiveDateTo).Enable(false))
+                    </fieldset>
+
+                </div>
+            </div>
+            <div class="row panel">
+                <div class="col-sm-12">
+                    <fieldset>
+                        <legend>Creation Details</legend>
+                        <input type="radio" id="rdbNext" name="creationDetails" value="1" disabled />
+                        @Html.Label("rdbNext", "Move to next business day")
+                        <br />
+                        <input type="radio" id="rdbPrevious" name="creationDetails" value="2" disabled />
+                        @Html.Label("rdbPrevious", "Move to previous business day")
+                        <br />
+                        <input type="radio" id="rdbNeither" name="creationDetails" value="3" disabled />
+                        @Html.Label("rdbNeither", " Neither")
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-5">
+            @{
+                Html.Kendo().TabStrip()
+                        .Name("tsTabs1")
+                        .Items(items =>
+                        {
+                            if (Model.VendorInfoModel == null)
+                            {
+                                items.Add().Text("Vendor Info").Enabled(false);
+                            }
+                            else
+                            {
+                                items.Add().Text("Vendor Info")
+                                .Content(Html.Partial("ViewRecurringMasterVendorInfoTab", Model.VendorInfoModel).ToHtmlString());
+                            }
+
+                            if (Model.RemitanceInfoModel == null)
+                            {
+                                items.Add().Text("Remitance Info").Enabled(false);
+                            }
+                            else
+                            {
+                                items.Add().Text("Remitance Info")
+                                .Content(Html.Partial("ViewRecurringMasterRemitanceInfoTab", Model.RemitanceInfoModel).ToHtmlString());
+                            }
+
+                            if (Model.DesignatedInfoModel == null)
+                            {
+                                items.Add().Text("Designated Info").Enabled(false);
+                            }
+                            else
+                            {
+                                items.Add().Text("Designated Info")
+                                .Content(Html.Partial("ViewRecurringMasterDesignatedInfoTab", Model.DesignatedInfoModel).ToHtmlString());
+                            }
+
+                        })
+                        .SelectedIndex(0)
+                        .Render();
+            }
+
+        </div>
+    </div>
+    <div class="row padBottom20">
+        <div class="col-sm-5">
+            <h2 style="padding-bottom: 4px;">Lease Chain</h2>
+            @{
+                Html.Kendo().Grid(Model.LeaseChainModels)
+                    .Name("grdLeaseChain")
+                    .Columns(columns =>
+                    {
+                        columns.Command(x => x.Custom("Select").Click("grdLeaseChainSelected")).Title("Action");
+                        columns.Bound(x => x.ChainNumber);
+                        columns.Bound(x => x.LeaseActive);
+                        columns.Bound(x => x.Suspended);
+                        columns.Bound(x => x.GenPastForms);
+                        columns.Bound(x => x.Item);
+                    //.Width(120).HeaderHtmlAttributes(headerAttr).ClientFooterTemplate("<div class='grid-footer'>Totals</div>");
+                })
+                    .Selectable()                    
+                    .Sortable()                    
+                    .DataSource(dataSource => dataSource
+                        .Ajax()                        
+                        .ServerOperation(false)
+                        .Model(model => model.Id(item => item.Uidy))
+                    )
+                    .Resizable(resize => resize.Columns(true))
+                    .Events(events => events.Change("grdLeaseChainChanged"))
+                    .Render();
+            }
+        </div>
+        <div class="col-sm-7">
+            <h2 style="padding-bottom: 4px;">Lease Amount</h2>
+            @{
+                Html.Kendo().Grid(Model.LeaseAmountModels)
+                    .Name("gridLeaseAmount")
+                    .Columns(columns =>
+                    {
+                        columns.Bound(x => x.ChangeEffectiveDate);
+                        columns.Bound(x => x.Amount).HtmlAttributes(new { style = "text-align: right;" });
+                        columns.Bound(x => x.AmountInterval);
+                        columns.Bound(x => x.NoOfYear);
+                    })
+                    .Selectable()                    
+                    .Sortable()                    
+                    .DataSource(dataSource => dataSource
+                        .Ajax()                        
+                        .ServerOperation(false)
+                        .Model(model => model.Id(item => item.Uidy))
+                    )
+                    .Resizable(resize => resize.Columns(true))
+                    .Render();
+            }
+        </div>
+    </div>
+    <div class="row padBottom20">
+        <div class="col-sm-5">
+            <h2 style="padding-bottom: 4px;">Document Template</h2>
+            @{Html.Kendo().Grid(Model.DocTemplateModels)
+                    .Name("grdDocumentTemplate")
+                    .Columns(columns =>
+                    {
+                        columns.Command(x => x.Custom("Select").Click("grdDocumentTemplateSelected")).Title("Action");
+                        columns.Bound(x => x.RecordNumber);
+                        columns.Bound(x => x.DocType);
+                        columns.Bound(x => x.FinalLastRef);
+                        columns.Bound(x => x.ReferredRecord);
+                        columns.Bound(x => x.FirstCreation);
+                        columns.Bound(x => x.Active);
+                    })
+                    .Selectable()                    
+                    .Sortable()                    
+                    .DataSource(dataSource => dataSource
+                        .Ajax()                        
+                        .ServerOperation(false)
+                        .Model(model => model.Id(item => item.Uidy))
+                    )
+                    .Resizable(resize => resize.Columns(true))
+                    .Events(events => events.Change("grdDocumentTemplateChanged"))
+                    .Render();
+            }
+        </div>
+        <div class="col-sm-7">
+            @{Html.Kendo().TabStrip()
+                    .Name("tsTabs2")
+                    .Items(items =>
+                    {
+
+                        items.Add().Text("Document")
+                        .Content(Html.Partial("ViewRecurringMasterDocumentTab", Model.DocumentModels).ToHtmlString());
+
+                        items.Add().Text("Frequency")
+                        .Content(Html.Partial("ViewRecurringMasterFrequencyTab", Model.FrequencyModels).ToHtmlString());
+                    })
+                    .SelectedIndex(0)
+                    .Render();
+            }
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+        </div>
+        <div class="col-md-2">
+        </div>
+        <div class="col-md-6">
+        </div>
+        <div class="col-md-2">
+            <a class="btn btn-info" name="lnkViewXXDocument" id="lnkViewXXDocument">@ViewBag.ViewXXButtonName</a>
+        </div>
+    </div>
+</div>
+
+@*@Html.HiddenFor(x => x.Command)
+
+    }*@
+<script type="text/javascript">
+    $(document).ready(function () {
+        // Set creationDetails radio buttons selected from db
+        var item = @Model.MainModel.CreationDetailSelectedOption;
+        $("input[name='creationDetails'][value=" + item + "]").prop("checked",true);
+
+        // Set ViewXXDocument button intial values from ViewBag
+        var buttonName = "@ViewBag.ViewXXButtonName";
+        var buttonAction = "@ViewBag.ViewXXButtonAction";
+        var buttonId = "@ViewBag.ViewXXButtonId";
+
+        SetupViewXXDocumentButton(buttonName, buttonAction, buttonId);
+
+        var grdLeaseChain = $("#grdLeaseChain").data("kendoGrid");
+        if (grdLeaseChain != null) {
+            var leaseChainGridId = "grdLeaseChain";
+            ConfigureKendoGridPaginationControlsFor508(leaseChainGridId);
+            MakeKendoGridScrollable(leaseChainGridId, "170px");
+        }
+
+        var gridLeaseAmount = $("#gridLeaseAmount").data("kendoGrid");
+        if (gridLeaseAmount != null) {
+            var leaseAmountGridId = "gridLeaseAmount";
+            ConfigureKendoGridPaginationControlsFor508(leaseAmountGridId);
+            MakeKendoGridScrollable(leaseAmountGridId, "170px");
+        }
+
+        var grdDocumentTemplate = $("#grdDocumentTemplate").data("kendoGrid");
+        if (grdDocumentTemplate != null) {
+            var documentTemplateGridId = "grdDocumentTemplate";
+            ConfigureKendoGridPaginationControlsFor508(documentTemplateGridId);
+            MakeKendoGridScrollable(documentTemplateGridId, "240px");
+        }
+
+
+    });
+
+
+    // When user selects one record in the document template grid
+    function grdDocumentTemplateChanged() {
+        var grid = $("#grdDocumentTemplate").data("kendoGrid");
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        grdDocumentTemplateSelecting(dataItem);
+    }
+
+    function grdDocumentTemplateSelected(e) {
+        // Highlight the row when "Select" button clicked
+        $("#grdDocumentTemplate table tr").removeClass('k-state-selected');
+        $(e.currentTarget).closest("tr").addClass('k-state-selected');
+
+        // Get the data from the current row
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        grdDocumentTemplateSelecting(dataItem);
+    }
+
+    function grdDocumentTemplateSelecting(dataItem) {
+        var uidy = $.trim(dataItem.Uidy);
+        var recur_Id = $("#MainModel_Code").val();
+        uidy = uidy.split('&').join('__');
+        location = "@Url.Action("ViewRecurringMaster")" + "?recur_Id=" + recur_Id +  "&uidy=" + uidy + "&source=dt";
+    }
+
+    function grdLeaseChainChanged(){
+        var grid = $("#grdLeaseChain").data("kendoGrid");
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        grdLeaseChainSelecting(dataItem);
+    }
+
+    function grdLeaseChainSelected(e) {
+        // Highlight the row when "Select" button clicked
+        $("#grdLeaseChain table tr").removeClass('k-state-selected');
+        $(e.currentTarget).closest("tr").addClass('k-state-selected');
+
+        // Get the data from the current row
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        grdLeaseChainSelecting(dataItem);
+    }
+
+    function grdLeaseChainSelecting(dataItem){
+        var uidy = $.trim(dataItem.Uidy);
+        var recur_Id = $("#MainModel_Code").val();
+        uidy = uidy.split('&').join('__');
+        location = "@Url.Action("ViewRecurringMaster")" + "?recur_Id=" + recur_Id +  "&uidy=" + uidy + "&source=lc";
+    }
+
+    function SetupViewXXDocumentButton(buttonName, buttonAction, buttonId)
+    {
+        $("#lnkViewXXDocument").val(buttonName);
+        var link ='@Html.Raw(@Url.Action("ActionName", "TransHist"))' + '?' + buttonId;
+        link = link.replace("ActionName", buttonAction);
+        $("#lnkViewXXDocument").attr("href", link);
+    }
+
+    // When user selects one record in the document template grid
+    function grdDocumentsChange() {
+        var grid = $("#grdDocuments").data("kendoGrid");
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+
+        var docType = dataItem.DocType;
+        var buttonName = '';
+        var buttonAction = '';
+        var buttonId = '';
+        switch ($.trim(docType).toUpperCase()) {
+            case "RO":
+                buttonName = "View PO Document";
+                buttonAction = "ViewPO";
+                buttonId = "po_Id=" + dataItem.PDN;
+                break;
+            case "RA":
+                buttonName = "View EA Document";
+                buttonAction = "ViewEAs";
+                buttonId = "ae_Id=" + dataItem.PDN;
+                break;
+            case "RT":
+                buttonName = "View RR Document";
+                buttonAction = "ViewRR";
+                buttonId = "rr_Id=" + dataItem.PDN;
+                break;
+            default:
+                buttonName = "View XX Document";
+                break;
+        }
+        SetupViewXXDocumentButton(buttonName, buttonAction, buttonId);
+    }
+</script>

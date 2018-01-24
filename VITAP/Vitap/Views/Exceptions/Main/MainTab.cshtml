@@ -1,0 +1,128 @@
+﻿@model VITAP.Data.Models.Exceptions.MainExMainTabModel
+@{ 
+    var OpenItemTextAttr = new { @style = "width: 80px; text-align: right;", @class = "" };
+    var attrText = new { @class = "" };
+    var attrTextRight = new { @class = " text-right" };
+    var attrLabel = new { @class = "control-label" };
+}
+
+<div id="tabMain" class="container-fluid peg-main-ex">
+    <div class="row" style="margin-left: 5px">
+        <h3>Summary Information:</h3>
+    </div>
+    <div class="row no-buffer">
+        <div class="col-xs-9 no-buffer">
+            <div class="col-xs-3 sm-buffer">
+                @Html.LabelFor(m => m.PegasysPODocNumber, attrLabel)<br />
+                @Html.TextBoxFor(m => m.PegasysPODocNumber, attrText)<br />
+                @Html.LabelFor(m => m.PegasysInvDocNumber, attrLabel)<br />
+                @Html.TextBoxFor(m => m.PegasysInvDocNumber, attrText)<br />
+                @Html.LabelFor(m => m.PegasysRRDocNumber, attrLabel)<br />
+                @Html.TextBoxFor(m => m.PegasysRRDocNumber, attrText)<br />
+                @Html.LabelFor(m => m.NetOrder, attrLabel)<br />
+                @Html.TextBoxFor(m => m.NetOrder, attrTextRight)<br />
+                @Html.LabelFor(m => m.UnpaidPOBalalance, attrLabel)<br />
+                @Html.TextBoxFor(m => m.UnpaidPOBalalance, attrTextRight)<br />
+            </div>
+            <div class="col-xs-3 sm-buffer">
+                @Html.LabelFor(m => m.ActNumber, attrLabel)<br />
+                @Html.TextBoxFor(m => m.ActNumber, attrText)<br />
+                @Html.LabelFor(m => m.InvoiceNumber, attrLabel)<br />
+                @Html.TextBoxFor(m => m.InvoiceNumber, attrText)<br />
+                @Html.LabelFor(m => m.RRAmount, attrLabel)<br />
+                @Html.TextBoxFor(m => m.RRAmount, attrTextRight)<br />
+                @Html.LabelFor(m => m.AccrualAmount, attrLabel)<br />
+                @Html.TextBoxFor(m => m.AccrualAmount, attrTextRight)<br />
+                @Html.LabelFor(m => m.RROpenAmount, attrLabel)<br />
+                @Html.TextBoxFor(m => m.RROpenAmount, attrTextRight)<br />
+            </div>
+            <div class="col-xs-2 sm-buffer">
+                @Html.LabelFor(m => m.VendorCode, attrLabel)<br />
+                @Html.TextBoxFor(m => m.VendorCode, attrText)<br />
+                @Html.LabelFor(m => m.AddressCode, attrLabel)<br />
+                @Html.TextBoxFor(m => m.AddressCode, attrText)<br />
+                @Html.LabelFor(m => m.RRInvoiceAmount, attrLabel)<br />
+                @Html.TextBoxFor(m => m.RRInvoiceAmount, attrTextRight)<br />
+            </div>
+            <div class="col-xs-3 sm-buffer" style="margin-left: 10px;">
+                @Html.LabelFor(m => m.VendorName, attrLabel)<br />
+                @Html.TextBoxFor(m => m.VendorName, attrText)<br />
+                @Html.LabelFor(m => m.N7DocumentNumber, attrLabel)<br />
+                @Html.TextBoxFor(m => m.N7DocumentNumber, attrText)<br />
+                @Html.LabelFor(m => m.StartDate, attrLabel)<br />
+                @Html.TextBoxFor(m => m.StartDate, attrText)<br />
+                @* This nested label provides some vertical separation*@
+                <label>
+                    <br />
+                    @Html.CheckBoxFor(m => m.PaymentCancelled, new { @class = "check-box " })&nbsp;
+                    <label for="PaymentCancelled" class="control-label">Payment Cancelled<br /></label>
+                </label>
+                @Html.LabelFor(m => m.DailyInterestAmount, attrLabel)<br />
+                @Html.TextBoxFor(m => m.DailyInterestAmount, attrTextRight)<br />
+                @Html.LabelFor(m => m.TotalInterestToDate, attrLabel)<br />
+                @Html.TextBoxFor(m => m.TotalInterestToDate, attrTextRight)<br />
+            </div>
+        </div>
+        <div class="col-xs-pull-3 no-buffer">
+            <div class="col-xs-2" style="margin-top:10px">
+                <button type="button" id="btnViewOpenItems" class="btn" style="width:110px; height:16px;">View Open Items</button>
+                <br /><br />
+                <label style="padding-left: 50px;">Open Items</label><br /><br />
+                @Html.LabelFor(m => m.OpenItemOB, new { @class = "control-label", @style = "margin-left:23px;" })
+                @Html.TextBoxFor(m => m.OpenItemOB, OpenItemTextAttr)<br />
+                @Html.LabelFor(m => m.OpenItemAC, new { @class = "control-label", @style = "margin-left:23px;" })
+                @Html.TextBoxFor(m => m.OpenItemAC, OpenItemTextAttr)<br />
+                @Html.LabelFor(m => m.OpenItemPayment, new { @class = "control-label", @style = "margin-left:12px;" })
+                @Html.TextBoxFor(m => m.OpenItemPayment, OpenItemTextAttr)<br />
+                @Html.LabelFor(m => m.OpenItemRetain, attrLabel)
+                @Html.TextBoxFor(m => m.OpenItemRetain, OpenItemTextAttr)<br />
+                <br />
+                <button type="button" id="btnTransHist" class="btn btn-default" style="width:110px; height:16px;">TransHist</button>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 no-buffer" style="margin-left: 15px">
+            <div class="col-xs-2 sm-buffer">
+                @Html.LabelFor(m => m.UnaccruedPOBalance, attrLabel)<br />
+                @Html.TextBoxFor(m => m.UnaccruedPOBalance, attrTextRight)<br />
+            </div>
+            <div class="col-xs-7 sm-buffer" style="margin-left: 20px">
+                @Html.LabelFor(m => m.Memo, attrLabel)<br />
+                @Html.TextBoxFor(m => m.Memo, new { @style = "width: 700px;" })<br />
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $().ready(function () {
+        $('#tabMain :input').attr('disabled', 'disabled');
+        $("#tabMain :input.check-box").attr("disabled", true);
+        if ('@Model.BtnOpenItems.Enabled' != 'True')
+            $('#btnViewOpenItems').attr('disabled', 'disabled');
+        else
+            $('#btnViewOpenItems').removeAttr('disabled');
+        if ('@Model.BtnTransHist.Enabled' != 'True')
+            $('#btnTransHist').attr('disabled', 'disabled');
+        else
+            $('#btnTransHist').removeAttr('disabled');
+    });
+
+    $("#btnViewOpenItems").on("click", function () {
+        var url = '@Html.Raw(Url.Action("OpenItems", "TransHist"
+            , new { act = Model.BtnOpenItems.Act, pDocNo = Model.BtnOpenItems.PDocNo }))';
+        window.location = url;
+    });
+
+    $("#btnTransHist").on("click", function () {
+        var url = '@Html.Raw(Url.Action("Index", "TransHist", new {
+                searchFor = Model.BtnTransHist.SearchFor,
+                searchIn = Model.BtnTransHist.SearchIn,
+                searchShow = "ALL",
+                searchFY = "ALL",
+            }))';
+        window.location = url;
+    });
+
+</script>

@@ -1,0 +1,195 @@
+﻿@model VITAP.Data.Models.Exceptions.ExceptionU066Model
+
+@{
+    ViewBag.Title = "Pegasys Exception (" + Model.ErrorCode + " - " + Model.Memo;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    input, select, textarea {
+        max-width: 100%;
+    }
+</style>
+
+
+<div class="container-fluid">
+    <br />
+    <h1 style="font-weight: bold">@string.Format("{0} | Pegasys Exception ({1}) - {2}", Model.InvKeyID, Model.ErrorCode, Model.Memo)</h1>
+    <br />
+    <div class="form-group">
+        <div class="row">
+            <div class="col-sm-2">
+                <label class="control-label">Document ID</label>
+                @Html.TextBoxFor(x => x.DocId, new { @class = "form-control", @disabled= "disabled" })
+            </div>
+            <div class="col-sm-2">
+                <label class="control-label">Pegasys PO DOC NO</label>
+                @Html.TextBoxFor(x => x.PegDocNo, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="col-sm-1">
+                <label class="control-label">ACT</label>
+                @Html.TextBoxFor(x => x.Act, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="col-sm-4">
+                <label class="control-label">Search</label>
+                @Html.TextBoxFor(x => x.Search, new { @class = "form-control" })
+            </div>
+            <div class="col-sm-3" style="margin-top: 25px;">
+                @Html.DropDownListFor(
+                    x => Model.SelectedSearchType,
+                    new SelectList(Model.SearchTypeItems, "Id", "Text"),
+                    new Dictionary<string, object> { { "class", "pull-right form-control" } }
+                )
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="row">
+            <div class="col-sm-2">
+                <label class="control-label">ORGCODE</label>
+                @Html.TextBoxFor(x => x.OrgCode, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="col-sm-1">
+                <label class="control-label">BA</label>
+                @Html.TextBoxFor(x => x.BA, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="col-sm-8">
+
+            </div>
+            <div class="col-sm-1">
+                <button id="btnSearch" type="button" class="btn btn-info btn-fixed-width-small">Search</button>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            @{
+                Html.Kendo().Grid(Model.U066Recs)
+                .Name("U066Grid")
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .ServerOperation(false)
+                )
+                .Pageable(pageable => pageable
+                    .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                )
+                .ToolBar(tools => tools.Excel())
+                .Excel(excel => excel
+                    .FileName("Export.xlsx")
+                    .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+                    .AllPages(true)
+                )
+                .Render();
+            }
+        </div>
+    </div>
+    <div class="row panel-body">
+        <div class="col-sm-1">
+            <button id="btnViewInv" type="button" class="btn btn-info btn-fixed-width">View INV</button>
+        </div>
+        <div class="col-sm-1">
+            <button id="btnViewPO" type="button" class="btn btn-info btn-fixed-width" @(Model.ViewPOButtonEnabled ? "" : "disabled")>View PO</button>
+        </div>
+        <div class="col-sm-5">
+            
+        </div>
+        <div class="col-sm-1">
+            <button id="btnTransHist" type="button" class="btn btn-info btn-fixed-width">TransHist</button>
+        </div>
+        <div class="col-sm-1">
+            <button id="btnAccept" type="button" class="btn btn-info btn-fixed-width">Accept</button>
+        </div>
+        <div class="col-sm-1">
+            <button id="btnRoute" type="button" class="btn btn-info btn-fixed-width">Route</button>
+        </div>
+        <div class="col-sm-1">
+            <button id="btnSkip" type="button" class="btn btn-info btn-fixed-width">Skip</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        $("#btnSearch").click(function () {
+            $.ajax({
+                type: "POST",
+                data:
+                    {
+                        searchText: $('#Search').val(),
+                        searchType: $("#SelectedSearchType").val(),
+                        orgCode: $('#OrgCode').val(),
+                        pDocNo: $('#PegDocNo').val(),
+                    },
+                url: "@Url.Action("U066Search")",
+                success: function (data) {
+
+                    var grid = $("#U066Grid").data("kendoGrid");
+                    var dataSource = grid.dataSource;
+                    dataSource.data(data);
+                },
+            error: function (error) {
+                alert('Error: ' + error.status);
+            }
+            });
+        });
+
+        $("#btnSkip").click(function () {
+            window.location = ('@Html.Raw(Url.Action("Skip", "Exceptions", new
+            {
+                               exceptionId = Model.ExId,
+                               PDocNo = Model.PDocNo
+            }))');
+        });
+
+        $("#btnRoute").click(function () {
+            window.location = '@Url.Action("Route", "Exceptions", new { ExId = Model.ExId }, null)';
+        });
+
+        $("#btnAccept").click(function () {
+            var pdocNo = $('#PDocNo').val();
+            var invKeyId = $("#InvKeyID").val();
+
+            window.location = '@Html.Raw(Url.Action("AcceptU066", "Exceptions", new {
+                              orgCode = Model.OrgCode,
+                              BA = Model.BA,
+                              newInvKeyId = Model.InvKeyID
+                          }))';
+        });
+
+        $("#btnTransHist").click(function () {
+
+            var url = '';
+            if ('@Model.Act')
+            {
+                url = '@Html.Raw(Url.Action("Index", "TransHist", new { searchFor = Model.Act, searchIn = "Act", searchShow = "All", searchFY = "All" }, null))'
+            }
+            else if ('@Model.PDocNo')
+            {
+                url = '@Html.Raw(Url.Action("Index", "TransHist", new { searchFor = Model.PDocNo, searchIn = "PDocNo", searchShow = "All", searchFY = "All" }, null))'
+            }
+            else
+            {
+                url = '@Url.Action("Index", "TransHist")'
+            }
+
+            window.open(url, "_blank");
+        });
+
+        $("#btnViewPO").on("click", function () {
+            var url = '@Url.Action("ViewPO", "TransHist", new { po_Id = Model.PDocNo })';
+
+            window.location = url;
+        });
+
+        $("#btnViewInv").on("click", function () {
+            var url = '@Url.Action("ViewInvoice", "TransHist", new { inv_key_id = Model.InvKeyID })';
+            window.location = url;
+        });
+
+        $(document).ready(function () {
+            ConfigureKendoGridPaginationControlsFor508("U066Grid");
+            MakeKendoGridScrollable("U066Grid", "250px");
+        });
+    </script>
+}

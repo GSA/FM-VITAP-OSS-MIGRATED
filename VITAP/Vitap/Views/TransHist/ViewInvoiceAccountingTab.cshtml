@@ -1,0 +1,60 @@
+﻿@model VITAP.ViewModels.TransHist.InvoiceAccountingModel
+
+	<div class="pad10">
+		@{  Html.Kendo().Grid<VITAP.ViewModels.TransHist.InvoiceAccountingModel>()
+                .Name("gridAccounting")
+                 .DataSource(dataSource => dataSource
+                .Ajax()
+                .Aggregates(aggr =>
+                {
+                }
+                )
+                .Read(r => r
+                    .Action("InvoiceAccountingRecords", "TransHist")
+                    .Data("GetSearchParametersInvoiceAccountingTab")
+                )
+            )
+                .Pageable(pageable => pageable
+                    .Input(true)
+                    .Numeric(false)
+                    .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                )
+                 .Resizable(r => r.Columns(true))
+                 .ToolBar(tools => tools.Excel())
+                .Excel(excel => excel
+                    .FileName("InvoiceAccounting.xlsx")
+                    .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+                    .AllPages(true)
+                )
+                .Events(e => e.DataBound("onRowBound"))
+                .Render();
+		}
+	</div>
+
+	<script type="text/javascript">
+
+        $(document).ready(function () {
+            ConfigureKendoGridPaginationControlsFor508("gridAccounting");
+            MakeKendoGridScrollable('gridAccounting', '600px')
+        });
+
+		function GetSearchParametersInvoiceAccountingTab() {
+
+			return {
+			    InvoiceTableName: $("#InvoiceTableName").val(),
+			    UIDY: $("#UIDY").val()
+			};
+		}
+
+		function btnSearchOnClick() {
+			$('#gridAccounting').data("kendoGrid").dataSource.read();
+		}
+
+		function onRowBound(e)
+		{
+		    if (e && e.sender && e.sender._data && e.sender._data.length > 0)
+		    {
+		        $("#pDocNo").text(e.sender._data[0].PDocNumber);
+		    }
+		}
+	</script>

@@ -1,0 +1,113 @@
+﻿@model VITAP.Data.Models.Exceptions.P039InvoiceTabModel
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="row">
+                <div class="col-md-12">
+                    <lable class="fill">
+                        INV Key ID <br />
+                        @Html.TextBoxFor(x => x.InvKeyID, new { @class = "fill text-primary" })
+                    </lable>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <lable class="fill">
+                        Invoice Number <br />
+                        @Html.TextBoxFor(x => x.InvNum, new { @class = "fill text-primary" })
+                    </lable>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <lable>
+                        Invoice Date <br />
+                        @Html.TextBoxFor(x => x.InvDate, new Dictionary < string, object > { {"class","text-primary" },{ "style", "width:200px" } })
+                    </lable>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <label>
+                        Invoice Amount <br />
+                        @Html.TextBoxFor(x => x.InvAmt, new Dictionary<string, object> { { "class", "text-primary" }, { "style", "width:200px" } })
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="row">
+                <div class="col-md-12">
+                    <lable>
+                        ACT Number <br />
+                        @Html.TextBoxFor(x => x.ActNum, new { @class = "text-primary" })
+                    </lable>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <lable>
+                        PO Number <br />
+                        @Html.TextBoxFor(x => x.PONum, new Dictionary<string, object> { { "class", "text-primary" }, { "style", "width:200px" } })
+                    </lable>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <label>
+                        Contract <br />
+                        @Html.TextBoxFor(x => x.Contract, new Dictionary<string, object> { { "class", "text-primary" }, { "style", "width:200px" } })
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="row">
+                <div class="col-md-12">
+                    <label class="fill">
+                        Remit Vendor: <br />
+                        @Html.TextBoxFor(x => x.VendorName, new Dictionary<string, object> { { "class", "text-primary" }, { "style", "width:250px" } })<br />
+                        @Html.TextBoxFor(x => x.VendorAddress1, new Dictionary<string, object> { { "class", "text-primary" }, { "style", "width:250px" } })<br />
+                        @Html.TextBoxFor(x => x.VendorAddress2, new Dictionary<string, object> { { "class", "text-primary" }, { "style", "width:250px" } })<br />
+                        @Html.TextBoxFor(x => x.VendorAddress3, new Dictionary<string, object> { { "class", "text-primary" }, { "style", "width:250px" } })<br />
+                        @Html.TextBoxFor(x => x.VendorCityStateZip, new Dictionary<string, object> { { "class", "text-primary" }, { "style", "width:250px" } })
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="row">
+                <div class="col-md-12">
+                    <label>
+                        Vendor Code <br />
+                        @Html.TextBoxFor(x => x.VendorCode, new Dictionary<string, object> { { "class", "text-primary" }, { "style", "width:200px" } })
+                    </label>
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <label>
+                        INV Receipt Date <br />
+                        @Html.TextBoxFor(x => x.InvRecDate, new { @class = "text-primary" })
+                    </label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <button onclick="viewInv()" type="button" class="btn btn-info">View INV</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+       
+    function viewInv() {
+        window.location.href = '@Url.Action("ViewInvoice", "TransHist", new { inv_Key_Id = Model.InvKeyID}, null)'
+    }
+</script>
+

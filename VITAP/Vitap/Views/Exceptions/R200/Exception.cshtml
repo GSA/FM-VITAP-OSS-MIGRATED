@@ -1,0 +1,493 @@
+﻿@using VITAP.Data.Models.Exceptions
+@model ExceptionR200ViewModel
+
+@{
+    ViewBag.Title = "Pegasys Exception (" + Model.ErrorCode + ") - " + Model.Memo;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var headerAttr = new { @style = "font-weight:bold" };
+    var textAttr = new Dictionary<string, object> { { "style", "width:140px" }, { "disabled", "" } };
+    var textAttrAlignRight = new Dictionary<string, object> { { "style", "width:140px; text-align:right" }, { "disabled", "" } };
+    var textAttrShort = new Dictionary<string, object> { { "style", "width:80px" }, { "disabled", "" } };
+    var textAttrMedium = new Dictionary<string, object> { { "style", "width:200px" }, { "disabled", "" } };
+    var textAttrLong = new Dictionary<string, object> { { "style", "width:300px" }, { "disabled", "" } };
+
+    var ddlSearchIn = new List<SelectListItem>()
+        {
+            new SelectListItem { Text = "PDocNo", Value = "PDocNo" },
+            new SelectListItem { Text = "ACT", Value = "ACT" },
+            new SelectListItem { Text = "PO ID", Value = "PO_ID" },
+            new SelectListItem { Text = "RR ID", Value = "RR_ID" },
+            new SelectListItem { Text = "AE ID", Value = "AE_ID" },
+            new SelectListItem { Text = "PA ID", Value = "PA_ID" },
+            new SelectListItem { Text = "Recurring Master ID", Value = "RECUR_ID" },
+            new SelectListItem { Text = "Vendor Name", Value = "VendName" },
+            new SelectListItem { Text = "Contract", Value = "Contract" },
+            new SelectListItem { Text = "PO Number", Value = "PONumber" },
+            new SelectListItem { Text = "Invoice", Value = "Invoice" },
+            new SelectListItem { Text = "Amount", Value = "Amount" }
+        };
+
+}
+
+<div class="controls" style="width: 58%; float: left;">
+    <br />
+    <h1 style="font-weight: bold">@string.Format("{0} | Pegasys Exception ({1}) - {2}", Model.InvKeyId, Model.ErrorCode, Model.Memo)</h1>
+    <br />
+    <div class="col-md-12">
+        <div class="row" style="width:300%">
+            <div class="col-md-12" style="vertical-align:bottom">
+                <label for="txtSearchFor">Search For:</label>
+                <input type="text" id="txtSearchFor" />
+                @*@Html.TextBoxFor(m => m.PegPODocNum, new { id = "txtSearchFor" })*@
+                <label for="ddlSearchIn">In:</label>
+                @Html.DropDownList("txtSearchIn", ddlSearchIn, new { width = "80px", id = "ddlSearchIn" })
+                <button type="button" class="btn btn-info" style="margin-bottom:20px" onclick="R200SearchList()">Search</button>
+                <br />
+            </div>
+        </div>
+        <br />
+
+        <div class="controls" style="width: 175%; float: left;">
+            @{
+                Html.Kendo().Grid<X200Model>()
+                    .Name("R200Grid")
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .PageSize(10)
+                        //.Sort(sort => sort.Add("START_DT").Ascending())
+                        .Model(model => model.Id(o => o.PDOCNO))
+                        .Read(r => r
+                            .Action("R200Search", "Exceptions")
+                            .Data("GetR200SearchParameters")
+                        )
+                    )
+                    .Selectable(s => s.Mode(GridSelectionMode.Single))
+                    .Sortable()
+                    .Pageable(pageable => pageable
+                        .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+                    )
+                    .Events(events => events.Change("grdR200Change"))
+                    .ToolBar(tools => tools.Excel())
+                    .Excel(excel => excel
+                        .FileName("R200List_" + DateTime.Today.ToString("yyyy-MM-dd") + ".xlsx")
+                        .ProxyURL(Url.Action("Excel_Export_Save", "Grid"))
+                        .AllPages(true)
+                    )
+                    .Columns(column =>
+                    {
+                        column.Command(c => c.Custom("Select").Click("R200GridSelect")).Width(100).Title("Action").HeaderHtmlAttributes(headerAttr); ;
+                        column.Bound(x => x.ISPEG).Width(105).HeaderHtmlAttributes(headerAttr);
+                        column.Bound(x => x.ACT).Width(110).HeaderHtmlAttributes(headerAttr);
+                        column.Bound(x => x.PDOCNO).Width(125).HeaderHtmlAttributes(headerAttr).Title("PDOCNO");
+                        column.Bound(x => x.START_DT).Width(110).HeaderHtmlAttributes(headerAttr).Format("{0:d}");
+                        column.Bound(x => x.AMOUNT).Format("{0:n2}").Width(110).HeaderHtmlAttributes(headerAttr).HtmlAttributes(textAttrAlignRight);
+                        column.Bound(x => x.CLSD_AMT).Format("{0:n2}").Width(110).HeaderHtmlAttributes(headerAttr).HtmlAttributes(textAttrAlignRight);
+                        column.Bound(x => x.VENDNAME).Width(300).HeaderHtmlAttributes(headerAttr);
+                        column.Bound(x => x.ADDR_L1).Width(250).HeaderHtmlAttributes(headerAttr);
+                        column.Bound(x => x.ADDR_L2).Width(250).HeaderHtmlAttributes(headerAttr);
+                        column.Bound(x => x.ADDR_L3).Width(250).HeaderHtmlAttributes(headerAttr);
+                        column.Bound(x => x.ADDR_CITY).Width(95).HeaderHtmlAttributes(headerAttr);
+                        column.Bound(x => x.ADDR_STATE).Width(65).HeaderHtmlAttributes(headerAttr);
+                        column.Bound(x => x.ADDR_ZPCD).Width(100).HeaderHtmlAttributes(headerAttr);
+                        column.Bound(x => x.RMIT_VEND).Width(150).HeaderHtmlAttributes(headerAttr);
+                        column.Bound(x => x.CONTRACT).Width(140).HeaderHtmlAttributes(headerAttr);
+                        column.Bound(x => x.PONUMBER).Width(130).HeaderHtmlAttributes(headerAttr);
+                        column.Bound(x => x.DSCR).Width(150).HeaderHtmlAttributes(headerAttr);
+                        column.Bound(x => x.UIDY).Width(230).HeaderHtmlAttributes(headerAttr);
+                        column.Bound(x => x.PODTYP).Width(120).HeaderHtmlAttributes(headerAttr);
+                        column.Bound(x => x.DOC_DT).Width(120).HeaderHtmlAttributes(headerAttr).Format("{0:d}");
+                        column.Bound(x => x.CLSD_FL).Width(100).HeaderHtmlAttributes(headerAttr);
+                    })
+                    .Render();
+            }
+            </div>
+
+            <div class="container" style="float:left">
+
+                <div class="row" style="float:left; width: 140%">
+                    <br />
+                    <div class="col" id="ElectronicData" style="float:left; width: 50%">
+                        <div class="row" style="float:left; width: 100%">
+                            <h2><em>Electronic Data</em></h2><br />
+                        </div>
+                        <div class="row" style="float:left; width: 100%">
+                            <div>
+                                <label for="inv_key_id" class="control-label">Document #</label>
+                                @Html.TextBoxFor(m => m.PegInv.INV_KEY_ID, new Dictionary<string, object> { { "style", "width:140px" }, { "disabled", "" }, { "id", "inv_key_id" } })
+                                <label for="ACT" class="control-label">ACT #</label>
+                                @Html.TextBoxFor(m => m.PegInv.ACT, new Dictionary<string, object> { { "style", "width:80px" }, { "disabled", "" }, { "id", "ACT" } })<br />
+                            </div>
+                            <div>
+                                <label for="ponumber" class="control-label">PO #</label>
+                                @Html.TextBoxFor(m => m.PegInv.PONUMBER, new Dictionary<string, object> { { "style", "width:200px" }, { "disabled", "" }, { "id", "ponumber" } })
+                                <label for="Amount" class="control-label">Amount</label>
+                                @Html.TextBoxFor(m => m.Amount, new Dictionary<string, object> { { "style", "width:140px; text-align:right" }, { "disabled", "" }, { "id", "Amount" } })
+                            </div>
+                            <div>
+                                <label for="contract" class="control-label">Contract</label>
+                                @Html.TextBoxFor(m => m.PegInv.CONTRACT, new Dictionary<string, object> { { "style", "width:200px" }, { "disabled", "" }, { "id", "contract" } })
+                                <label for="invoice" class="control-label">Invoice</label>
+                                @Html.TextBoxFor(m => m.PegInv.INVOICE, new Dictionary<string, object> { { "style", "width:200px" }, { "disabled", "" }, { "id", "invoice" } })
+                            </div>
+                            <div>
+                                <label for="invdate" class="control-label">Invoice Date</label>
+                                @Html.TextBoxFor(m => m.PegInv.INVDATE, new Dictionary<string, object> { { "style", "width:200px" }, { "disabled", "" }, { "id", "invdate" } })
+                                <label for="stampdate" class="control-label">Invoice Received Date</label>
+                                @Html.TextBoxFor(m => m.PegInv.STAMPDATE, new Dictionary<string, object> { { "style", "width:200px" }, { "disabled", "" }, { "id", "stampdate" } })
+                            </div>
+                            <div>
+                                <label for="svc_perd_strt" class="control-label">Service Period</label>
+                                @Html.TextBoxFor(m => m.PegInv.SVC_PERD_STRT, new Dictionary<string, object> { { "style", "width:200px" }, { "disabled", "" }, { "id", "svc_perd_strt" } })
+                                <label for="svc_perd_endt" class="control-label sr-only">End Date</label>
+                                @Html.TextBoxFor(m => m.PegInv.SVC_PERD_END, new Dictionary<string, object> { { "style", "width:200px" }, { "disabled", "" }, { "id", "svc_perd_endt" } })
+                            </div>
+                            <div>
+                                <div style="float:left; width:60%">
+                                    <label for="vend_cd" class="control-label">Vendor Code</label>
+                                    <label for="vend_addr_cd" class="control-label sr_only" hidden="hidden">Vendor Address Code</label><br />
+                                    @Html.TextBoxFor(m => m.PegInv.VEND_CD, new Dictionary<string, object> { { "style", "width:140px" }, { "disabled", "" }, { "id", "vend_cd" } })
+                                    @Html.TextBoxFor(m => m.PegInv.VEND_ADDR_CD, new Dictionary<string, object> { { "style", "width:140px" }, { "disabled", "" }, { "id", "vend_addr_cd" } })
+                                    <br />
+                                    <label for="vendname" class="control-label">Remit Vendor</label><br />
+                                    @Html.TextBoxFor(m => m.PegInv.VENDNAME, new Dictionary<string, object> { { "style", "width:300px" }, { "disabled", "" }, { "id", "vendname" } })
+                                    <br />
+                                    <label for="addr_l1" class="control-label sr-only">Address 1</label>
+                                    <label for="addr_l2" class="control-label sr-only">Address 2</label>
+                                    <label for="addr_l3" class="control-label sr-only">Address 3</label>
+                                    <label for="addr_city" class="control-label sr-only">City</label>
+                                    <label for="addr_state" class="control-label sr-only">State</label>
+                                    <label for="addr_zpcd" class="control-label sr-only">Zip</label>
+                                    @Html.TextBoxFor(m => m.PegInv.ADDR_L1, new Dictionary<string, object> { { "style", "width:300px" }, { "disabled", "" }, { "id", "addr_l1" } })
+                                    @Html.TextBoxFor(m => m.PegInv.ADDR_L2, new Dictionary<string, object> { { "style", "width:300px" }, { "disabled", "" }, { "id", "addr_l2" } })
+                                    @Html.TextBoxFor(m => m.PegInv.ADDR_L3, new Dictionary<string, object> { { "style", "width:300px" }, { "disabled", "" }, { "id", "addr_l3" } })<br />
+                                    @Html.TextBoxFor(m => m.PegInv.ADDR_CITY, new Dictionary<string, object> { { "style", "width:140px" }, { "disabled", "" }, { "id", "addr_city" } })
+                                    @Html.TextBoxFor(m => m.PegInv.ADDR_STATE, new { style = "width:40px", @disabled = "disabled", id = "addr_state" })
+                                    @Html.TextBoxFor(m => m.PegInv.ADDR_ZPCD, new { style = "width:90px", @disabled = "disabled", id = "addr_zpcd" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col" style="float:right; width: 50%">
+                        <div class="col" style="float:left; width: 30%">
+                            <label for="txtAct">ACT</label><br />
+                            @Html.TextBox("Act", null, new { id = "txtAct", style = "width:100px", @disabled = "disabled" })
+                        </div>
+                        <div class="col" style="float:left; width: 30%">
+                            <label for="txtPdocno">Pegasys PO Document</label>
+                            @Html.TextBox("PDocNo", null, new { id = "txtPdocno", style = "width:140px", @disabled = "disabled" })
+                        </div>
+                        <div class="col" style="float:left; width: 30%">
+                            <label for="txtDocType">PO Document Type</label>
+                            @Html.TextBox("Doc Type", null, new { id = "txtDocType", style = "width:40px", @disabled = "disabled" })
+                        </div>
+                        <div class="row" style="float:left;">
+                            <div style="float:left; width:60%">
+                                <label for="txtPONumber">PO Number</label><br />
+                                @Html.TextBox("PO Number", null, new { id = "txtPONumber", @disabled = "disabled" })<br />
+                                <br />
+                                <label for="txtContract">Contract</label><br />
+                                @Html.TextBox("Contract", null, new { id = "txtContract", @disabled = "disabled" })
+                                <br />
+                                <label for="txtRmitVend">Remit Vendor Code</label><br />
+                                @Html.TextBox("Remit Vendor", null, new { id = "txtRmitVend", @disabled = "disabled" })
+                                <br />
+                                <label for="txtVendName">Vendor Name</label><br />
+                                <label for="txtAddress1" class="control-label sr-only">Address 1</label>
+                                <label for="txtAddress2" class="control-label sr-only">Address 2</label>
+                                <label for="txtAddress3" class="control-label sr-only">Address 3</label>
+                                <label for="txtCityStateZip" class="control-label sr-only">City, State Zip</label>
+                                @Html.TextBox("Vendor Name", null, new { id = "txtVendName", style = "width:300px", @disabled = "disabled" })
+                                @Html.TextBox("Address 1", null, new { id = "txtAddress1", style = "width:300px", @disabled = "disabled" })
+                                @Html.TextBox("Address 2", null, new { id = "txtAddress2", style = "width:300px", @disabled = "disabled" })
+                                @Html.TextBox("Address 3", null, new { id = "txtAddress3", style = "width:300px", @disabled = "disabled" })
+                                @Html.TextBox("City State Zip", null, new { id = "txtCityStateZip", style = "width:300px", @disabled = "disabled" })
+                            </div>
+                            <div style="float:left; width: 35%">
+                                <label for="txtAmount">Amount</label><br />
+                                @Html.TextBox("Amount", null, new { id = "txtAmount", style = "width:100px; text-align:right", @disabled = "disabled" })<br />
+
+                                <label for="txtClsdAmt">Closed Amount</label><br />
+                                @Html.TextBox("Closed Amount", null, new { id = "txtClsdAmt", style = "width:100px; text-align:right", @disabled = "disabled" })<br />
+
+                                <label for="txtDocDt">Document Date</label><br />
+                                @Html.TextBox("Doc Date", null, new { id = "txtDocDt", style = "width:100px", @disabled = "disabled" })<br />
+
+                                <span style="font-weight: bold">Period of Performance</span><br />
+                                <label for="txtStartDt">Start Date</label>
+                                <label for="txtEndDt" class="sr-only" hidden="hidden">End Date</label><br />
+                                @Html.TextBox("Start Date", null, new { id = "txtStartDt", style = "width:100px", @disabled = "disabled" })
+                                @Html.TextBox("End Date", null, new { id = "txtEndDt", style = "width:100px", @disabled = "disabled" })<br />
+
+                                <label for="txtResponseNotes">Response Notes</label><br />
+                                @Html.TextAreaFor(m => m.ResponseNotes, new { id = "txtResponseNotes", style = "width:500px; height: 150px", @disabled = "disabled" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div class="row" style="clear: left">
+                <div class="col-sm-12">
+                    <button type="button" class="btn btn-info" onclick="ReferencingInvoices()">Referencing<br />Inv's</button>
+                    <button type="button" class="btn btn-info" id="btnViewImage" onclick="ViewImage()">View Image</button>
+                    <button type="button" class="btn btn-info" onclick="ViewDocument()">View<br />Document</button>
+                    <button type="button" class="btn btn-info" onclick="TransHist()">TransHist</button>
+                    <button type="button" class="btn btn-info" onclick="ViewPO()">View PO</button>
+                    <br /><br />
+                    <button type="button" class="btn btn-info" onclick="POMatch()">PO Match</button>
+                    <button type="button" id="PORequest" class="btn btn-info" onclick="PORequest()">PO Request</button>
+                    <button type="button" class="btn btn-info" onclick="Reject()">Reject</button>
+                    <button type="button" class="btn btn-info" onclick="Skip()">Skip</button>
+                </div>
+            </div>
+        </div>
+    @*</div>*@
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        if ('@Model.Act' == null && '@Model.PegPODocNum' == null)
+        {
+            document.getElementById("PORequest").disabled = true;
+        }
+
+        if ('@Model.PegInv.EDI_IND' == "F")
+        {
+            $("#btnViewImage").attr("disabled", false);
+            document.getElementById("ElectronicData").style.visibility = 'hidden';
+        }
+        else
+        {
+            $("#btnViewImage").attr("disabled", true);
+            document.getElementById("ElectronicData").style.visibility = 'visible';
+        }
+
+
+        var grdR200 = $("#R200Grid").data("kendoGrid");
+        if (grdR200 != null) {
+            var selectedRow = grdR200.dataItem(grdR200.select());
+            ConfigureKendoGridPaginationControlsFor508("R200Grid");
+            MakeKendoGridScrollable("R200Grid", "300px");
+            //grdR200.find('tbody tr:first').addClass('k-state-selected');
+        }
+
+    });
+
+    function R200GridSelect(e) {
+        e.preventDefault();
+        $("#R200Grid table tr").removeClass('k-state-selected');
+        $(e.currentTarget).closest("tr").addClass('k-state-selected');
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        var grdR200 = $("#R200Grid").data("kendoGrid");
+        grdR200Select(dataItem);
+        $(e.currentTarget).closest("tr").addClass('k-state-selected');
+    }
+
+    function grdR200Select(dataItem) {
+
+        try {
+            var pDocNo = dataItem.PDOCNO;
+            if (pDocNo.length > 2) {
+                var docType = pDocNo.substring(0, 2);
+            }
+            var Act = dataItem.ACT;
+            $("#txtAct").val(Act);
+            if (pDocNo != "") {
+                $("#txtPdocno").val(pDocNo);
+            }
+            $("#txtDocType").val(docType);
+            $("#txtPONumber").val(dataItem.PONUMBER);
+            $("#txtContract").val(dataItem.CONTRACT);
+            $("#txtRmitVend").val(dataItem.RMIT_VEND);
+            $("#txtVendName").val(dataItem.VENDNAME);
+            $("#txtAddress1").val(dataItem.ADDR_L1);
+            $("#txtAddress2").val(dataItem.ADDR_L2);
+            $("#txtAddress3").val(dataItem.ADDR_L3);
+            $("#txtCityStateZip").val(dataItem.ADDR_CITY + ", " + dataItem.ADDR_STATE + "  " + dataItem.ADDR_ZPCD);
+            $("#txtAmount").val(GetFormattedAmount(dataItem.AMOUNT));
+            $("#txtClsdAmt").val(GetFormattedAmount(dataItem.CLSD_AMT));
+            $("#txtDocDt").val(GetFormattedDate(dataItem.DOC_DT));
+            $("#txtStartDt").val(GetFormattedDate(dataItem.START_DT));
+            $("#txtEndDt").val("  /  /  ");
+        }
+        catch (err) {
+            $("#txtPdocno").val("");
+            $("#txtAct").val("");
+        }
+    }
+
+    // When user selects one record in the grid
+    function grdR200Change() {
+        var grid = $('#R200Grid').data('kendoGrid');
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        grdR200Select(dataItem);
+
+    }
+
+    function ViewImage() {
+        if ('@Model.PegInv.EDI_IND' != "T") {
+            var url = '@Url.Action("ViewImageByImageID", "Exceptions")';
+            var docId = "@Model.PegInv.IMAGEID";
+            if (docId == null) {
+                alert("No image was found!");
+                return;
+            }
+
+            window.location = url + '?docId=' + docId;
+        }
+    }
+
+    function ReferencingInvoices() {
+        var newPdocno = $("#txtPdocno").val();
+        if (newPdocno == "") {
+            alert("You must select a record from the grid");
+            return;
+        }
+        var url = '@Url.Action("ReferencingInvoices", "Exceptions")';
+
+        window.location = url + '?Pdocno=' + newPdocno;
+    }
+
+    function ViewDocument() {
+        var url = '@Url.Action("ViewInvoice", "TransHist")';
+        var id = "@Model.PegInv.INV_KEY_ID";
+        window.location = url + '?inv_Key_Id=' + id;
+    }
+
+    function TransHist() {
+        var url = '@Url.Action("Index", "TransHist")';
+        var Act = "@Model.Act";
+        var Pdocno = "@Model.PegPODocNum";
+        var InvKeyId = "@Model.PegInv.INV_KEY_ID";
+        if (Act != null && Act != "" && Act != "        ")
+        {
+            url = url + '?searchFor=' + Act + '&searchIn=ACT&searchShow=ALL&searchFY=ALL&id=' +
+                InvKeyId + '&act=' + Act + '&pDocNo=' + Pdocno + '&searchedBy=';
+        }
+        else
+        {
+            url = (url + '?searchFor=' + Pdocno + '&searchIn=PDocNo&searchShow=ALL&searchFY=ALL&id=' +
+                InvKeyId + '&act=' + Act + '&pDocNo=' + Pdocno + '&searchedBy=');
+        }
+
+        window.open(url, "_blank");
+    }
+
+    function ViewPO() {
+        var newPdocno = $("#txtPdocno").val();
+        if (newPdocno == "") {
+            alert("You must select a record from the grid");
+            return;
+        }
+        var url = '@Url.Action("ViewPO", "TransHist")';
+        window.location = url + '?po_Id=' + newPdocno ;
+    }
+
+    function POMatch() {
+        var url = '@Url.Action("POMatch", "Exceptions")';
+        var Pdocno = "@Model.PegInv.PDOCNOPO";
+        var newAct = $("#txtAct").val();
+        var newPdocno = $("#txtPdocno").val();
+        if (newPdocno == "") {
+            alert("You must select a record from the grid");
+            return;
+        }
+        var Vcpo = '@(Model.VCPO ? "T" : "F")';
+        window.location = url + '?PDocNo=' + Pdocno + '&NewAct=' + newAct + '&NewPDocNo=' + newPdocno + '&Vcpo=' + Vcpo ;
+    }
+
+
+    function PORequest() {
+        var newPdocno = $("#txtPdocno").val();
+        if (newPdocno == "") {
+            alert("You must select a record from the grid");
+            return;
+        }
+        var url = '@Url.Action("PORequest", "Exceptions")';
+        window.location = url + '?pDocNo=' + newPdocno;
+    }
+
+    function Reject() {
+        window.location = '@Url.Action("Reject", "Exceptions", new { PDocNo = @Model.PegInv.PDOCNOPO })';
+    }
+
+    function Skip() {
+        window.location = ('@Html.Raw(Url.Action("Skip", "Exceptions", new
+            {
+                exceptionId = @Model.Ex_Id,
+                PDocNo = @Model.PegInv.PDOCNOPO
+            }))');
+    }
+
+    function GetR200SearchParameters() {
+         // Reserved property names
+        // used by DataSourceRequest: sort, page, pageSize, group, filter
+        var searchIn = $("#ddlSearchIn").val();
+        if (searchIn == null) {
+            searchIn = "PDOCNO";
+            searchFor = '@Model.PegPODocNum';
+        } else {
+            var searchFor = $("#txtSearchFor").val();
+
+            if (!searchFor) {
+                if ('@Model.Act'.trim() == "") {
+                    searchFor = '@Model.PegPODocNum';
+                    searchIn = "PDOCNO";
+                }
+                else {
+                    searchFor = '@Model.Act';
+                    searchIn = "ACT";
+                }
+            }
+        }
+
+        var searchParams = {
+            FieldName: searchIn,
+            SearchValue: searchFor
+        };
+        return searchParams;
+    }
+
+    function R200SearchList() {
+        setDataSource($("#txtSearchFor").val(), $("#ddlSearchIn").val());
+    }
+
+
+    function setDataSource(searchFor, searchIn) {
+        var grdR200 = $('#R200Grid').data('kendoGrid');
+        grdR200.dataSource.read();
+        grdR200.dataSource.fetch(function () {
+            if (grdR200.dataSource.total() > 0) {
+                $('#R200Grid').data().kendoGrid.bind('dataBound', function (e) {
+                    this.element.find('tbody tr:first').addClass('k-state-selected')
+                    var grdR200 = $("#R200Grid").data("kendoGrid");
+                    var selectedRow = grdR200.dataItem(grdR200.select());
+                })
+                grdR200Change();
+            }
+        });
+    }
+
+    function GetFormattedAmount(amt) {
+        return amt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+    }
+
+    function GetFormattedDate(date){
+        return (date.getMonth() + 1) + "/" + (date.getDate()) + "/" + (date.getFullYear());
+    }
+
+    function GetSelectedRow() {
+        var grid = $('#R200Grid').data('kendoGrid');
+        var row = grid.select();
+
+        var dataItem = grid.dataItem(row);
+        return dataItem;
+    }
+
+</script>
+

@@ -1,0 +1,559 @@
+﻿@using VITAP.Data.Models
+@model ContactViewModel
+
+@{
+    ViewBag.Title = Model.PageTitle;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var headerAttr = new { @style = "font-weight:bold" };
+    var alignRight = new { @style = "text-align: right" };
+    var textAttr = new Dictionary<string, object> { { "style", "width:140px" } };
+    var textAttrShort = new Dictionary<string, object> { { "style", "width:80px" } };
+    var textAttrMedium = new Dictionary<string, object> { { "style", "width:200px" } };
+    var textAttrLong = new Dictionary<string, object> { { "style", "width:300px" } };
+    var textAttrExtraLong = new Dictionary<string, object> { { "style", "width:1000px" } };
+
+    var ddlContactType = new List<SelectListItem>()
+        {
+            new SelectListItem { Text = "PO Contact", Value = "PO Contact" },
+            new SelectListItem { Text = "RR Contact", Value = "RR Contact" },
+            //remove per RON
+            //new SelectListItem { Text = "Other", Value = "Other" },
+        };
+
+}
+
+@using (Html.BeginForm("Edit", "Contacts", FormMethod.Post, new { id = "form1" }))
+{
+    @Html.HiddenFor(x => x.PoDocNumber)
+
+    <div class="container-fluid">
+        <br />
+        <h1 style="font-weight: bold">@Model.PageTitle</h1>
+        <div class="validationErrors error">
+            <span>@Html.DisplayFor(x => x.ModelStatus)</span>
+        </div>
+        <div class="col-md-12">
+            <br />
+            <div class="row" style="float: left">
+                @{
+                    Html.Kendo().Grid<VITAP.Data.Models.ContactViewModel>()
+                        .Name("Grid")
+                        .DataSource(dataSource => dataSource
+                            .Ajax()
+                        .Read(r => r
+                            .Action("ContactRecords", "Contacts")
+                            .Data("GetSearchParameters")
+                        )
+                        )
+                        .Columns(columns =>
+                        {
+                            columns.Command(commands =>
+                            {
+                                commands.Custom("Edit").Click("edit");
+                            }).Title("ACTION").Width(100);
+
+                            columns.Bound(x => x.OrgCode).Width(80).HeaderHtmlAttributes(headerAttr).Title("ORG CODE");
+                            columns.Bound(x => x.BA).Width(40).HeaderHtmlAttributes(headerAttr).Title("BA");
+                            columns.Bound(x => x.Phone).Width(100).HeaderHtmlAttributes(headerAttr).Title("PHONE");
+                            columns.Bound(x => x.Fax).Width(100).HeaderHtmlAttributes(headerAttr).Title("FAX");
+                            columns.Bound(x => x.Name).Width(180).HeaderHtmlAttributes(headerAttr).Title("NAME");
+                            columns.Bound(x => x.Email).Width(180).HeaderHtmlAttributes(headerAttr).Title("EMAIL");
+                            columns.Bound(x => x.OfficeName).Width(180).HeaderHtmlAttributes(headerAttr).Title("OFFICE NAME");
+                            columns.Bound(x => x.CorrSym).Width(80).HeaderHtmlAttributes(headerAttr).Title("CORR SYM");
+                            columns.Bound(x => x.EmailOrFaxPreference).Width(80).HeaderHtmlAttributes(headerAttr).Title("EMAIL OR FAX PREFERENCE");
+                        })
+
+            .Pageable(pageable => pageable
+                .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+            )
+            .Events(x => x.DataBound("RowDataBound"))
+              .Resizable(r => r.Columns(true))
+                 .ToolBar(tools => tools.Excel())
+                .Excel(excel => excel
+                    .FileName("ContactEdit.xlsx")
+                    .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+                    .AllPages(true)
+                )
+            .Render();
+                }
+
+
+
+
+            </div>
+            <div class="row" style="float:left; width: 100%">
+                <br />
+                <div style="float:left; width: 45%">
+                    @Html.LabelFor(m => m.OrgCode, alignRight)
+                    @Html.TextBoxFor(m => m.OrgCode, textAttr) &nbsp;
+                    @Html.LabelFor(m => m.BA, alignRight)
+                    @Html.TextBoxFor(m => m.BA, textAttr) &nbsp;
+                    @Html.LabelFor(m => m.Region, alignRight)
+                    @Html.TextBoxFor(m => m.Region, textAttr)
+                    <br />
+                    @Html.LabelFor(m => m.CorrSym, alignRight)
+                    @Html.TextBoxFor(m => m.CorrSym, textAttr) &nbsp;
+                    @Html.LabelFor(m => m.Phone, alignRight)
+                    @Html.TextBoxFor(m => m.Phone, textAttr)
+                    <br />
+                    @Html.LabelFor(m => m.OfficeName, alignRight)
+                    @Html.TextBoxFor(m => m.OfficeName, textAttrExtraLong)
+                    <br />
+                    @Html.Label("Preference", alignRight) &nbsp;
+                    @*@Html.RadioButton("FaxRadio", new { @name = "EmailOrFaxPreference" })*@
+                    <input type="radio" name="group" id="FaxRadio" />
+                    @Html.Label("Fax")
+                    @*@Html.RadioButton("EmailRadio", new { @name = "EmailOrFaxPreference" })*@
+                    <input type="radio" name="group" id="EmailRadio" checked="true" />
+                    @Html.Label("Email") &nbsp; &nbsp;
+                    @Html.LabelFor(m => m.Fax)
+                    @Html.TextBoxFor(m => m.Fax, textAttr)
+                    <br />
+
+                    @Html.LabelFor(m => m.Name, alignRight)
+                    @Html.TextBoxFor(m => m.Name, textAttrExtraLong)
+                    <br />
+                    @Html.LabelFor(m => m.Email, alignRight)
+                    @Html.TextBoxFor(m => m.Email, textAttrExtraLong)
+                    <br />
+                </div>
+                <div style="float:left;">
+                    @Html.LabelFor(m => m.PoAct)
+                    @Html.TextBoxFor(m => m.PoAct)
+                    <br />
+                    @Html.LabelFor(m => m.PoNumber)
+                    @Html.TextBoxFor(m => m.PoNumber)
+                    <br />
+                    @Html.LabelFor(m => m.ContactType)
+                    @Html.DropDownListFor(m => m.ContactType, ddlContactType, textAttr)
+                    <br />
+                    @Html.LabelFor(m => m.CoPhone)
+                    @Html.TextBoxFor(m => m.CoPhone, textAttr)
+                    <br />
+                    @Html.LabelFor(m => m.CoName)
+                    @Html.TextBoxFor(m => m.CoName, textAttr)
+                    <br />
+                </div>
+            </div>
+            <br />
+            <br />
+            <div class="row" style="clear: left">
+                <div class="col-sm-12">
+                    <br />
+                    <button type="button" class="btn btn-info" disabled readonly id="new">New</button>
+                    <button type="button" class="btn btn-info" disabled readonly id="delete">Delete</button>
+                    <button type="button" class="btn btn-info" id="save" disabled readonly>Save</button>
+                    <button type="button" class="btn btn-info" disabled readonly id="cancel">Cancel</button>
+                    <button type="button" class="btn btn-info" id="accept">Accept</button>
+                    <button type="button" class="btn btn-info" id="skip">Skip</button>
+                    <button type="button" class="btn btn-info" disabled readonly id="viewPO" command="viewpo">View PO</button>
+                    <button type="button" class="btn btn-info" disabled readonly id="viewRR" command="viewrr">View RR</button>
+                    <button type="button" class="btn btn-info" disabled readonly id="viewInv" command="viewinvoice">View INV</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section ModalControls
+    {
+        @Html.Partial("ConfirmYesNoModal")
+    }
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            ConfigureKendoGridPaginationControlsFor508('Grid');
+            MakeKendoGridScrollable('Grid', '300px');
+
+            initNavOptions();
+
+            $("#save").click(function () {
+
+                var  result = validate();
+                if(result)
+                {
+                    $(".validationErrors").html(result);
+                    return false;
+                }
+
+                showConfirmYesNoModal(confirmSaveCallback, cancelSaveCallback, "Save", 'Are you sure?');
+            });
+
+            $("#delete").click(function () {
+
+                showConfirmYesNoModal(confirmDeleteCallback, cancelDeleteCallback, "Delete", 'Do you want to delete current record with OrgCode=' + $('#OrgCode').val() + ' and BA=' +  $('#BA').val() + "?" );
+            });
+
+            $("#skip").click(function () {
+                skip();
+            });
+
+            $("#accept").click(function () {
+                var  result = validate();
+                if(result)
+                {
+                    $(".validationErrors").html(result);
+                    return false;
+                }
+
+                showConfirmYesNoModal(confirmAcceptCallback, cancelAcceptCallback, "Accept", 'Are you sure?');
+            });
+
+            $("#new").click(function () {
+                resetForm();
+            });
+
+            $('#cancel').click(function () {
+                window.location = '@Url.Action("Index", "Home")';
+            });
+
+            $("#viewPO").click(function () {
+
+                var model = @Html.Raw(Json.Encode(@Model));
+                if(!model.PoId)
+                {
+                    showConfirmYesNoModal(confirmSaveCallback, cancelSaveCallback, "Error", 'No PO Information found');
+                    return;
+                }
+
+                $("#Command").val($(this).attr('command'));
+                $("form").submit();
+            });
+
+            $("#viewRR").click(function () {
+
+                var model = @Html.Raw(Json.Encode(@Model));
+                if(!model.RRId)
+                {
+                    showConfirmYesNoModal(confirmSaveCallback, cancelSaveCallback, "Error", 'No RR Information found');
+                    return;
+                }
+
+                $("#Command").val($(this).attr('command'));
+                $("form").submit();
+            });
+
+            $("#viewInv").click(function () {
+
+                var url = '@Url.Action("ViewInvoice", "TransHist", new { inv_Key_Id = Model.InvoiceId })';
+                window.location = url;
+            });
+
+            $('#OrgCode').change(function()
+            {
+                var orgCode = $('#OrgCode').val();
+                if(orgCode.length > 2)
+                {
+                    $('#Region').val(orgCode[1] +  orgCode[2]);
+                }
+            });
+
+            $("#ContactType").change(function()
+            {
+                setContactTypeSettings();
+            });
+        });
+
+        function validate()
+        {
+            $(".validationErrors").html('');
+
+            var message = "";
+
+            var orgCode = $('#OrgCode').val();
+            if(!orgCode)
+            {
+                message += "Org Code required<br />";
+            }
+
+            var ba = $('#BA').val();
+            if(!ba)
+            {
+                message += "Budget Activity required<br />";
+            }
+
+            var region = $('#Region').val();
+            if(!region)
+            {
+                message += "Region required<br />";
+            }
+
+            var contactName = $('#Name').val();
+            if(!contactName)
+            {
+                message += "Contact Name required<br />";
+            }
+
+            var val = $('#EmailRadio').prop("checked");
+
+            if (val) {
+                var email = $('#Email').val();
+                if(!email)
+                {
+                    message += "Email required<br />";
+                }
+            }
+                //fax selected
+            else {
+                var corrSSym = $('#CorrSym').val();
+                if(!corrSSym)
+                {
+                    message += "Correspondence Symbol required<br />";
+                }
+
+                var phone = $('#Phone').val();
+                if(!phone)
+                {
+                    message += "Phone required<br />";
+                }
+
+                var fax = $('#Fax').val();
+                if(!fax)
+                {
+                    message += "Fax required<br />";
+                }
+            }
+
+            return message;
+        }
+
+        function confirmGeneralCallback(data) {
+        }
+
+        function cancelGeneralCallback(data) {
+        }
+
+        function confirmSaveCallback(data) {
+
+            $('#Command').val('save');
+
+            $("form").submit();
+        }
+
+        function cancelSaveCallback(data) {
+        }
+
+        function confirmAcceptCallback(data) {
+
+            $('#Command').val('accept');
+
+            $("form").submit();
+        }
+
+        function cancelAcceptCallback(data) {
+        }
+
+        function confirmDeleteCallback(data) {
+
+            $('#Command').val('delete');
+
+            $("form").submit();
+        }
+
+        function cancelDeleteCallback(data) {
+        }
+       
+        function skip() {
+            var Pdocno = "@Model.PoDocNumber";
+            var exId = "@Model.ExceptionId";
+            var url = '@Url.Action("Skip", "Exceptions")';
+            url = url + "?exceptionId=" + exId.encodeUriComponent() + "&Pdocno=" + Pdocno.encodeUriComponent() + "&";
+            location = url;
+        }
+
+        function setContactTypeSettings()
+        {
+            $('#CoName').removeAttr('disabled','').removeAttr('readonly', '');
+            $('#CoPhone').removeAttr('disabled','').removeAttr('readonly', '');
+            $('#PoNumber').removeAttr('disabled','').removeAttr('readonly', '');
+            $('#PoAct').removeAttr('disabled','').removeAttr('readonly', '');
+
+            if($("#ContactType").val() == "PO Contact" || $("#ContactType").val()== "RR Contact")
+            {
+                $('#CoName').attr('disabled','').attr('readonly', '');
+                $('#CoPhone').attr('disabled','').attr('readonly', '');
+                $('#PoNumber').attr('disabled','').attr('readonly', '');
+                $('#PoAct').attr('disabled','').attr('readonly', '');
+            }
+            else if($("#ContactType").val() == "Other")
+            {
+                $('#PoNumber').attr('disabled','').attr('readonly', '');
+                $('#PoAct').attr('disabled','').attr('readonly', '');
+            }
+        }
+
+        function initNavOptions() {
+            var model = @Html.Raw(Json.Encode(@Model));
+
+            setContactTypeSettings();
+
+            if(model.ViewPOEnabled && model.PoId)
+            {
+                $('#viewPO').removeAttr('disabled').removeAttr('readonly');
+            }
+            else{
+                $('#viewPO').attr('disabled','').attr('readonly', '');
+            }
+
+            if(model.ViewRREnabled && model.RRId)
+            {
+                $('#viewRR').removeAttr('disabled').removeAttr('readonly');
+            }
+            else{
+                $('#viewRR').attr('disabled','').attr('readonly', '');
+            }
+
+            if(model.ViewInvEnabled && model.InvoiceId)
+            {
+                $('#viewInv').removeAttr('disabled').removeAttr('readonly');
+            }
+            else{
+                $('#viewInv').attr('disabled','').attr('readonly', '');
+            }
+
+            if(model.SaveEnabled)
+            {
+                $('#save').removeAttr('disabled').removeAttr('readonly');
+            }
+            else{
+                $('#save').attr('disabled','').attr('readonly', '');
+            }
+
+            if(model.DeleteEnabled)
+            {
+                $('#delete').removeAttr('disabled').removeAttr('readonly');
+            }
+            else{
+                $('#delete').attr('disabled','').attr('readonly', '');
+            }
+
+            if(model.NewEnabled)
+            {
+                $('#new').removeAttr('disabled').removeAttr('readonly');
+            }
+            else{
+                $('#new').attr('disabled','').attr('readonly', '');
+            }
+
+            if(model.CancelEnabled)
+            {
+                $('#cancel').removeAttr('disabled').removeAttr('readonly');
+            }
+            else{
+                $('#cancel').attr('disabled','').attr('readonly', '');
+            }
+
+            if(model.SkipVisible)
+            {
+                $('#skip').show();
+            }
+            else{
+                $('#skip').hide();
+            }
+
+            if(model.AcceptVisible)
+            {
+                $('#accept').show();
+            }
+            else{
+                $('#accept').hide();
+            }
+        }
+
+        function resetForm() {
+            $("#ContactId").val('');
+            $('#OrgCode').val('');
+            $('#BA').val('');
+            $('#Region').val('');
+            $('#CorrSym').val('');
+            $('#Phone').val('');
+            $('#OfficeName').val('');
+            $('#Fax').val('');
+            $('#Name').val('');
+            $('#Email').val('');
+
+            $("#EmailRadio").prop('checked', true);
+            $('input[type=radio][name=contacts]').prop('checked',false);
+        }
+
+        function edit(e) {
+
+            var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+            $("#ContactId").val(dataItem.ContactId);
+            $('#OrgCode').val(dataItem.OrgCode);
+            $('#BA').val(dataItem.BA);
+            $('#Region').val(dataItem.Region);
+            $('#CorrSym').val(dataItem.CorrSym);
+            $('#Phone').val(dataItem.Phone);
+            $('#OfficeName').val(dataItem.OfficeName);
+            $('#Fax').val(dataItem.Fax);
+            $('#Name').val(dataItem.Name);
+            $('#Email').val(dataItem.Email);
+
+            var val = dataItem.EmailOrFaxPreference;
+            if (val == "EMAIL") {
+                $("#EmailRadio").prop('checked', true);
+            }
+            else {
+                $("#FaxRadio").prop('checked', true);
+            }
+
+            return false;
+
+
+        }
+
+
+        function GetSearchParameters() {
+
+            // Reserved property names
+            // used by DataSourceRequest: sort, page, pageSize, group, filter
+            return {
+                ErrorCode: $("#ErrorCode").val(),
+                ExceptionId: $("#ExceptionId").val()
+            };
+        }
+
+        function btnSearchOnClick() {
+
+            $('#Grid').data("kendoGrid").dataSource.read();
+        }
+
+        function RowDataBound()
+        {
+            if ($("#Command").val() == "delete")
+            {
+                //Select first row in the grid if we just deleted something
+                $(".k-grid a:contains('Edit')").first().click();
+
+                //Only first first row selection code on initial load
+                $("#Command").val('');
+            }
+        }
+
+    </script>
+
+    @Html.HiddenFor(x => x.ContactId)
+                    @Html.HiddenFor(x => x.Command)
+                    @Html.HiddenFor(x => x.OpenOption)
+                    @Html.HiddenFor(x => x.PoAct)
+                    @Html.HiddenFor(x => x.ExceptionId)
+                    @Html.HiddenFor(x => x.ErrorCode)
+                    @Html.HiddenFor(x => x.AssignedService)
+
+                    @Html.HiddenFor(x => x.ViewPOEnabled)
+                    @Html.HiddenFor(x => x.ViewRREnabled)
+                    @Html.HiddenFor(x => x.ViewInvEnabled)
+                    @Html.HiddenFor(x => x.SaveEnabled)
+                    @Html.HiddenFor(x => x.DeleteEnabled)
+                    @Html.HiddenFor(x => x.NewEnabled)
+                    @Html.HiddenFor(x => x.CancelEnabled)
+                    @Html.HiddenFor(x => x.SkipVisible)
+                    @Html.HiddenFor(x => x.AcceptVisible)
+                    @Html.HiddenFor(x => x.BA)
+                    @Html.HiddenFor(x => x.RRId)
+                    @Html.HiddenFor(x => x.PoId)
+                    @Html.HiddenFor(x => x.ViewInvEnabled)
+                    }

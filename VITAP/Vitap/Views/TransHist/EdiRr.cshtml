@@ -1,0 +1,185 @@
+﻿@using VITAP.ViewModels.TransHist;
+@model ReceivingReportEdiModel
+
+@{
+    ViewBag.Title = "View EDI RR";
+    var headerAttr = new { @style = "font-weight:bold" };
+}
+
+<br />
+<h2>View EDI RR</h2>
+<br />
+
+
+<div style="width: 100%; min-height: 60px; overflow: auto;">
+    <table>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Header.PegDocNoRR)
+            </th>
+            <td>
+                @Html.DisplayFor(model => model.Header.PegDocNoRR)
+            </td>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Header.DeliveryOrderNumber)
+            </th>
+            <td>
+                @Html.DisplayFor(model => model.Header.DeliveryOrderNumber)
+            </td>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Header.Act)
+            </th>
+            <td>
+                @Html.DisplayFor(model => model.Header.Act)
+            </td>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Header.VendorName)
+            </th>
+            <td colspan="3">
+                @Html.DisplayFor(model => model.Header.VendorName)
+            </td>
+        </tr>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Header.ContractNumber)
+            </th>
+            <td>
+                @Html.DisplayFor(model => model.Header.ContractNumber)
+            </td>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Header.MaxPaymentAmount)
+            </th>
+            <td>
+                @Html.DisplayFor(model => model.Header.MaxPaymentAmount)
+            </td>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Header.InvoiceNumber)
+            </th>
+            <td>
+                @Html.DisplayFor(model => model.Header.InvoiceNumber)
+            </td>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Header.DeliveryType)
+            </th>
+            <td>
+                @Html.DisplayFor(model => model.Header.DeliveryType)
+            </td>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Header.OfficeSym)
+            </th>
+            <td>
+                @Html.DisplayFor(model => model.Header.OfficeSym)
+            </td>
+        </tr>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Header.ReceivedDate)
+            </th>
+            <td>
+                @Html.DisplayFor(model => model.Header.ReceivedDate)
+            </td>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Header.Deduction)
+            </th>
+            <td>
+                @Html.DisplayFor(model => model.Header.Deduction)
+            </td>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Header.InvoiceDate)
+            </th>
+            <td>
+                @Html.DisplayFor(model => model.Header.InvoiceDate)
+            </td>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Header.ReceiverName)
+            </th>
+            <td colspan="3">
+                @Html.DisplayFor(model => model.Header.ReceiverName)
+            </td>
+        </tr>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Header.AcceptanceDate)
+            </th>
+            <td>
+                @Html.DisplayFor(model => model.Header.AcceptanceDate)
+            </td>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Header.MaxAmountApproved)
+            </th>
+            <td>
+                @Html.DisplayFor(model => model.Header.MaxAmountApproved)
+            </td>
+
+            <th>
+            </th>
+            <td>
+            </td>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Header.ReceiverPhone)
+            </th>
+            <td colspan="3">
+                @Html.DisplayFor(model => model.Header.ReceiverPhone)
+            </td>
+        </tr>
+    </table>
+</div>
+<br />
+<div>
+    @{
+        Html.Kendo().Grid(Model.Details)
+            .Name("gridDetails")
+            .DataSource(dataSource => dataSource.Server()
+                .Model(model => model.Id(o => o.PegDocNoRR))
+                .PageSize(50))
+            .Columns(columns =>
+            {
+                columns.Bound(x => x.MDL).Width(80).HeaderHtmlAttributes(headerAttr);
+                columns.Bound(x => x.OrgCode).Width(110).HeaderHtmlAttributes(headerAttr);
+                columns.Bound(x => x.BA).Width(80).HeaderHtmlAttributes(headerAttr);
+                columns.Bound(x => x.FC).Width(80).HeaderHtmlAttributes(headerAttr);
+                columns.Bound(x => x.CE).Width(80).HeaderHtmlAttributes(headerAttr);
+                columns.Bound(x => x.StockNumber).Width(120).HeaderHtmlAttributes(headerAttr);
+                columns.Bound(x => x.Quantity).Width(110).HeaderHtmlAttributes(headerAttr);
+                columns.Bound(x => x.TotalMdlAmount).Width(180).HeaderHtmlAttributes(headerAttr);
+                columns.Bound(x => x.DeductAmount).Width(160).HeaderHtmlAttributes(headerAttr);
+                columns.Bound(x => x.NetMdlAmount).Width(160).HeaderHtmlAttributes(headerAttr);
+            })
+            .TableHtmlAttributes(new { style = "width: 800px" })
+            .Selectable()
+            .Navigatable()
+            .Scrollable(s => s.Height(100))
+            .Sortable()
+            .Filterable()
+            .Pageable(pageable => pageable
+                .Input(true)
+                .Numeric(false)
+                .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+            )
+            //.Events(events => events.Change("onRowChange"))
+            .Render();
+    }
+</div>
+<hr />
+<table>
+    <tr>
+        <th>@Html.DisplayName("Status")</th>
+        <th>Description</th>        
+    </tr>
+    <tr>
+        <td>@Html.DisplayFor(model => model.Header.Status)</td>
+        <td>@Html.DisplayFor(model => model.Header.Description)</td>
+    </tr>
+</table>

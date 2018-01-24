@@ -1,0 +1,436 @@
+﻿@model VITAP.Data.Models.Exceptions.ExceptionListModel
+
+@{
+    ViewBag.Title = "Exceptions";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+.k-grid table
+{
+    table-layout:fixed; /*Not sure I want to apply this to whole site*/
+}
+</style>
+
+
+<div style="margin-bottom:25px;">
+    @{
+
+        @Html.HiddenFor(x => Model.SearchCriteria.SearchSource)
+        @Html.HiddenFor(x => Model.SearchCriteria.ExceptionType)
+
+        foreach (var exceptionType in Model.SearchCriteria.ExceptionTypes)
+        {
+            if ((exceptionType.Id == "Vendor" || exceptionType.Id == "Keying"))
+            {
+                <button class="btn-exception-type" type=button data-exception-type="@exceptionType.Id">@exceptionType.Text</button>
+            }
+            else if ((!Model.RoleModel.HasApacctRole && !Model.RoleModel.HasExceptionsRole) && (exceptionType.Id != "Vendor" || exceptionType.Id != "Keying"))
+            {
+                <button class="btn-exception-type" type=button data-exception-type="@exceptionType.Id" disabled="disabled">@exceptionType.Text</button>
+            }
+            else
+            {
+                <button class="btn-exception-type" type=button data-exception-type="@exceptionType.Id">@exceptionType.Text</button>
+            }
+        }
+    }
+</div>
+
+
+<div>
+    @{
+        Html.Kendo().Grid<VITAP.Data.Models.VitapException>()
+            .Name("Grid")
+            .AutoBind(false)
+            .DataSource(dataSource => dataSource
+                .Ajax()
+                .Sort(sort => sort.Add("Err_code").Ascending())
+                .Model(model => model.Id(o => o.EX_ID))
+                .Read(r => r
+                    .Action("Index", "Exceptions")
+                    .Data("GetSearchParameters")
+                )
+            )
+            .Columns(columns =>
+            {
+                columns
+                    .Bound(x => x.Err_code)
+                    .ClientTemplate(
+                            @"
+                            #if(exceptionEnabled(Err_code)){#
+
+                            <a href='" + Url.Action("DisplayException", "Exceptions") + @"?exCode=#=Err_code#&exId=#=EX_ID.encodeUriComponent()#'>Open</a>
+                            #}else {#
+                                <p></p>
+                            #}#
+                            "
+                            )
+                        .Title("Action").Width(75);
+                columns.Bound(x => x.Act).Title("ACT").Width(100);
+                columns.Bound(x => x.PdocNo).Title("PDOCNO").Width(130);
+                columns.Bound(x => x.Err_code).Title("Code").Width(50);
+                columns.Bound(x => x.Ex_Date).Title("Date").Width(100).Format("{0:MM/dd/yyyy}").Width(90);
+                columns.Bound(x => x.Err_response).Title("Response").Width(100);
+                columns.Bound(x => x.Prepcode).Title("PC").Width(50);
+                columns.Bound(x => x.Out).Title("Out").Width(50);
+                columns.Bound(x => x.Ex_Fund).Title("Fund").Width(50);
+                columns.Bound(x => x.Orgcode).Title("ORGCODE").Width(100);
+                columns.Bound(x => x.Age).Title("Age").Width(50);
+                columns.Bound(x => x.Ex_memo).Title("Memo").Width(400);
+                columns.Bound(x => x.Vendname).Title("Vendor").Width(300);
+                columns.Bound(x => x.TIN).Title("TIN").Width(100);
+                columns.Bound(x => x.Region).Title("Region").Width(75);
+                columns.Bound(x => x.EX_ID).Title("EX_ID").Width(150);
+                columns.Bound(x => x.Po_id).Title("PO_ID").Width(150);
+                columns.Bound(x => x.Rr_id).Title("RR_ID").Width(100);
+                columns.Bound(x => x.Inv_key_id).Title("INV_KEY_ID").Width(150);
+                columns.Bound(x => x.Ae_id).Title("AE_ID").Width(100);
+                columns.Bound(x => x.Pegsystem).Title("System").Width(75);
+                columns.Bound(x => x.Ba).Title("BA").Width(50);
+            })
+            .Pageable(pageable => pageable
+            .PageSizes(new object[] { 10, 20, 50, 100, 200, 500, 1000 })
+            )
+            .ToolBar(tools => tools.Excel())
+            .Excel(excel => excel
+                .FileName("Export.xlsx")
+                .ProxyURL(Url.Action("Excel_Export_Save", "VitapBase", "Grid"))
+                .AllPages(true)
+            )
+            .NoRecords("No Results Found")
+            .Render();
+    }
+</div>
+
+
+
+
+    <div class="container-fluid">
+        <div class="row panel-body">
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div id="ErrorMsg" style="color:red; padding-bottom: 5px;" hidden></div>
+                        <table style="font-size:16px; border-width:0">
+                            <tr>
+                                <td style = "text-align:left" colspan="4">
+                                    @Html.Label("Search all Exceptions for: ")                                    
+                                </td>
+                                <td style = "text-align:left" colspan="1">
+                                    @Html.TextBoxFor(x => Model.SearchCriteria.SearchAll, new { @class = "", id = "SearchAll" })<br />
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td style = "text-align:left" colspan="4">
+                                    @Html.Label("Search By: ")
+                                </td>
+                                <td style = "text-align:left" colspan="1">
+                                    @Html.DropDownListFor(
+                                        x => Model.SearchCriteria.SearchBy,
+                                        new SelectList(Model.SearchCriteria.SearchByVals, "Id", "Text", "Act"),
+                                        new { @class = "", id = "SearchBy" }
+                                    )
+                                </td>
+                                <td>
+                                    <button class="button[type=submit]" onclick="btnSearchOnClick();">Search</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    
+                                </td>
+                                <td colspan="2">
+                                    (Please Click on Search Button after your selections)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="5">
+                                    (Please Click on Search Button after your selections)
+                                </td>
+                            </tr>
+                        </table>
+
+
+                        <div class="pull-right">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 pull-left text-">
+                        <text><strong>Additional Search Criteria</strong></text>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-10">
+                        <table style="font-size:16px; border-width:0;">
+                            <tr>
+                                <td style="text-align:right">
+                                    @Html.Label("ORGCODE: ")
+                                </td>
+                                <td style="text-align:left">
+                                    @Html.TextBoxFor(x => Model.SearchCriteria.OrgCode, new { @class = "pull-left", id = "OrgCode" })
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-md-10">
+                        <div class="row">
+                            <div class="col-md-2">
+                                @Html.Label("Role: ")
+                            </div>
+                            <div class="col-md-10">
+                                <div>
+                                    @foreach (var Role in Model.SearchCriteria.Roles)
+                                    {
+                                        if ((Role.Id == "PBS" && Model.RoleModel.ASSIGN_SRV == "PBS") || (Role.Id == "FTS" && Model.RoleModel.ASSIGN_SRV == "FTS"))
+                                        {
+                                            @Html.Label(Role.Text, new { @class = "radio-inline" })<br />
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="col-md-2">
+                </div>
+                <div class="col-md-2">
+                    <div class="well well-" style="width: 120px;">
+                        @Html.Label("PegSystem")
+                        <br />
+                        @foreach (var RadioVal in Model.SearchCriteria.RadioVals)
+                        {
+                            if (RadioVal.Text == "All")
+                            {
+                                @Html.RadioButtonFor(x => Model.SearchCriteria.Radio2, RadioVal.Text, new { @class = "radio-inline", id = "Radio2", Checked = "checked" })
+                                @Html.Label(RadioVal.Text, new { @class = "radio-inline" })<br />
+                            }
+                            else if (Model.RoleModel.HasTopsRole && RadioVal.Text == "TOPS" || Model.RoleModel.HasVcRole && RadioVal.Text == "VCPO")
+                            {
+                                @Html.RadioButtonFor(x => Model.SearchCriteria.Radio2, RadioVal.Text, new { @class = "radio-inline", id = "Radio2" })
+                                @Html.Label(RadioVal.Text, new { @class = "radio-inline" })<br />
+                            }
+                            else if ((RadioVal.Text == "TOPS" || RadioVal.Text == "VCPO"))
+                            {
+                                @Html.RadioButtonFor(x => Model.SearchCriteria.Radio2, RadioVal.Text, new { @class = "radio-inline", id = "Radio2", disabled = "disabled" })
+                                @Html.Label(RadioVal.Text, new { @class = "radio-inline" })<br />
+                            }
+                            else if ((RadioVal.Text == "FTS" && Model.RoleModel.ASSIGN_SRV != "FTS") || (RadioVal.Text == "PBS" && Model.RoleModel.ASSIGN_SRV != "PBS"))
+                            {
+                                @Html.RadioButtonFor(x => Model.SearchCriteria.Radio2, RadioVal.Text, new { @class = "radio-inline", id = "Radio2", disabled = "disabled" })
+                                @Html.Label(RadioVal.Text, new { @class = "radio-inline" })<br />
+                            }
+                            else
+                            {
+                                @Html.RadioButtonFor(x => Model.SearchCriteria.Radio2, RadioVal.Text, new { @class = "radio-inline", id = "Radio2" })
+                                @Html.Label(RadioVal.Text,new { @class = "radio-inline" })<br />
+                            }
+                        }
+                    </div>
+                </div>
+                <div class="col-md-2">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <table style="font-size:16px; border-width:0">
+                        <tr>
+                            <td></td>
+                            <td style="text-align:left">
+                                @Html.CheckBoxFor(x => Model.SearchCriteria.ShowSkip, new { id = "ShowSkip" }) Show Skip Exceptions
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:right">
+                                @Html.Label("Sort By: ")
+                            </td>
+                            <td style="text-align:left">
+                                @Html.DropDownListFor(
+                                    x => Model.SearchCriteria.SortBy,
+                                    new SelectList(Model.SearchCriteria.SortByVals, "Id", "Text", "Code"),
+                                    new { @class = "pull-left", id = "SortBy" }
+                                )
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:right">
+                                @Html.Label("2nd Sort By: ")
+                            </td>
+                            <td style="text-align:left">
+                                @Html.DropDownListFor(
+                                    x => Model.SearchCriteria.SecSortBy,
+                                    new SelectList(Model.SearchCriteria.SecSortByVals, "Id", "Text", "Code"),
+                                    new { @class = "pull-left", id = "SecSortBy" }
+                                )
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:right">
+                                @Html.Label("Show DOC Type: ")
+                            </td>
+                            <td style="text-align:left">
+                                @Html.DropDownListFor(
+                                    x => Model.SearchCriteria.ShowDocType,
+                                    new SelectList(Model.SearchCriteria.DocTypeVals, "Id", "Text", "All"),
+                                    new { @class = "pull-left", id = "ShowDocType" }
+                                )
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:right">
+                                <button class="form-button" type="button" id="CodesButton">Codes</button>
+                            </td>
+                            <td style="text-align:left">
+                                <button class="form-button" type="button" id="SaveToExcel">Save to Excel</button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section ModalControls
+    {
+        @Html.Partial("Other/CodeList")
+    }
+
+    @section Scripts
+    {
+        <script>
+            $(document).ready(function () {
+                $('.btn-exception-type').click(function () {
+                    var btn = $(this);
+                    var selectedExceptionType = btn.data("exception-type");
+
+                    $("#SearchCriteria_ExceptionType").val(selectedExceptionType);
+
+                    $('.btn-exception-type').removeClass("chosen");
+                    $(this).addClass('chosen');
+
+                    $("#SearchCriteria_SearchSource").val("topbutton");
+
+                    RunSearch();
+                });
+
+                // Search if returning from another screen and the grid needs to be restored.
+                var srch = $('#SearchAll').val();
+                if (srch != null && typeof(srch) != 'undefined' && srch.trim().length > 0)
+                    RunSearch();
+            });
+
+            function GetSearchParameters() {
+                // Reserved property names
+                // used by DataSourceRequest: sort, page, pageSize, group, filter
+                return {
+                    SearchAll: $("#SearchAll").val().toUpperCase(),
+                    SearchBy: $("#SearchBy").val(),
+                    OrgCode: $("#OrgCode").val(),
+                    Role: $("#Role").val(),
+                    Radio2: $("input[name='SearchCriteria.Radio2']:checked"). val(),
+                    ShowSkip: $("#ShowSkip")[0].checked,
+                    SortBy: $("#SortBy").val(),
+                    SecSortBy: $("#SecSortBy").val(),
+                    ShowDocType: $("#ShowDocType").val(),
+                    ExceptionType: $("#SearchCriteria_ExceptionType").val(),
+                    SearchSource: $("#SearchCriteria_SearchSource").val()
+                };
+            }
+
+            function btnSearchOnClick() {
+                //var exId = $('#SearchAll').val().trim().toUpperCase();
+                $("#SearchCriteria_SearchSource").val("searchbutton");
+
+                //Remove top button selection
+                $('.btn-exception-type').removeClass("chosen");
+                $("#SearchCriteria_ExceptionType").val("");
+
+                //if (exId == "") {
+                //    $('#ErrorMsg')[0].innerHTML = 'Please enter a search value.';
+                //    $('#ErrorMsg').show();
+                //    return;
+                //}
+
+                RunSearch();
+            }
+
+            function RunSearch() {
+
+                var permission = true;
+                var hasVendCoder = @Json.Encode(Model.RoleModel.HasVendCoderRole),
+                    hasExceptions = @Json.Encode(Model.RoleModel.HasExceptionsRole),
+                    hasApacct = @Json.Encode(Model.RoleModel.HasApacctRole),
+                    exId = $('#SearchAll').val().trim().toUpperCase();
+
+                if ($("#SearchBy").val() == "err_code") {
+                    // Only Exceptions and Apacct roles can search V295.
+                    if (exId == "V295") {
+                        if ((!hasExceptions && !hasApacct)) permission = false;
+                    }
+                        // Only VendCoder and Exceptions can search V exceptions.
+                    else if (exId.substring(0,1) == "V") {
+                        if ((!hasVendCoder && !hasExceptions)) permission = false;
+                    }
+                        // Only Exceptions and Apacct can do non-vendor searches.
+                    else if (!hasExceptions && !hasApacct) permission = false;
+                }
+
+                if (!permission) {
+                    $('#ErrorMsg')[0].innerHTML = 'You do not have permission to search for this code.';
+                    $('#ErrorMsg').show();
+                }
+                else {
+                    if ($('#ErrorMsg').is(':visible')) {
+                        $('#ErrorMsg')[0].innerHTML = '';
+                        $('#ErrorMsg').hide();
+                    }
+                    $('#Grid').data("kendoGrid").dataSource.read();
+                }
+            }
+
+            $("#SaveToExcel").click(function (e) {
+                var grid = $("#Grid").data("kendoGrid");
+                grid.saveAsExcel();
+            });
+
+            $("#CodesButton").click(function (e) {
+                showWindowCodesList();
+            });
+
+            function exceptionEnabled(code) {
+                var hasAcct = @Json.Encode(Model.RoleModel.HasApacctRole),
+                    hasVendCoder = @Json.Encode(Model.RoleModel.HasVendCoderRole),
+                    hasVerifyDup = @Json.Encode(Model.RoleModel.HasVerifyDupRole),
+                    enabled = true;
+
+                if ((code == "P060" || code == "P061" || code == "P005" || code == "P006") && !hasAcct) {
+                    enabled = false;
+                }
+                else if ((code == "V216" || code == "V299" || code == "V300" || code == "V215") && !hasVendCoder) {
+                    enabled = false;
+                }
+                else if ((code == "U049") && !hasVerifyDup) {
+                    enabled = false;
+                }
+                else {
+                    enabled = true;
+                }
+
+                return enabled;
+            }
+
+            $(document).ready(function () {
+                ConfigureKendoGridPaginationControlsFor508("Grid");
+                MakeKendoGridScrollable("Grid", "300px");
+            });
+        </script>
+
+    }

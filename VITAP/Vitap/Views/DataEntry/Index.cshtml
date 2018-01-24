@@ -1,0 +1,429 @@
+﻿@using VITAP.Data.Models.DataEntry
+@using VITAP.Library.Strings
+@model AddInvoiceViewModel
+
+@{
+    ViewBag.Title = "Data Entry";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    input, select, textarea {
+        max-width: 100%;
+        color: black;
+    }
+
+    .dark-text {
+        color: black;
+    }
+</style>
+
+@using (Html.BeginForm("Index", "DataEntry", FormMethod.Post))
+{
+<div class="container-fluid">
+    <div class="row panel-body">
+        <div class="col-md-12">
+            @{if (ViewBag.InvoiceType != null)
+                {
+                    if (ViewBag.InvoiceType.Equals(DataEntry.TypeTops))
+                    {
+                    <label style="font: bold; font-size: large">
+                        Pegasys TOPS Invoice Data Entry:
+                    </label>
+                    }
+                    else if (ViewBag.InvoiceType.Equals(DataEntry.TypeNonTops))
+                    {
+                    <label style="font: bold; font-size: large">
+                        Pegasys Non-TOPS Invoice Data Entry:
+                    </label>
+                    }
+                    else if (ViewBag.InvoiceType.Equals(DataEntry.TypeConst))
+                    {
+                    <label style="font: bold; font-size: large">
+                        Pegasys Construction Invoice Data Entry:
+                    </label>
+                    }
+                    else if (ViewBag.InvoiceType.Equals(DataEntry.TypeNonConst))
+                    {
+                    <label style="font: bold; font-size: large">
+                        Pegasys Non-Construction Invoice Data Entry:
+                    </label>
+                    }
+                }
+            }
+			<label>
+				@ViewBag.Message
+			</label>
+            <p><label class="error">@ViewBag.ErrorMessage</label></p>
+		</div>
+	</div>
+    <div class="row panel-body">
+        <div class="col-md-8">
+@{ if (Model.IMAGEID == null)
+    {
+    <label>&nbsp;</label>
+    }
+    else
+    {
+    <div class="tiff-container">
+        <iframe src="@Url.Action("TiffViewResult", "Exceptions", new { Type = "inv", TypeId = Model.INV_KEY_ID, FilePath = Model.IMAGEPATH })"></iframe>
+    </div>
+    }
+}
+        </div>
+        <div class="col-md-4">
+            <div class="row">
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="control-label">Invoice Number</label>
+                        @Html.TextBoxFor(m => m.INVOICE, new { @class = "form-control dark-text", @disabled = "disabled" })
+                    </div>
+                    <div class="col-md-6">
+                        <label class="control-label">Invoice Date</label>
+                        @Html.TextBoxFor(m => m.INVDATE, "{0:MM/dd/yyyy}", new { @class = "form-control dark-text", @disabled = "disabled" })
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="control-label">ACT</label>
+                        @Html.TextBoxFor(m => m.ACT, new { @class = "form-control dark-text", @disabled = "disabled" })
+                    </div>
+                    <div class="col-md-6">
+                        <label class="control-label">Pegasys PO Doc Num</label>
+                        @Html.TextBoxFor(m => m.PDOCNOPO, new { @class = "form-control dark-text", @disabled = "disabled" })
+                    </div>
+                </div>
+            </div>
+            <!-- All but TOPS invoices show PO Number and Contract -->
+            @if (ViewBag.InvoiceType != null && (ViewBag.InvoiceType.Equals(DataEntry.TypeNonTops) || ViewBag.InvoiceType.Equals(DataEntry.TypeConst) || ViewBag.InvoiceType.Equals(DataEntry.TypeNonConst)))
+            {
+            <div class="row">
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="control-label">PO Number</label>
+                        @Html.TextBoxFor(m => m.PONUMBER, new { @class = "form-control dark-text", @disabled = "disabled" })
+                    </div>
+                    <div class="col-md-6">
+                        <label class="control-label">Contract Number</label>
+                        @Html.TextBoxFor(m => m.CONTRACT, new { @class = "form-control dark-text", @disabled = "disabled" })
+                    </div>
+                </div>
+            </div>
+            }
+            <div class="row">
+                <div class="col-md-12">
+                    <label class="control-label">Account Number (Telephone Bills)</label>
+                    @Html.TextBoxFor(m => m.ACCOUNTNO, new { @class = "form-control dark-text", @disabled = "disabled" })
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <label class="control-label">Vendor Name and Address</label>
+                    @Html.TextBoxFor(m => m.VENDNAME, new { @class = "form-control dark-text", @disabled = "disabled" })
+                    @Html.TextAreaFor(m => m.VENDADDRESS, new { rows = 5, cols = 100, @disabled = "disabled" })
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <div class="col-md-4">
+                        <label class="control-label">Disc % (1% is 1.00)</label>
+                        @Html.TextBoxFor(m => m.DISCPERCENT, "{0:0.00}", new { @class = "form-control dark-text", @disabled = "disabled" })
+                    </div>
+                    <div class="col-md-4">
+                        <label class="control-label">Discount Days</label>
+                        @Html.TextBoxFor(m => m.DISCDAYS, new { @class = "form-control dark-text", @disabled = "disabled" })
+                    </div>
+                    <div class="col-md-4">
+                        <label class="control-label">Net Days</label>
+                        @Html.TextBoxFor(m => m.NETDAYS, new { @class = "form-control dark-text", @disabled = "disabled" })
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+            <!-- Only Construction invoices show Stamp Date -->
+                @if (ViewBag.InvoiceType != null && ViewBag.InvoiceType.Equals(DataEntry.TypeConst))
+                {
+                <div class="col-md-12">
+                    <label class="control-label">Fin Stamp Date</label>
+                    @Html.TextBoxFor(m => m.STAMPDATE, "{0:MM/dd/yyyy}", new { @class = "form-control dark-text", @disabled = "disabled" })
+                </div>
+                }
+                <div class="col-md-12">
+                    <label class="control-label">FO Stamp Date</label>
+                    @Html.TextBoxFor(m => m.INVRECDATE, "{0:MM/dd/yyyy}", new { @class = "form-control dark-text", @disabled = "disabled" })
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <div class="col-md-6">
+                        @Html.CheckBox("noVendorMatch", false)
+                        <label for="noVendorMatch" class="control-label">No Vendor Match</label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.CheckBox("yesVendorMatch", false)
+                        <label for="yesVendorMatch" class="control-label">Vendor Matches</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="control-label">Tax Amount</label>
+                        @Html.TextBoxFor(m => m.TAXAMOUNT, "{0:c}", new { @class = "form-control dark-text", @disabled = "disabled" })
+                    </div>
+                    <div class="col-md-6">
+                    @if (ViewBag.InvoiceType != null && ViewBag.InvoiceType.Equals(DataEntry.TypeTops))
+                    {
+                        <label class="control-label">Invoice Due Date</label>
+                        @(Html.Kendo().DatePickerFor(m => m.INVDUEDATE)
+                        .HtmlAttributes(new { @class = "form-control" })
+                        .Format("MM/dd/yyyy").Enable(Model.IMAGEID != null)
+                        .Min(DateTime.Now.AddYears(-2)).Max(DateTime.Now.AddYears(2))
+                        )
+                    }
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <div class="col-md-6">
+                    @if (ViewBag.InvoiceType != null && (ViewBag.InvoiceType.Equals(DataEntry.TypeTops) || ViewBag.InvoiceType.Equals(DataEntry.TypeNonConst)))
+                    {
+                        <label class="control-label">Late Charges - Tariff</label>
+                        @Html.TextBoxFor(m => m.TARIFF, "{0:c}", new { @class = "form-control dark-text", @disabled = "disabled" })
+                    }
+                    </div>
+                    <div class="col-md-6">
+                    @if (ViewBag.InvoiceType != null && ViewBag.InvoiceType.Equals(DataEntry.TypeTops))
+                    {
+                        <label class="control-label">Service Period Start Date</label>
+                        @(Html.Kendo().DatePickerFor(m => m.SVC_PERD_STRT)
+                        .HtmlAttributes(new { @class = "form-control" })
+                        .Format("MM/dd/yyyy").Enable(Model.IMAGEID != null)
+                        .Min(DateTime.Now.AddYears(-2)).Max(DateTime.Now.AddYears(2))
+                        )
+                    }
+                    </div>
+                </div>
+            </div>
+            <!-- Non-TOPS and Construction invoices show Shipping Amount and Miscellaneous Charges -->
+            @if (ViewBag.InvoiceType != null && (ViewBag.InvoiceType.Equals(DataEntry.TypeNonTops) || ViewBag.InvoiceType.Equals(DataEntry.TypeConst)))
+            {
+            <div class="row">
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="control-label">Shipping Charges</label>
+                        @Html.TextBoxFor(m => m.SHIPAMOUNT, "{0:c}", new { @class = "form-control dark-text", @disabled = "disabled" })
+                    </div>
+                    <div class="col-md-6">
+                        <label class="control-label">Misc Charge</label>
+                        @Html.TextBoxFor(m => m.MISC_CHARGES, "{0:c}", new { @class = "form-control dark-text", @disabled = "disabled" })
+                    </div>
+                </div>
+            </div>
+            }
+            <div class="row">
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="control-label">Total Charges For Invoice</label>
+                        @Html.TextBoxFor(m => m.AMOUNT, "{0:c}", new { @class = "form-control dark-text", @disabled = "disabled" })
+                    </div>
+                    <div class="col-md-6">
+                    @if (ViewBag.InvoiceType != null && ViewBag.InvoiceType.Equals(DataEntry.TypeTops))
+                    {
+                        <label class="control-label">Service Period End Date</label>
+                        @(Html.Kendo().DatePickerFor(m => m.SVC_PERD_END)
+                        .HtmlAttributes(new { @class = "form-control" })
+                        .Format("MM/dd/yyyy").Enable(Model.IMAGEID != null)
+                        .Min(DateTime.Now.AddYears(-2)).Max(DateTime.Now.AddYears(2))
+                        )
+                    }
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <button type="submit" class="btn btn-info" name="btnAddValidate" id="btnAddValidate" onclick="return addInvValidate()"
+                        @{
+                            if (Model.IMAGEID == null)
+                            {
+                                @:disabled="disabled"
+                            }
+                        }>Add Invoice</button>
+                        <button type="submit" name="btnAdd" id="btnAdd" hidden="hidden"></button>
+                        <button type="submit" class="btn btn-info" name="btnRejectModal" id="btnRejectModal" onclick="return rejectInvModal()"
+                        @{
+                            if (Model.IMAGEID == null)
+                            {
+                                @:disabled="disabled"
+                            }
+                        }>Reject</button>
+                        <button type="submit" name="btnReject" id="btnReject" hidden="hidden"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section ModalControls
+{
+    <div id="dialog"></div>
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#INVDUEDATE").change(function () {
+            dateChanged(this);
+        });
+        $("#SVC_PERD_STRT").change(function () {
+            dateChanged(this);
+        });
+	    $("#SVC_PERD_END").change(function () {
+	        dateChanged(this);
+	    });
+	});
+
+	function dateChanged(e) {
+        // If date is specified, it must be valid.
+	    if (e.value) {
+	        var result = true;
+	        var message = "";
+	        var date = kendo.parseDate(e.value);
+	        if (!date) {
+	            result = false;
+	            message = e.value + " is an invalid date."
+	        } else {
+	            // Dates must be within 2 years.
+	            message = "Please enter a date within two years.";
+	            var minDate = new Date();
+	            minDate.setDate(minDate.getDate() - 730);
+	            var maxDate = new Date();
+	            maxDate.setDate(maxDate.getDate() + 730);
+	            if (date.getTime() < minDate.getTime()) {
+	                result = false;
+	            } else if (date.getTime() > maxDate.getTime()) {
+	                result = false;
+	            }
+	        }
+	        if (!result) {
+	            kendoAlert(message, "Verify Date");
+	        }
+	    }
+	}
+
+	function validateFields() {
+	    // One and only one checkbox must be checked.
+	    var nvmChecked = $('#noVendorMatch').is(":checked");
+	    var vmChecked = $('#yesVendorMatch').is(":checked");
+	    if (nvmChecked && vmChecked) {
+	        kendoAlert("Please check only one box.", "Vendor Address Match");
+	        return false;
+	    }
+	    if (!nvmChecked && !vmChecked) {
+	        kendoAlert("Please check at least one box.", "Vendor Address Match");
+	        return false;
+	    }
+
+	    $('#VENDORMATCH').val(vmChecked ? "True" : "False");
+
+	    return true;
+	}
+
+	function pageCountPrompt() {
+	    if ('@Model.DOCPAGE' > 1) {
+	        kendoYesNoDialog("The document has multiple pages. Do you want to continue?", "Multiple Page Document", mandatoryFieldPrompt);
+	    } else {
+	        mandatoryFieldPrompt(true);
+	    }
+	}
+
+    function mandatoryFieldPrompt(result) {
+        if (result) {
+            // Mandatory fields.
+            // INVDATE, INVOICE, AMOUNT, ACT
+            var message = "";
+            if ($('#INVDATE').val().replace(/^\s+|\s+$/g, "").length == 0) {
+                message = "Invoice Date<br>";
+            }
+            if ($('#INVOICE').val().replace(/^\s+|\s+$/g, "").length == 0) {
+                message += "Invoice Number<br>";
+            }
+            if ($('#AMOUNT').val().replace(/^\s+|\s+$/g, "").length == 0) {
+                message += "Invoice Amount<br>";
+            }
+            if ($('#ACT').val().replace(/^\s+|\s+$/g, "").length == 0) {
+                message += "ACT<br>";
+            }
+
+            if (message) {
+                message += "Are all these fields missing on the invoice?";
+                kendoYesNoDialog(message, "Mandatory Invoice Field Errors", generateE043s);
+            } else {
+                addInv(true);
+            }
+        }
+    }
+
+    function generateE043s(result) {
+        if (result) {
+            $('#GENE043S').val("True");
+            addInv(true);
+        }
+    }
+
+	function addInvValidate(event) {
+	    if (validateFields()) {
+	        // Start the user prompt chain.
+	        // Per UAT response, these prompts are not needed. Scott Marks confirms that
+            // NEEDERR_CODE is now set by a backend job.
+	        //pageCountPrompt();
+	        addInv(true);
+	    }
+
+        // Always return false. The user prompt routines will click the hidden submit button.
+	    return false;
+	}
+
+	function addInv(result) {
+	    if (result) {
+	        $("#btnAdd").click();
+	    }
+	}
+
+	function rejectInvModal() {
+	    // Show the modal. If the user clicks OK it will call rejectInv, which will click the hidden submit button.
+	    showWindowRejectAddInvoice(rejectInv);
+	    return false;
+	}
+
+	function rejectInv(option, description) {
+	    $('#REJECTOPTION').val(option);
+	    $('#REJECTDESCRIPTION').val(description);
+	    $("#btnReject").click();
+	}
+</script>
+
+    @Html.HiddenFor(m => m.INVOICETYPE);
+    @Html.HiddenFor(m => m.INV_KEY_ID);
+    @Html.HiddenFor(m => m.IMAGEID);
+    @Html.HiddenFor(m => m.IMAGEPATH);
+    @Html.HiddenFor(m => m.IMAGEBATCH);
+    @Html.HiddenFor(m => m.VENDORMATCH);
+    @Html.HiddenFor(m => m.DOCPAGE);
+    @Html.HiddenFor(m => m.GENE043S);
+    @Html.HiddenFor(m => m.REJECTOPTION);
+    @Html.HiddenFor(m => m.REJECTDESCRIPTION);
+}
+
+@Html.Partial("RejectModal")
+
+
+
+
+
+
+

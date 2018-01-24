@@ -1,0 +1,551 @@
+﻿@using VITAP.Data.Models.Exceptions
+@model InvEditViewModel
+
+@{
+    ViewBag.Title = "Invoice Data Entry";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    input, select, textarea {
+        max-width: 100%;
+    }
+</style>
+
+@using (Html.BeginForm("InvEdit", "Exceptions", FormMethod.Post, new { id = "formInvEdit" }))
+{
+    <div id="vwInvEdit" class="container pad10">
+        <h1>Invoice Data Entry</h1>
+        <br /><br />
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-3">
+                    <label for="InvoiceNumber" class="control-label">Invoice Number</label>
+                    @Html.TextBoxFor(x => x.InvoiceNumber, new { @class = "form-control u043-required u044-enabled u049-required u054-required v055-required" })
+                </div>
+                <div class="col-sm-2">
+                    <label for="InvoiceDate" class="control-label">Invoice Date</label>
+                        @(Html.Kendo().DatePickerFor(x => x.InvoiceDate)
+                        .HtmlAttributes(new { @class = "form-control  u043-required u044-enabled u049-enabled u054-required v055-required" })
+                        .Format("MM/dd/yyyy")
+                        )
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-2">
+                    <label for="Act" class="control-label">ACT</label>
+                    @Html.TextBoxFor(x => x.Act, new { @class = "form-control u044-enabled u049-enabled" })
+                </div>
+                <div class="col-sm-4">
+                    <label for="PurchaseOrderNumber" class="control-label">PO Number</label>
+                    @Html.TextBoxFor(x => x.PurchaseOrderNumber, new { @class = "form-control u044-enabled u049-enabled" })
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-4">
+                    <label for="ContractNumber" class="control-label">Contract Number</label>
+                    @Html.TextBoxFor(x => x.ContractNumber, new { @class = "form-control u044-enabled u049-enabled" })
+                </div>
+                <div class="col-sm-2">
+                    <label for="PegasysDocumentNumber" class="control-label">PDocNo</label>
+                    @Html.TextBoxFor(x => x.PegasysDocumentNumber, new { @class = "form-control u044-enabled u049-enabled" })
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-5">
+                    <label for="VendorName" class="label-control">Vendor Name and Address</label>
+                    @Html.TextBoxFor(x => x.VendorName, new { @class = "form-control u043-required u044-enabled u049-enabled u054-required v055-required" })
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-6">
+                    @Html.TextBoxFor(x => x.VendorAddr1, new { @class = "form-control u043-required u044-enabled u049-enabled u054-required v055-required" })
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-6">
+                    @Html.TextBoxFor(x => x.VendorAddr2, new { @class = "form-control u044-enabled u049-enabled u054-required v055-required" })
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-6">
+                    @Html.TextBoxFor(x => x.VendorAddr3, new { @class = "form-control u044-enabled u049-enabled u054 v055" })
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-4">
+                    @Html.TextBoxFor(x => x.RemitCity, new { @class = "form-control u043-required u044-enabled u049-enabled u054-required v055-required" })
+                </div>
+                <div class="col-sm-1">
+                    @Html.TextBoxFor(x => x.RemitState, new { @class = "form-control u043-required u044-enabled u049-enabled u054-required v055-required" })
+                </div>
+                <div class="col-sm-2">
+                    @Html.TextBoxFor(x => x.RemitZip, new { @class = "form-control u043-required u044-enabled u049-enabled u054-required v055-required" })
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-4">
+                    <label for="DiscountPercent" class="control-label">Disc Percent</label>
+                    @Html.TextBoxFor(x => x.DiscountPercent, "{0:C}", new { @class = "form-control u044-enabled u049-enabled" })
+                </div>
+                <div class="col-sm-1">
+                    <label for="DiscountDays" class="control-label">Disc Days</label>
+                    @Html.TextBoxFor(x => x.DiscountDays, new { @class = "form-control u044-enabled u049-enabled" })
+                </div>
+                <div class="col-sm-1">
+                    <label for="NetDays" class="control-label">Net Days</label>
+                    @Html.TextBoxFor(x => x.NetDays, new { @class = "form-control u044-enabled u049-enabled" })
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-3">
+                    <label for="TaxAmount" class="control-label">Tax Amount</label>
+                    @Html.TextBoxFor(x => x.TaxAmount, "{0:C}", new { @class = "form-control u044-enabled u049-enabled" })
+                </div>
+                <div class="col-sm-3">
+                    <label for="MiscChargeType" class="control-label">Misc Charge Type</label>
+                    @Html.TextBoxFor(x => x.MiscChargeType, new { @class = "form-control u044-enabled u049-enabled" })
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-3">
+                    <label for="ShippingCharges" class="control-label">Shipping Charges</label>
+                    @Html.TextBoxFor(x => x.ShippingCharges, "{0:C}", new { @class = "form-control u044-enabled u049-enabled" })
+                </div>
+                <div class="col-sm-3">
+                    <label for="InvoiceAmount" class="control-label">Total Charges for Invoice</label>
+                    @Html.TextBoxFor(x => x.InvoiceAmount, "{0:C}", new { @class = "form-control u043-required u044-enabled u049-enabled u054-required v055-required" })
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-3">
+                    <label for="MiscCharge" class="control-label">Miscellaneous Charges</label>
+                    @Html.TextBoxFor(x => x.MiscCharge, "{0:C}", new { @class = "form-control u044-enabled u049-enabled" })
+                </div>
+                <div class="col-sm-4">
+                    <label for="AccountNumber" class="control-label">Account Number (Telephone Bills)</label>
+                    @Html.TextBoxFor(x => x.AccountNumber, new { @class = "form-control u043-enabled u044-enabled u049-enabled u054-enabled v055-enabled" })
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-3">
+                    <label for="InvoiceReceivedDate" class="control-label">Invoice Received Date</label>
+                    @(Html.Kendo().DatePickerFor(x => x.InvoiceReceivedDate)
+                        .HtmlAttributes(new { @class = "form-control  u043-required u044-enabled u049-enabled" })
+                        .Format("MM/dd/yyyy")
+                    )
+                </div>
+            </div>
+        </div>
+        @*  All buttons are plain buttons, none are submit. This is to maintain a consistent look-and-feel.
+            However, the Next and Accept functions require posting back the view model to capture and record
+            changes. For these, we have to manually serialize the form data, add an additional parameter to
+            route the data to the correct action method, and finally invoke the form's submit() method.
+        *@
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="container">
+                        <div class="row no-buffer">
+                            <div class="col-sm-4 sm-buffer">
+                                <button id="btnTransHist" type="button" class="btn btn-info" onclick="transHist()">
+                                    TransHist
+                                </button>
+                            </div>
+                            <div class="col-sm-1 sm-buffer">
+                                <button id="btnBackToU044" type="button" class="btn btn-info" onclick="backToU044()">
+                                    Back to U044
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row no-buffer" style="vertical-align:bottom;">
+                            <div class="col-sm-1 sm-buffer">
+                                <button id="btnNext" type="button" class="btn btn-info" onclick="nextInvEdit()">
+                                    Next
+                                </button>
+                            </div>
+                            <div class="col-sm-1 sm-buffer">
+                                <button id="btnAccept" type="button" class="btn btn-info" onclick="acceptInvEdit()">
+                                    Accept
+                                </button>
+                            </div>
+                            <div class="col-sm-1 sm-buffer">
+                                <button id="btnSkip" type="button" class="btn btn-info" onclick="skipInvEdit()">
+                                    Skip
+                                </button>
+                            </div>
+                            <div class="col-sm-1 sm-buffer">
+                                <button id="btnCancel" type="button" class="btn btn-info" onclick="return cancel()">
+                                    Cancel
+                                </button>
+                            </div>
+                            <div class="col-sm-1 sm-buffer">
+                                <button id="btnViewImage" type="button" data-toggle="tooltip" title="View Invoice" class="btn btn-img" @(Model.ImageExists ? "" : "disabled")>
+                                    View Image
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section ModalControls
+    {
+        <div id="dialog"></div>
+    }
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // For testing...
+            //$('#IsEdi').val('False');
+            //$('#VendorAddr2').val('');
+            //$('#RemitCity').val('');
+            //$('#RemitState').val('');
+            enableDisable();
+            validateInvEditFields();
+        });
+
+        $('.btn-img').click(function () {
+            var url = '@Url.Action("ViewImageByImageID", "Exceptions", new { docId = Model.ImageId })';
+            window.location = url;
+        })
+
+        function enableDisable() {
+            // Disable all input
+            $("#vwInvEdit :input").attr('disabled', 'disabled');
+            $("#vwInvEdit :input").css('border-color', '');
+            $("#InvoiceDate").data('kendoDatePicker').enable(false);
+            $("#InvoiceReceivedDate").data('kendoDatePicker').enable(false);
+
+            var exCode = $('#ExceptionCode').val();
+            enableButtons(exCode);
+            enableInputs(exCode);
+        }
+
+        function enableInputs(exCode) {
+            if (exCode == 'U043') {
+                enableInputU043();
+            } else if (exCode == 'U044') {
+                enableInputU044()
+            } else if (exCode == 'U049') {
+                enableInputU049();
+            } else if (exCode == 'U054') {
+                enableInputU054();
+            } else if (exCode == 'V055') {
+                enableInputV055();
+            }
+        }
+
+        function enableInputU043() {
+            $('.u043-enabled').removeAttr('disabled');
+            enableIfEmpty('.u043-required')
+            if (isEmpty($('#InvoiceDate')))
+                $('#InvoiceDate').data('kendoDatePicker').enable(true);
+            if (isEmpty($('#InvoiceReceivedDate')))
+                $('#InvoiceReceivedDate').data('kendoDatePicker').enable(true);
+        }
+
+        function enableInputU049() {
+            var isEdi = $('#IsEdi').val() == 'True';
+            if (isEdi) {
+                $('#InvoiceNumber').removeAttr('disabled');
+                return;
+            }
+
+            $('.u049-enabled').removeAttr('disabled');
+            enableIfEmpty('.u049-required')
+            if (isEmpty($('#InvoiceDate')))
+                $('#InvoiceDate').data('kendoDatePicker').enable(true);
+            if (isEmpty($('#InvoiceReceivedDate')))
+                $('#InvoiceReceivedDate').data('kendoDatePicker').enable(true);
+        }
+
+        function enableInputU044() {
+            var isEdi = $('#IsEdi').val() == 'True';
+            if (isEdi) {
+                $('#InvoiceNumber').removeAttr('disabled');
+                return;
+            }
+
+            $('.u044-enabled').removeAttr('disabled');
+            enableIfEmpty('.u044-required')
+        }
+
+        function enableInputU054() {
+            $('.u054-enabled').removeAttr('disabled');
+            enableIfEmpty('.u054-required')
+            $('#VendorName').removeAttr('disabled');
+            $('#VendorName').css('border-color', 'red');
+            if (isEmpty($('#InvoiceDate'))) {
+                $('#InvoiceDate').data('kendoDatePicker').enable(true);
+            }
+        }
+
+        function enableInputV055() {
+            $('.v055-enabled').removeAttr('disabled');
+            enableIfEmpty('.v055-required')
+            $('#VendorName').removeAttr('disabled');
+            $('#VendorName').css('border-color', 'red');
+            if (isEmpty($('#InvoiceDate'))) {
+                $('#InvoiceDate').data('kendoDatePicker').enable(true);
+            }
+        }
+
+        function enableButtons(exCode) {
+            $('#btnTransHist').removeAttr('disabled');
+            $('#btnCancel').removeAttr('disabled');
+            var enableViewImage = ('@Model.ImageExists' === '@true');
+            if (enableViewImage)
+                $('#btnViewImage').removeAttr('disabled');
+
+            if (exCode == 'U043') {
+                enableButtonU043();
+            } else if (exCode == 'U044') {
+                enableButtonU044();
+            } else if (exCode == 'U049') {
+                enableButtonU049();
+            } else if (exCode == 'U054') {
+                enableButtonU054();
+            } else if (exCode == 'V055') {
+                enableButtonV055();
+            }
+        }
+
+        function enableButtonU043() {
+            $('#btnNext').removeAttr('disabled');
+        }
+
+        function enableButtonU049() {
+            $('#btnNext').removeAttr('disabled');
+            $('#btnBackToU044').removeAttr('disabled');
+        }
+
+        function enableButtonU044() {
+            $('#btnNext').removeAttr('disabled');
+        }
+
+        function enableButtonU054() {
+            $('#btnAccept').removeAttr('disabled');
+            $('#btnSkip').removeAttr('disabled');
+        }
+
+        function enableButtonV055() {
+            $('#btnAccept').removeAttr('disabled');
+            $('#btnSkip').removeAttr('disabled');
+        }
+
+        $("input[type='text']").change(function () {
+            validateInvEditFields();
+        });
+
+        function validateInvEditFields() {
+            var exCode = $('#ExceptionCode').val();
+            enableInputs(exCode);
+            var invalid = false;
+
+            if (exCode == "U043") {
+                invalid = isMissingRequiredFields(".u043-required");
+            } else if (exCode == "U049") {
+                invalid = isMissingRequiredFields(".u049-required");
+            } else if (exCode == "U054") {
+                invalid = isMissingRequiredFields(".u054-required");
+                $('#VendorName').css('border-color', 'red');
+            } else if (exCode == "V055") {
+                invalid = isMissingRequiredFields(".v055-required");
+                $('#VendorName').css('border-color', 'red');
+            }
+
+            return !invalid;
+        }
+
+        function isMissingRequiredFields(selector) {
+            var missingSomething = false;
+            var pDocNo = $('#PegasysDocumentNumber').val();
+            var is2I = pDocNo == null ? false : pDocNo.StartsWith('2I');
+            var exCode = $('#ExceptionCode').val();
+
+            $(selector).each(function () {
+                if ($(this).is("input") && isEmpty($(this))) {
+                    missingSomething = true;
+                    $(this).css('border-color', 'red');
+                    if ($(this).getKendoDatePicker() != null) {
+                        // If it's not a U054 or V055 then go ahead and make it red
+                        if ('U054/V055'.indexOf(exCode) == -1) {
+                            $(this).parent().css('border-color', 'red');
+                        // If it is a U054 or V055 then make it red only if it's not a '2I'
+                        } else if (!is2I) {
+                            $(this).parent().css('border-color', 'red');
+                        }
+                    }
+                } else {
+                    $(this).css('border-color', '');
+                    if ($(this).getKendoDatePicker() != null) {
+                        $(this).parent().css('border-color', '');
+                    }
+                }
+            });
+            return missingSomething;
+        }
+
+        function isEmpty(ctl) {
+            if (ctl.val().replace(/^\s+|\s+$/g, "").length == 0)
+                return true;
+            return false;
+        }
+
+        function enableIfEmpty(selector) {
+            $(selector).each(function () {
+                if (isEmpty($(this))) {
+                    $(this).removeAttr('disabled');
+                }
+            });
+        }
+
+        function doInvEditSubmit() {
+            var valid = validateInvEditFields();
+            if (!valid)
+                alert('You need to type in the mandatory fields.');
+            if (valid) {
+                // Enable all input so that it posts back
+                $("#vwInvEdit :input").removeAttr('disabled');
+                // Now disable all buttons to prevent double clicks or interruptions.
+                $('#btnTransHist').attr('disabled', 'disabled');
+                $('#btnBackToU044').attr('disabled', 'disabled');
+                $('#btnNext').attr('disabled', 'disabled');
+                $('#btnAccept').attr('disabled', 'disabled');
+                $('#btnSkip').attr('disabled', 'disabled');
+                $('#btnCancel').attr('disabled', 'disabled');
+                $('#btnViewImage').attr('disabled', 'disabled');
+                // The commas and dollar signs will fail the deserialization at the controller and result in null values so remove them
+                removeFormattingFromAmounts();
+            }
+            return valid;
+        }
+
+        function removeFormattingFromAmounts() {
+            removeFormatting($("#DiscountPercent"));
+            removeFormatting($("#InvoiceAmount"));
+            removeFormatting($("#TaxAmount"));
+            removeFormatting($("#ShippingCharges"));
+            removeFormatting($("#TotalCharges"));
+            removeFormatting($("#MiscCharge"));
+        }
+
+        function removeFormatting(selector) {
+            var val = selector.val();
+            selector.val(val == null ? null : val.split(',').join('').replace('$', ''));
+        }
+
+        function nextInvEdit() {
+            var result = doInvEditSubmit();
+            if (!result)
+                return result;
+
+            // Add &btnNext=Next to form data to route the post to NextInvEdit
+            $('<input />').attr('type', 'hidden').attr('name', 'btnNext').attr('value', 'Next').appendTo('#formInvEdit');
+            $('#formInvEdit').submit();
+        }
+
+        function acceptInvEdit() {
+            var result = doInvEditSubmit();
+            if (!result)
+                return;
+
+            // Add &btnAccept=Accept to route the post to AcceptInvEdit
+            $('<input />').attr('type', 'hidden').attr('name', 'btnAccept').attr('value', 'Accept').appendTo('#formInvEdit');
+            $('#formInvEdit').submit();
+        }
+
+        function skipInvEdit() {
+            var result = doInvEditSubmit();
+            if (!result)
+                return;
+            window.location = "@Url.Action("SkipInvEdit", new { exceptionId = Model.ExceptionId })";
+        }
+
+        function transHist() {
+            var searchIn = "";
+            var searchFor = "";
+            if ('@(string.IsNullOrWhiteSpace(Model.Act))' != 'True') {
+                searchIn = 'ACT';
+                searchFor = '@Model.Act'
+            } else if ('@(string.IsNullOrWhiteSpace(Model.PegasysDocumentNumber))' != 'True') {
+                searchIn = 'PDocNo';
+                searchFor = '@Model.PegasysDocumentNumber'
+            } else {
+                searchIn = 'INV_KEY_ID';
+                searchFor = '@Model.InvoiceKeyId'
+            }
+            var url = '@Html.Raw(Url.Action("Index", "TransHist", new
+                  {
+                      searchIn = "searchInThis",
+                      searchFor = "searchForThis",
+                      searchShow = "ALL",
+                      searchFY = "ALL",
+                      searchedBy = "Inv Key ID"
+                  }))';
+            url = url.replace('searchInThis', searchIn).replace('searchForThis', searchFor);
+            window.location = url;
+        }
+
+        function backToU044() {
+            //window.location = "@Url.Action("BackToU044", new { exceptionCode = Model.ExceptionCode })";
+
+            var result = doInvEditSubmit();
+            if (!result)
+                return;
+
+            // Add &btnBackToU044=Back to route the post to BackInvEdit
+            $('<input />').attr('type', 'hidden').attr('name', 'btnBackToU044').attr('value', 'Back').appendTo('#formInvEdit');
+            $('#formInvEdit').submit();
+        }
+
+        function cancel() {
+            window.location = "@Html.Raw(Url.Action("CancelInvEdit", new { exceptionCode = Model.ExceptionCode, exceptionId = Model.ExceptionId }))";
+        }
+
+    </script>
+
+    @Html.HiddenFor(m => m.InvoiceKeyId);
+    @Html.HiddenFor(m => m.ExceptionId);
+    @Html.HiddenFor(m => m.ExceptionCode);
+    @Html.HiddenFor(m => m.IsEdi);
+}
