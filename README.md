@@ -27,7 +27,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ## Built With
 - C#
-- Entity Framework
+- Entity Framework & ADO .NET
 - Oracle Databse 11g
 - LINQ
 - Kendo
