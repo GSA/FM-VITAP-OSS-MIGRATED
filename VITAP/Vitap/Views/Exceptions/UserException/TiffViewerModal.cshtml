@@ -16,12 +16,12 @@
                         string bigSrc = Url.Action("ViewTiffAtPath", "Exceptions", new { View = "1", FilePath = HttpUtility.UrlEncode(Model.TiffFilePath), Pg = Model.BigImgPg, Height = Model.DefaultBigHeight, Width = Model.DefaultBigWidth, unsized = "1" });
                         <div id="tiffCanvasWrapper"><canvas></canvas></div>
                         <div style = "margin:5px" >
-                            <a id="_hlRot270" href="javascript:void(0);" onclick="rotateLeft()">[Rotate Left]</a>
-                            <a id="_hlRot90" href="javascript:void(0);" onclick="rotateRight()">[Rotate Right]</a>
-                            <a id="_hlRot180" href="javascript:void(0);" onclick="rotate180()">[Rotate 180]</a>
+                            <a id="_hlRot270" href="javascript:void(0);">[Rotate Left]</a>
+                            <a id="_hlRot90" href="javascript:void(0);">[Rotate Right]</a>
+                            <a id="_hlRot180" href="javascript:void(0);">[Rotate 180]</a>
                             <a id="_tiffZoomIn" href="javascript:void(0);">[Zoom In]</a>
                             <a id="_tiffZoomOut" href="javascript:void(0);">[Zoom Out]</a>
-                            <a id="_revert" href="javascript:void(0);" onclick="revertImg()">[Revert]</a>
+                            <a id="_revert" href="javascript:void(0);">[Revert]</a>
                             @{
                                 string pages = Model.TotalTIFPgs.ToString() + " Page" + (Model.TotalTIFPgs > 1 ? "s" : "");
                                 <label>@pages</label>
@@ -61,8 +61,8 @@
                                         }
 
                                         string src = Url.Action("ViewTiffAtPath", "Exceptions", new { View = "1", FilePath = Model.TiffFilePath, Pg = pagerPage, Height = Model.DefaultThumbHeight, Width = Model.DefaultThumbWidth });
-                                            <img onclick = "ChangePg(@pagerPage)" style="border: 1px solid black" src="@src" />
-                                        }
+                                        <img onclick = "ChangePg(@pagerPage)" style="border: 1px solid black" src="@src" />
+                                    }
 
                                         //ConfigPagers
                                         //Config first pager
@@ -132,13 +132,19 @@
 
 
 <script type="text/javascript">
+	var currentRotationDegrees = 0;
+    var originalHeight = 0;
+    var originalWidth = 0;
+    var imageHeight = 0;
+    var imageWidth = 0;
+
 	$(document).ready(function () {
 	    window.type = '@Model.TiffType';
 	    window.typeId = '@Model.TiffTypeId';
         window.filePath = '@HttpUtility.UrlEncode(Model.TiffFilePath)';
 
 	    window.bigSrc = '@Url.Action("ViewTiffAtPath", "Exceptions", new { View = "1", FilePath = "JSFILEPATH", Pg = Model.StartPg, Height = "600", Width = "600", unsized = "1" })';
-	    gkhead.src = ReplaceFilePathAndAmps(window.bigSrc);
+        gkhead.src = ReplaceFilePathAndAmps(window.bigSrc);
 	});
 
     function ChangePg(Pg) {
@@ -147,10 +153,6 @@
         SrcBig = ReplaceFilePathAndAmps(SrcBig);
 
 	    gkhead.src = SrcBig;
-	    document.getElementById('_hlRot270').onclick = function () { ChangePg(Pg); gkhead.src = SrcBig + "&Rotate=270"; };
-	    document.getElementById('_hlRot180').onclick = function () { ChangePg(Pg); gkhead.src = SrcBig + "&Rotate=180"; };
-	    document.getElementById('_hlRot90').onclick = function () { ChangePg(Pg); gkhead.src = SrcBig + "&Rotate=90"; };
-	    document.getElementById('_revert').onclick = function () { ChangePg(Pg); gkhead.src = SrcBig;}
 	}
 
     function ReplaceFilePathAndAmps(SrcStr)
@@ -170,26 +172,6 @@
 	            return ft[1];
 	    }
 	}
-
-	function rotateRight() {
-	    var rotateSrc = '@Url.Action("ViewTiffAtPath", "Exceptions", new { View = "1", FilePath = "JSFILEPATH", Pg = Model.BigImgPg, Height = Model.DefaultBigHeight, Width = Model.DefaultBigWidth, Rotate = "90", unsized = "1" })';
-	    gkhead.src = ReplaceFilePathAndAmps(rotateSrc);
-	}
-
-    function rotateLeft() {
-        var rotateSrc = '@Url.Action("ViewTiffAtPath", "Exceptions", new { View = "1", FilePath = "JSFILEPATH", Pg = Model.BigImgPg, Height = Model.DefaultBigHeight, Width = Model.DefaultBigWidth, Rotate = "270", unsized = "1" })';
-        gkhead.src = ReplaceFilePathAndAmps(rotateSrc);
-	}
-
-    function rotate180() {
-        var rotateSrc = '@Url.Action("ViewTiffAtPath", "Exceptions", new { View = "1", FilePath = "JSFILEPATH", Pg = Model.BigImgPg, Height = Model.DefaultBigHeight, Width = Model.DefaultBigWidth, Rotate = "180", unsized = "1" })';
-        gkhead.src = ReplaceFilePathAndAmps(rotateSrc);
-	}
-
-    function revertImg() {
-        var rotateSrc = '@Url.Action("ViewTiffAtPath", "Exceptions", new { View = "1", FilePath = "JSFILEPATH", Pg = Model.BigImgPg, Height = Model.DefaultBigHeight, Width = Model.DefaultBigWidth, unsized = "1" })';
-        gkhead.src = ReplaceFilePathAndAmps(rotateSrc);
-    }
 
     var canvas = document.getElementsByTagName('canvas')[0];
 
@@ -226,6 +208,10 @@
 
             redraw();
         }
+        originalHeight = canvas.height;
+        originalWidth = canvas.width;
+        imageHeight = canvas.height;
+        imageWidth = canvas.width;
 	}
 	String.prototype.replaceAll = function(search, replacement) {
 	    var target = this;
@@ -234,12 +220,6 @@
 
 	function redraw(){
 	    var ctx = canvas.getContext('2d');
-	    trackTransforms(ctx);
-
-	    // Clear the entire canvas
-	    var p1 = ctx.transformedPoint(0,0);
-	    var p2 = ctx.transformedPoint(canvas.width,canvas.height);
-	    ctx.clearRect(p1.x,p1.y,p2.x-p1.x,p2.y-p1.y);
 
 	    ctx.save();
 	    ctx.setTransform(1,0,0,1,0,0);
@@ -250,7 +230,6 @@
 
 	window.onload = function(){
 	    var ctx = canvas.getContext('2d');
-	    trackTransforms(ctx);
 
 	    redraw();
 
@@ -261,7 +240,10 @@
 	        ctx.scale(factor, factor);
 	        canvas.height = canvas.height * factor;
 	        canvas.width = canvas.width * factor;
+	        imageHeight = imageHeight * factor;
+	        imageWidth = imageWidth * factor;
 	        redraw();
+	        drawRotated(currentRotationDegrees);
 	    }
 
 	    var tiffZoomOut = function () {
@@ -271,72 +253,52 @@
 	        zoom(1);
 	    }
 
+	    $('#_hlRot270').click(function() { drawRotated(-90); });
+	    $('#_hlRot90').click(function () { drawRotated(90); });
+	    $('#_hlRot180').click(function () { drawRotated(180); });
 	    $('#_tiffZoomOut').click(tiffZoomOut);
 	    $('#_tiffZoomIn').click(tiffZoomIn);
+	    $('#_revert').click(tiffRevert);
 	};
 
-	// Adds ctx.getTransform() - returns an SVGMatrix
-	// Adds ctx.transformedPoint(x,y) - returns an SVGPoint
-	function trackTransforms(ctx){
-	    var svg = document.createElementNS("http://www.w3.org/2000/svg",'svg');
-	    var xform = svg.createSVGMatrix();
-	    ctx.getTransform = function(){ return xform; };
+	function drawRotated(degrees) {
+	    var ctx = canvas.getContext('2d');
+        var newWidth = startWidth = canvas.width;
+        var newHeight = startHeight = canvas.height;
+        var newWidthOffset = -newWidth/2;
+        var newHeightOffset = -newHeight/2;
+        var orientationChange = Math.abs((currentRotationDegrees + degrees)/90%2);
 
-	    var savedTransforms = [];
-	    var save = ctx.save;
-	    ctx.save = function(){
-	        savedTransforms.push(xform.translate(0,0));
-	        return save.call(ctx);
-	    };
-
-	    var restore = ctx.restore;
-	    ctx.restore = function(){
-	        xform = savedTransforms.pop();
-	        return restore.call(ctx);
-	    };
-
-	    var scale = ctx.scale;
-	    ctx.scale = function(sx,sy){
-	        xform = xform.scaleNonUniform(sx,sy);
-	        return scale.call(ctx,sx,sy);
-	    };
-
-	    var rotate = ctx.rotate;
-	    ctx.rotate = function(radians){
-	        xform = xform.rotate(radians*180/Math.PI);
-	        return rotate.call(ctx,radians);
-	    };
-
-	    var translate = ctx.translate;
-	    ctx.translate = function(dx,dy){
-	        xform = xform.translate(dx,dy);
-	        return translate.call(ctx,dx,dy);
-	    };
-
-	    var transform = ctx.transform;
-	    ctx.transform = function(a,b,c,d,e,f){
-	        var m2 = svg.createSVGMatrix();
-	        m2.a=a; m2.b=b; m2.c=c; m2.d=d; m2.e=e; m2.f=f;
-	        xform = xform.multiply(m2);
-	        return transform.call(ctx,a,b,c,d,e,f);
-	    };
-
-	    var setTransform = ctx.setTransform;
-	    ctx.setTransform = function(a,b,c,d,e,f){
-	        xform.a = a;
-	        xform.b = b;
-	        xform.c = c;
-	        xform.d = d;
-	        xform.e = e;
-	        xform.f = f;
-	        return setTransform.call(ctx,a,b,c,d,e,f);
-	    };
-
-	    var pt  = svg.createSVGPoint();
-	    ctx.transformedPoint = function(x,y){
-	        pt.x=x; pt.y=y;
-	        return pt.matrixTransform(xform.inverse());
+        // If rotating right or left - change canvas dimensions. Clears rect when changing canvas size.
+        if (orientationChange) {
+	        newWidth = canvas.height;   // use new<> to swap values
+	        newHeight = canvas.width;
+            canvas.width = newWidth;
+            canvas.height = newHeight;
+	    } else {
+	        ctx.clearRect(0, 0, canvas.width, canvas.height);
 	    }
+
+	    currentRotationDegrees = degrees;           // Applied after zoom.
+
+	    ctx.save();
+	    ctx.translate(canvas.width / 2, canvas.height / 2);
+	    ctx.rotate(degrees * Math.PI / 180);
+	    ctx.drawImage(gkhead, -imageWidth/2, -imageHeight/2, imageWidth, imageHeight);   // since we may be drawing on rotated canvas use start<> values.
+	    ctx.restore();
+	}
+
+	function tiffRevert() {
+	    var ctx = canvas.getContext('2d');
+	    currentRotationDegrees = 0;         // if reverting, clear current rotation.
+
+	    canvas.width = originalWidth;
+	    canvas.height = originalHeight;
+	    imageWidth = originalWidth;
+	    imageHeight = originalHeight;
+	    ctx.save();
+	    ctx.drawImage(gkhead, 0, 0, originalWidth, originalHeight);
+	    ctx.restore();
 	}
 
 </script>

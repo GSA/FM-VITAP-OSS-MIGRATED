@@ -25,9 +25,19 @@ namespace VITAP.SharedLogic.Buttons
 
         public void FinishCode(string NewAct, string NewPDocNo, string Vcpo, DateTime? StartDate, PEGASYSPO_FRM vpo)
         {
+            if (!String.IsNullOrEmpty(NewAct) && NewAct.Length > 8 && NewAct.StartsWith("1B") && NewAct.EndsWith("C"))
+            {
+                NewAct = NewAct.Substring(NewAct.Length - 8);
+            }
+            else if (!String.IsNullOrEmpty(NewAct) && NewAct.Length > 8)
+            {
+                NewAct = "";
+            }
+
+
             //string Act = "";
             bool bChangeAct = false, bChangePdocno = false;
-            if (String.IsNullOrWhiteSpace(exception.ACT))
+            if (String.IsNullOrWhiteSpace(exception.ACT) && !String.IsNullOrWhiteSpace(NewAct))
             {
                 bChangeAct = true;
                 //Act = "";
@@ -63,6 +73,14 @@ namespace VITAP.SharedLogic.Buttons
             if (!String.IsNullOrWhiteSpace(exception.INV_KEY_ID))
             {
                 UpdateInvData(NewAct, NewPDocNo, StartDate);
+            }
+            else if (!String.IsNullOrWhiteSpace(exception.AE_ID))
+            {
+                UpdateAERecord(NewAct, NewPDocNo);
+            }
+            else if (!String.IsNullOrWhiteSpace(exception.RR_ID))
+            {
+                UpdateRRRecord(NewAct, NewPDocNo);
             }
         }
 
@@ -111,7 +129,12 @@ namespace VITAP.SharedLogic.Buttons
                 modNo = vpo.MODNO;
             }
 
-            var newPoId = newPDocNo.Trim() + "&" + modNo;
+            var newPoId = newPDocNo.Trim();
+
+            if (!String.IsNullOrWhiteSpace(modNo))
+            {
+                newPoId = newPoId + "&" + modNo;
+            } 
 
             var fieldsToUpdate = new List<string>
                 {

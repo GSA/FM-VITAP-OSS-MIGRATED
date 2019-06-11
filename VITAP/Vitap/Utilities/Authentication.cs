@@ -60,7 +60,8 @@ namespace VITAP.Utilities.Security
             if (verified)
             {
                 // Update user log.
-                EventLog.RecordLogin(secureAuthUser.ToString(), "", HttpContext.Current.Request.UserHostAddress, Login.APPNAME);
+                Audit ad = new Audit();
+                ad.WriteUserEvent(Login.APPNAME, secureAuthUser.ToString(), Audit.UserEvent.LogonSuccessful);
             }
             else
             {

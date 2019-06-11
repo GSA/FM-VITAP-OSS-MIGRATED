@@ -45,7 +45,6 @@
             .AutoBind(false)
             .DataSource(dataSource => dataSource
                 .Ajax()
-                .Sort(sort => sort.Add("Err_code").Ascending())
                 .Model(model => model.Id(o => o.EX_ID))
                 .Read(r => r
                     .Action("Index", "Exceptions")
@@ -145,11 +144,6 @@
                                     (Please Click on Search Button after your selections)
                                 </td>
                             </tr>
-                            <tr>
-                                <td colspan="5">
-                                    (Please Click on Search Button after your selections)
-                                </td>
-                            </tr>
                         </table>
 
 
@@ -189,7 +183,14 @@
                                     {
                                         if ((Role.Id == "PBS" && Model.RoleModel.ASSIGN_SRV == "PBS") || (Role.Id == "FTS" && Model.RoleModel.ASSIGN_SRV == "FTS"))
                                         {
-                                            @Html.Label(Role.Text, new { @class = "radio-inline" })<br />
+                                            string roleText = Role.Text;
+
+                                            if (Model.RoleModel.HasVendCoderRole == true)
+                                            {
+                                                roleText += " +VENDOR";
+                                            }
+
+                                            @Html.Label(roleText, new { @class = "radio-inline" })<br />
                                         }
                                     }
                                 </div>
@@ -220,12 +221,12 @@
                             }
                             else if ((RadioVal.Text == "TOPS" || RadioVal.Text == "VCPO"))
                             {
-                                @Html.RadioButtonFor(x => Model.SearchCriteria.Radio2, RadioVal.Text, new { @class = "radio-inline", id = "Radio2", disabled = "disabled" })
+                                @Html.RadioButtonFor(x => Model.SearchCriteria.Radio2, RadioVal.Text, new { @class = "radio-inline vendcoder-enabled", id = "Radio2", disabled = "disabled" })
                                 @Html.Label(RadioVal.Text, new { @class = "radio-inline" })<br />
                             }
                             else if ((RadioVal.Text == "FTS" && Model.RoleModel.ASSIGN_SRV != "FTS") || (RadioVal.Text == "PBS" && Model.RoleModel.ASSIGN_SRV != "PBS"))
                             {
-                                @Html.RadioButtonFor(x => Model.SearchCriteria.Radio2, RadioVal.Text, new { @class = "radio-inline", id = "Radio2", disabled = "disabled" })
+                                @Html.RadioButtonFor(x => Model.SearchCriteria.Radio2, RadioVal.Text, new { @class = "radio-inline vendcoder-enabled", id = "Radio2", disabled = "disabled" })
                                 @Html.Label(RadioVal.Text, new { @class = "radio-inline" })<br />
                             }
                             else
@@ -318,6 +319,11 @@
 
                     $("#SearchCriteria_SearchSource").val("topbutton");
 
+                    //Reset back to page 1
+                    if ($('#Grid').data("kendoGrid").dataSource.page() != 1) {
+                        $('#Grid').data("kendoGrid").dataSource.page(1);
+                    }
+
                     RunSearch();
                 });
 
@@ -335,7 +341,7 @@
                     SearchBy: $("#SearchBy").val(),
                     OrgCode: $("#OrgCode").val(),
                     Role: $("#Role").val(),
-                    Radio2: $("input[name='SearchCriteria.Radio2']:checked"). val(),
+                    Radio2: $("input[name='SearchCriteria.Radio2']:checked").val(),
                     ShowSkip: $("#ShowSkip")[0].checked,
                     SortBy: $("#SortBy").val(),
                     SecSortBy: $("#SecSortBy").val(),
@@ -346,18 +352,16 @@
             }
 
             function btnSearchOnClick() {
-                //var exId = $('#SearchAll').val().trim().toUpperCase();
                 $("#SearchCriteria_SearchSource").val("searchbutton");
 
                 //Remove top button selection
                 $('.btn-exception-type').removeClass("chosen");
                 $("#SearchCriteria_ExceptionType").val("");
 
-                //if (exId == "") {
-                //    $('#ErrorMsg')[0].innerHTML = 'Please enter a search value.';
-                //    $('#ErrorMsg').show();
-                //    return;
-                //}
+                //Reset back to page 1
+                if ($('#Grid').data("kendoGrid").dataSource.page() != 1) {
+                    $('#Grid').data("kendoGrid").dataSource.page(1);
+                }
 
                 RunSearch();
             }
@@ -365,6 +369,8 @@
             function RunSearch() {
 
                 var permission = true;
+                var vendorPegSystemOk = true; 
+
                 var hasVendCoder = @Json.Encode(Model.RoleModel.HasVendCoderRole),
                     hasExceptions = @Json.Encode(Model.RoleModel.HasExceptionsRole),
                     hasApacct = @Json.Encode(Model.RoleModel.HasApacctRole),
@@ -383,8 +389,25 @@
                     else if (!hasExceptions && !hasApacct) permission = false;
                 }
 
+                // Check that we aren't trying to search for a non-vendor exception code with a PegSystem that got unlocked by us being a vendCoder
+                if ($("#SearchCriteria_SearchSource").val() == 'searchbutton' && $("#SearchBy").val() == "err_code" && hasVendCoder &&
+                    exId.substring(0, 1) != "V" && (hasExceptions || hasApacct) &&
+                    $("input[name='SearchCriteria.Radio2']:checked").hasClass('vendcoder-enabled')) {
+                    vendorPegSystemOk = false;
+                }
+                else if ($("#SearchCriteria_SearchSource").val() == 'topbutton' && hasVendCoder &&
+                    $("#SearchCriteria_ExceptionType").val().toLowerCase() != 'vendor' &&
+                    $("input[name='SearchCriteria.Radio2']:checked").hasClass('vendcoder-enabled')) {
+                    vendorPegSystemOk = false;
+                }
+
                 if (!permission) {
                     $('#ErrorMsg')[0].innerHTML = 'You do not have permission to search for this code.';
+                    $('#ErrorMsg').show();
+                }
+                else if (!vendorPegSystemOk)
+                {
+                    $('#ErrorMsg')[0].innerHTML = 'You cannot search for non-vendor exception codes with this PegSystem selection: ' + $("input[name='SearchCriteria.Radio2']:checked").val();
                     $('#ErrorMsg').show();
                 }
                 else {
@@ -427,9 +450,19 @@
                 return enabled;
             }
 
+            function InitializeVendCoderPegSystemOptions() {
+                var hasVendCoder = @Json.Encode(Model.RoleModel.HasVendCoderRole);
+
+                //Turn on all pegSystem options for vendCoder, but only for vendor searches
+                if (hasVendCoder) {
+                    $('.vendcoder-enabled').prop("disabled", false);
+                }
+            }
+
             $(document).ready(function () {
                 ConfigureKendoGridPaginationControlsFor508("Grid");
                 MakeKendoGridScrollable("Grid", "300px");
+                InitializeVendCoderPegSystemOptions();
             });
         </script>
 

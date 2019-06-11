@@ -2,91 +2,100 @@
 @model VITAP.Data.Models.AssoProdViewModel
 
 @{
-    ViewBag.Title = "Associate Productivity Report";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    var headerAttr = new { @style = "font-weight:bold" };
-    var rightAlignAttr = new { @style = "text-align:right" };
+                /**/
+
+                ViewBag.Title = "Associate Productivity Report";
+                Layout = "~/Views/Shared/_Layout.cshtml";
+                var headerAttr = new { @style = "font-weight:bold" };
+                var rightAlignAttr = new { @style = "text-align:right" };
 }
 
-    @using (Html.BeginForm("Index", "AssoProd", FormMethod.Post))
-    {
-        @Html.AntiForgeryToken()
+@using (Html.BeginForm("Index", "AssoProd", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
 
-        <br />
-        <h1 style="font-weight: bold">Associate Productivity Report</h1>
-        <br />
+    <br />
+    <h1 style="font-weight: bold">Associate Productivity Report</h1>
+    <br />
 
-        <div class="container-fluid">
-            <div class="col-md-12">
-                
-                <div class="row" style="clear: left;">
-                    <div class="form-group">
-                        <label for="Answer" class="control-label">
-                            Transactions for period:
-                        </label><br />
+    <div class="container-fluid">
+        <div class="col-md-12">
 
-                        @(Html.Kendo().RadioButton()
-                    .Name("Answer")
-                    .Checked(Model.Answer == "1")
-                    .HtmlAttributes(new { @name = "Answer" })
-                    .Value("1")
-                    .Label("All"))
+            <div class="row" style="clear: left;">
+                <div class="form-group">
+                    <label for="Answer" class="control-label">
+                        Transactions for period:
+                    </label><br />
 
-                        @(Html.Kendo().RadioButton()
+                    @(Html.Kendo().RadioButton()
                         .Name("Answer")
-                        .Checked(Model.Answer == "2")
+                        .Checked(Model.Answer == "1")
                         .HtmlAttributes(new { @name = "Answer" })
-                        .Value("2")
-                        .Label("Today"))
+                        .Value("1")
+                        .Label("All"))
 
-                        @(Html.Kendo().RadioButton()
-                    .Name("Answer")
-                    .Checked(Model.Answer == "3")
-                    .HtmlAttributes(new { @name = "Answer" })
-                    .Value("3")
-                    .Label(">= 7 days old"))
+                    @(Html.Kendo().RadioButton()
+                            .Name("Answer")
+                            .Checked(Model.Answer == "2")
+                            .HtmlAttributes(new { @name = "Answer" })
+                            .Value("2")
+                            .Label("Today"))
 
-                        @(Html.Kendo().RadioButton()
-                    .Name("Answer")
-                    .Checked(Model.Answer == "4")
-                    .HtmlAttributes(new { @name = "Answer" })
-                    .Value("4")
-                    .Label(">= 30 days old"))
-                        @(Html.Kendo().RadioButton()
-                    .Name("Answer")
-                    .Checked(Model.Answer == "5")
-                    .HtmlAttributes(new { @name = "Answer" })
-                    .Value("5")
-                    .Label("Range"))
+                    @(Html.Kendo().RadioButton()
+                        .Name("Answer")
+                        .Checked(Model.Answer == "3")
+                        .HtmlAttributes(new { @name = "Answer" })
+                        .Value("3")
+                        .Label(">= 7 days old"))
 
-                    </div>
-                    <div class="col-md-6 ">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="From" class="control-label">Date From:</label>
-                                    @(Html.Kendo().DatePickerFor(x => x.From)
-                            .HtmlAttributes(new { @class = "form-control" })
-                            .Format("MM/dd/yyyy")
-                            .Enable(Model.Answer == "Range")
-                                    )
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="To" class="control-label">Date To:</label>
-                                    @(Html.Kendo().DatePickerFor(x => x.To)
-                            .HtmlAttributes(new { @class = "form-control" })
-                            .Format("MM/dd/yyyy")
-                            .Enable(Model.Answer == "Range")
-                                    )
-                                </div>
+                    @(Html.Kendo().RadioButton()
+                        .Name("Answer")
+                        .Checked(Model.Answer == "4")
+                        .HtmlAttributes(new { @name = "Answer" })
+                        .Value("4")
+                        .Label(">= 30 days old"))
+                    @(Html.Kendo().RadioButton()
+                        .Name("Answer")
+                        .Checked(Model.Answer == "5")
+                        .HtmlAttributes(new { @name = "Answer" })
+                        .Value("5")
+                        .Label("Range"))
+
+                </div>
+                <div class="col-md-6 ">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="From" class="control-label">Date From:</label>
+                                @(Html.Kendo().DatePickerFor(x => x.From)
+                                        .HtmlAttributes(new { @class = "form-control" })
+                                        .Format("MM/dd/yyyy")
+                                        .Enable(Model.Answer == "Range")
+                                )
                             </div>
                         </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="To" class="control-label">Date To:</label>
+                                @(Html.Kendo().DatePickerFor(x => x.To)
+                                        .HtmlAttributes(new { @class = "form-control" })
+                                        .Format("MM/dd/yyyy")
+                                        .Enable(Model.Answer == "Range")
+                                )
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="SelectedAssignedService" class="control-label">Assigned Service</label>
+                            @Html.DropDownListFor(x => x.SelectedAssignedService, Model.AssignedServiceListOptions)
+                        </div>
+                    </div>
                 </div>
+
                 <div class="row">
                     <br />
-                    <button type="submit" class="btn btn-default" name="btnSearch" id="btnSearch" onclick="return dateSearchValidate()" >Search</button>                  
+                    <button type="submit" class="btn btn-default" name="btnSearch" id="btnSearch" onclick="return dateSearchValidate()">Search</button>
                     <br />
                 </div>
                 <div class="row" style="clear: left;">
@@ -134,12 +143,12 @@
                     </div>
 
                 </div>
-                   
+
             </div>
-               
+
         </div>
-            </div>
-    }
+    </div>
+}
 
 <script type="text/javascript">
     $(document).ready(function () {
@@ -156,60 +165,60 @@
         MakeKendoGridScrollable('grdAssoProd', "300px");
     });
 
-    $(document).on("change", "input[name=Answer]", function () {  
+    $(document).on("change", "input[name=Answer]", function () {
         if (this.value == "5") {
-                disableDateRangeFields(false);
-            } else {
-                disableDateRangeFields(true);
-            }
-        })
+            disableDateRangeFields(false);
+        } else {
+            disableDateRangeFields(true);
+        }
+    })
 
-        function dateChanged(e) {
-            if (e.value) {
-                var result = true;
-                var message = "";
-                var date = kendo.parseDate(e.value);
-                if (!date) {
-                    result = false;
-                    message = e.value + " is an invalid date."
-                }
-                if (!result) {
-                    kendoAlert(message, "Verify Date");
-                }
+    function dateChanged(e) {
+        if (e.value) {
+            var result = true;
+            var message = "";
+            var date = kendo.parseDate(e.value);
+            if (!date) {
+                result = false;
+                message = e.value + " is an invalid date."
+            }
+            if (!result) {
+                kendoAlert(message, "Verify Date");
             }
         }
+    }
 
-        function disableDateRangeFields(disabled) {
-           
-            $('#From').prop("disabled", disabled);
-            $('#From').data('kendoDatePicker').enable(!disabled);
-            $('#To').prop("disabled", disabled);
-            $('#To').data('kendoDatePicker').enable(!disabled);
-        }
+    function disableDateRangeFields(disabled) {
 
-        function dateSearchValidate(event) {
-            
-            // Range search requires dates.
-            var optionValue = $('input[name=Answer]:checked').val()
-           
+        $('#From').prop("disabled", disabled);
+        $('#From').data('kendoDatePicker').enable(!disabled);
+        $('#To').prop("disabled", disabled);
+        $('#To').data('kendoDatePicker').enable(!disabled);
+    }
 
-            if (optionValue == "5") {
-                
-                var message = "";
-                if ($('#From').val() == "01/01/0001") {
-                    alert('inside' + optionValue)
-                    message = "Date From<br>";
-                }
-                if ($('#To').val() == "01/01/0001") {
-                    message = "Date To<br>";
-                }
-                if (message) {
-                    kendoAlert(message, "Missing Date Fields");
-                    return false;
-                }
+    function dateSearchValidate(event) {
+
+        // Range search requires dates.
+        var optionValue = $('input[name=Answer]:checked').val()
+
+
+        if (optionValue == "5") {
+
+            var message = "";
+            if ($('#From').val() == "01/01/0001") {
+                alert('inside' + optionValue)
+                message = "Date From<br>";
             }
-            return true;
+            if ($('#To').val() == "01/01/0001") {
+                message = "Date To<br>";
+            }
+            if (message) {
+                kendoAlert(message, "Missing Date Fields");
+                return false;
+            }
         }
+        return true;
+    }
 
 </script>
 
@@ -219,6 +228,6 @@
 
 
 
- 
+
 
 

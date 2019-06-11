@@ -14,6 +14,8 @@
 
 @using (Html.BeginForm("InvEdit", "Exceptions", FormMethod.Post, new { id = "formInvEdit" }))
 {
+    @Html.HiddenFor(x => Model.ImageId)
+
     <div id="vwInvEdit" class="container pad10">
         <h1>Invoice Data Entry</h1>
         <br /><br />
@@ -79,7 +81,7 @@
         <div class="form-group">
             <div class="row">
                 <div class="col-sm-6">
-                    @Html.TextBoxFor(x => x.VendorAddr2, new { @class = "form-control u044-enabled u049-enabled u054-required v055-required" })
+                    @Html.TextBoxFor(x => x.VendorAddr2, new { @class = "form-control u044-enabled u049-enabled u054-enabled v055-enabled" })
                 </div>
             </div>
         </div>
@@ -87,7 +89,7 @@
         <div class="form-group">
             <div class="row">
                 <div class="col-sm-6">
-                    @Html.TextBoxFor(x => x.VendorAddr3, new { @class = "form-control u044-enabled u049-enabled u054 v055" })
+                    @Html.TextBoxFor(x => x.VendorAddr3, new { @class = "form-control u044-enabled u049-enabled u054-enabled v055-enabled" })
                 </div>
             </div>
         </div>
@@ -244,7 +246,7 @@
         });
 
         $('.btn-img').click(function () {
-            var url = '@Url.Action("ViewImageByImageID", "Exceptions", new { docId = Model.ImageId })';
+            var url = '@Url.Action("ViewImageByImageID", "Exceptions")' + '?docId=' + $("#ImageId").val();
             window.location = url;
         })
 
@@ -471,7 +473,7 @@
 
         function removeFormatting(selector) {
             var val = selector.val();
-            selector.val(val == null ? null : val.split(',').join('').replace('$', ''));
+            selector.val(val == null ? null : val.split(',').join('').replace('$', '').replace('(', '-').replace(')', ''));
         }
 
         function nextInvEdit() {

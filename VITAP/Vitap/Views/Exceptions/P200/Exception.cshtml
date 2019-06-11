@@ -15,7 +15,7 @@
     var textAttrLong = new Dictionary<string, object> { { "style", "width:300px" }, { "disabled", "" } };
     var textAttrLongRW = new Dictionary<string, object> { { "style", "width:300px" } };
 
-    var ddlSearchIn = ViewBag.ddlSearchIn as List<SelectListItem>;
+    var ddlSearchIn = ViewBag.ddlSearchIn.Items as List<SelectListItem>;
 
 }
 
@@ -35,8 +35,10 @@
     }
 </style>
 
-<h1 style="font-weight: bold">@string.Format("{0} | Pegasys Exception ({1}) - {2}", Model.InvKeyId, Model.ErrorCode, Model.Memo)</h1>
+<h1 style="font-weight: bold">@string.Format("{0}Pegasys Exception ({1}) - {2}", string.IsNullOrEmpty( Model.InvKeyId)?"": Model.InvKeyId +" | ", Model.ErrorCode, Model.Memo)</h1>
 <br />
+
+@Html.HiddenFor(x => Model.PegInv.IMAGEID)
 
 <div class="container-fluid">
     <div class="row no-buffer">
@@ -117,7 +119,7 @@
         <div class="col-md-6">
             <div class="row">
                 <label>Search For:</label>
-                @Html.TextBox("txtSearchFor")
+                @Html.TextBox("txtSearchFor", (string)ViewBag.txtSearchFor)
                 <label>In:</label>
                 @Html.DropDownList("txtSearchIn", ddlSearchIn, new { width = "80px" })
                 <br />
@@ -166,7 +168,7 @@
                                 c.Bound(x => x.ACT).Width(140).HeaderHtmlAttributes(headerAttr);
                                 c.Bound(x => x.PDOCNO).Width(120).HeaderHtmlAttributes(headerAttr);
                                 c.Bound(x => x.DOC_DT).Format("{0:MM/dd/yyyy}").Width(150).HeaderHtmlAttributes(headerAttr);
-                                c.Bound(x => x.AMOUNT).Format("{0:n2}").Width(80).HeaderHtmlAttributes(headerAttr).HtmlAttributes(new { style = "text-align: right;" });
+                                c.Bound(x => x.AMOUNT).Format("{0:c2}").Width(80).HeaderHtmlAttributes(headerAttr).HtmlAttributes(new { style = "text-align: right;" });
                                 c.Bound(x => x.VENDNAME).Width(120).HeaderHtmlAttributes(headerAttr);
                                 c.Bound(x => x.ADDR_L1).Width(120).HeaderHtmlAttributes(headerAttr);
                                 c.Bound(x => x.ADDR_L2).Width(120).HeaderHtmlAttributes(headerAttr);
@@ -283,21 +285,34 @@
             $('.k-pager-wrap').css('max-height', '30px');
             }
 
-        $('#P200Grid').data().kendoGrid.bind('dataBound', function(e) {
-                this.element.find('tbody tr:first').addClass('k-state-selected')
-            var grdP200 = $("#P200Grid").data("kendoGrid");
-                grdP200.select();
-                grdP200Change();
-            })
+            $('#P200Grid').data().kendoGrid.bind('dataBound', function(e) {
+                    this.element.find('tbody tr:first').addClass('k-state-selected')
+                var grdP200 = $("#P200Grid").data("kendoGrid");
+                    grdP200.select();
+                    grdP200Change();
+                })
 
-            ResetErrors();
+        if ('@Model.ErrorCode' == "M200")
+        {
+            $('#btnPoRequest').attr('disabled', 'disabled');
+            $('#btnRoute').attr('disabled', 'disabled');
+        }
+            if ('@Model.ErrorCode' == "A200") {
+                $('#btnPoRequest').attr('disabled', 'disabled');
+                $('#btnRoute').attr('disabled', 'disabled');
+            }
+
+        ResetErrors();
+
+        // Refresh grid.
+        $('#P200Grid').data("kendoGrid").dataSource.read();
         });
 
     function P200Selected(e)
         {
             e.preventDefault();
-        $("#P200Grid table tr").removeClass('k-state-selected');
-        $(e.currentTarget).closest("tr").addClass('k-state-selected');
+            $("#P200Grid table tr").removeClass('k-state-selected');
+            $(e.currentTarget).closest("tr").addClass('k-state-selected');
             var row = this.dataItem($(e.currentTarget).closest("tr"));
             grdP200Select(row);
         }
@@ -314,7 +329,7 @@
             // Highlight the row when "Select" button clicked
             var grid = $('#P200Grid').data('kendoGrid');
             var row = $(e.currentTarget).closest("tr");
-        $("#P200Grid table tr").removeClass('k-state-selected');
+            $("#P200Grid table tr").removeClass('k-state-selected');
             row.addClass('k-state-selected');
 
             grid.select(row);
@@ -341,21 +356,21 @@
             {
                 docType = pDocNo.substring(0, 2);
             }
-        $("#ActNumber").val(row.ACT);
-        $("#PegasysDocumentNumber").val(row.PDOCNO);
-        $("#PurchaseOrderDocumentType").val(docType);
-        $("#PurchaseOrderNumber").val(row.PONUMBER);
-        $("#ContractNumber").val(row.CONTRACT);
-        $("#VendorCode").val(row.RMIT_VEND);
-        $("#RemitVendorCode").val(row.RMIT_VEND);
-        $("#VendorName").val(row.VENDNAME);
-        $("#VendorAddress1").val(row.ADDR_L1);
-        $("#VendorAddress2").val(row.ADDR_L2);
-        $("#VendorAddress3").val(row.ADDR_L3);
-        $("#VendorCityStateZip").val(row.ADDR_CITY + ", " + row.ADDR_STATE + "  " + row.ADDR_ZPCD);
-        $("#Invoice").val(row.INVOICE);
+            $("#ActNumber").val(row.ACT);
+            $("#PegasysDocumentNumber").val(row.PDOCNO);
+            $("#PurchaseOrderDocumentType").val(docType);
+            $("#PurchaseOrderNumber").val(row.PONUMBER);
+            $("#ContractNumber").val(row.CONTRACT);
+            $("#VendorCode").val(row.RMIT_VEND);
+            $("#RemitVendorCode").val(row.RMIT_VEND);
+            $("#VendorName").val(row.VENDNAME);
+            $("#VendorAddress1").val(row.ADDR_L1);
+            $("#VendorAddress2").val(row.ADDR_L2);
+            $("#VendorAddress3").val(row.ADDR_L3);
+            $("#VendorCityStateZip").val(row.ADDR_CITY + ", " + row.ADDR_STATE + "  " + row.ADDR_ZPCD);
+            $("#Invoice").val(row.INVOICE);
 
-           
+
             $("#Amount").val(row.AMOUNT == null ? '' : numberWithCommas(parseFloat(Math.round(row.AMOUNT * 100) / 100).toFixed(2)));
 
 
@@ -363,7 +378,7 @@
             if (obj.AMOUNT != null && obj.AMOUNT > 0)
             {
                 $("#Amount").val(obj.AMOUNT == null ? '' : numberWithCommas(parseFloat(Math.round(obj.AMOUNT * 100) / 100).toFixed(2)));
-            }        
+            }
         }
 
         function GetFormattedDate(strDate)
@@ -576,14 +591,22 @@ function ResetErrors()
     $("#btnViewDocument").on("click", function (e)
 {
     ResetErrors();
-    var url = '@Url.Action("ViewInvoice", "TransHist", new { inv_Key_Id = Model.PegInv.INV_KEY_ID })';
+    var url;
+    if ('@Model.ErrorCode' == "P200") {
+        url = '@Url.Action("ViewInvoice", "TransHist", new { inv_Key_Id = Model.PegInv.INV_KEY_ID })';
+    } else if ('@Model.ErrorCode' == "M200") {
+        url = '@Url.Action("ViewEstimatedAccrual", "TransHist", new { ae_Id = Model.PegInv.INV_KEY_ID })';
+    } else if ('@Model.ErrorCode' == "A200") {
+        url = '@Url.Action("ViewEDIRR", "TransHist", new { rrId = Model.PegInv.INV_KEY_ID })';
+    }
+
     window.location = url;
 });
 
     $("#btnViewImage").on("click", function (e)
 {
     ResetErrors();
-    var docId = "@Model.PegInv.IMAGEID";
+    var docId = $("#PegInv_IMAGEID").val();
     if (docId == null || docId.trim().length == 0)
     {
         alert("No image was found!");
@@ -651,7 +674,20 @@ function ResetErrors()
             return;
         }
         var newPdocno = GetPDocNo(row);
-        var newAct = $.trim(row.ACT);
+        var newAct = $.trim(row.TITL);
+
+        if ('@Model.ErrorCode' == "M200" &&
+            !(newPdocno.toLowerCase().StartsWith("2b") || newPdocno.toLowerCase().StartsWith("hb")))
+        {
+            alert("The Accrual can only be matched to doctypes where VITAP can process the Accrual. Otherwise the Accrual should be rejected.");
+            return;
+        }
+
+    if ('@Model.ErrorCode' == "A200" &&
+            !(newPdocno.toLowerCase().StartsWith("2b") || newPdocno.toLowerCase().StartsWith("hb"))) {
+            alert("The RR can only be matched to doctypes where VITAP can process the RR. Otherwise the RR should be rejected.");
+            return;
+        }
 
         var vcpo = 'F';
 
@@ -696,7 +732,7 @@ function ResetErrors()
     });
 
     function numberWithCommas(x) {
-        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return '$' + x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
 
 </script>

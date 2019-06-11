@@ -81,6 +81,11 @@ namespace VITAP.SharedLogic.Buttons
                     //    break;
 
                     case "D062":
+                    case "M303":
+                    case "M224":
+                    case "M237":
+                        ExceptionM237(exception);
+                        break;
                     case "P060":
                         ExceptionD062(Search, Address);
                         break;
@@ -122,6 +127,18 @@ namespace VITAP.SharedLogic.Buttons
                     case "V300":
                     case "V215":
                         ExceptionV299(Search, Address, InvQuery, POFrmQuery);
+                        break;
+
+                    case "A224":
+                        ExceptionA224(exception,Search, Address, RRFrmQuery);
+                        break;                   
+
+                    case "A226":
+                        ExceptionA226(exception, Search, Address);
+                        break;
+
+                    case "A237":
+                        ExceptionA237(exception, Search, Address);
                         break;
 
                     default:
@@ -260,6 +277,29 @@ namespace VITAP.SharedLogic.Buttons
                     UpdatePegasysInvoiceToReject(rtnInv);
                 }
             }
+            else if (exception.ERR_CODE.Left(1) == "A")
+            {
+                NewNote = "Reject RR - " + NewNote;
+
+                var rtnRR = GetPegasysRRByKey(exception.RR_ID);
+                if (rtnRR != null)
+                {
+                    UpdatePegasysRRToReject(rtnRR);
+                }
+            }
+            else if (exception.ERR_CODE.Left(1) == "M")
+            {
+                NewNote = "Reject AE - " + NewNote;
+
+                var rtnAE = GetPegasysAEByKey(exception.AE_ID);
+                if (rtnAE != null)
+                {
+                    UpdatePegasysAEToReject(rtnAE);
+                }
+
+                // Do not send Rejection Notification Letter for EA's.
+                return;
+            }
 
             if (notes.returnVal2 == null || !notes.returnVal2.Contains("DUPLICATE"))
             {
@@ -268,8 +308,14 @@ namespace VITAP.SharedLogic.Buttons
                     Report_ID = "P08";
                     ReportForm = "PegInvReject";
                 }
+                else if (exception.ERR_CODE.Left(1) == "A")
+                {
+                    Report_ID = "F05";
+                    ReportForm = "PegRRReject";
+                }
 
-                //Do not send Rejection Notification Letter for EA's. 
+                //Do not send Rejection Notification Letter for EA's.
+
                 if (!CheckNotificationExists())
                 {
                     Status = "Pending";
@@ -301,6 +347,16 @@ namespace VITAP.SharedLogic.Buttons
                     Report_ID = "P08";
                     ReportForm = "PegInvReject";
                 }
+                else if (exception.ERR_CODE.Left(1) == "A")
+                {
+                    Report_ID = "F05";
+                    ReportForm = "PegRRReject";
+                }
+                else if (exception.ERR_CODE.Left(1) == "M")
+                {
+                    Report_ID = "F08";
+                    ReportForm = "PegAEReject";
+                }
 
                 Status = "Pending";
                 var FaxNotes = notes.returnVal7;
@@ -321,8 +377,22 @@ namespace VITAP.SharedLogic.Buttons
                 }
             }
 
-            var rtnInv = GetPegasysInvoiceByKey(exception.INV_KEY_ID);
-            UpdatePegasysInvoiceToReject(rtnInv);
+
+            if (exception.ERR_CODE.Left(1) == "P" || exception.ERR_CODE.Left(1) == "R")
+            {
+                var rtnInv = GetPegasysInvoiceByKey(exception.INV_KEY_ID);
+                UpdatePegasysInvoiceToReject(rtnInv);
+            }
+            else if (exception.ERR_CODE.Left(1) == "A")
+            {
+                var rtnRR = GetPegasysRRByKey(exception.RR_ID);
+                UpdatePegasysRRToReject(rtnRR);
+            }
+            else if (exception.ERR_CODE.Left(1) == "M")
+            {
+                var rtnAE = GetPegasysAEByKey(exception.AE_ID);
+                UpdatePegasysAEToReject(rtnAE);
+            }
 
             NewNote = NoteInfo + "/r/n" + ReportForm + "\r" + NewNote;
         }
@@ -361,6 +431,21 @@ namespace VITAP.SharedLogic.Buttons
             var rtnInv = GetPegasysInvoiceByKey(exception.INV_KEY_ID);
             UpdatePegasysInvoiceToReject(rtnInv);
         }
+
+        /// <summary>
+        /// Handles M237 exceptions
+        /// </summary>
+        private void ExceptionM237(EXCEPTION exception)
+        {
+            NewNote = "Reject AE - " + NewNote;
+
+            var rtnAE = GetPegasysAEByKey(exception.AE_ID);
+            if (rtnAE != null)
+            {
+                UpdatePegasysAEToReject(rtnAE);
+            }
+        }
+
 
         /// <summary>
         /// Handles P001, P002, P004, and P024 exceptions
@@ -414,7 +499,11 @@ namespace VITAP.SharedLogic.Buttons
                 InsertTranshist(exception, "X", strCuffMemo, "Reject Notification", PrepCode);
 
                 var rtnInv = GetPegasysInvoiceByKey(exception.INV_KEY_ID);
-                UpdatePegasysInvoiceToReject(rtnInv);
+
+                if (rtnInv != null)
+                {
+                    UpdatePegasysInvoiceToReject(rtnInv);
+                }
             }
         }
 
@@ -460,6 +549,116 @@ namespace VITAP.SharedLogic.Buttons
             if (rtnInv != null)
             {
                 UpdatePegasysInvoiceToReject(rtnInv);
+            }
+        }
+
+        /// <summary>
+        /// Handles A224 exceptions
+        /// If notes.returnVal2 does not contain "DUPLICATE", it adds a notification and transhist record
+        /// Update PegasysRR record to "REJECT"
+        /// Update Exceptions Properties
+        /// </summary>
+        private void ExceptionA224(EXCEPTION exception, AddressValuesModel Search, AddressValuesModel Address,PEGASYSRR_FRM RRFrmQuery)
+        {           
+            var rtnRR = GetPegasysRRByKey(exception.RR_ID);
+            UpdatePegasysRRToReject(rtnRR);
+            
+            var Ex_Date = exception.EX_DATE;
+            ReportForm = "";
+
+            var S_Note = "No";
+            Report_ID = "F05";
+            ReportForm = "PRRReject";
+
+            if (!notes.returnVal2.Contains("DUPLICATE"))
+            {
+                if (!CheckNotificationExists())
+                {
+                    InsertNotification();
+                }
+
+                S_Note = "Yes";
+
+                var strCuffMemo = "Reject - " + "\r\n" + "Send Notification " + S_Note + ": " +
+                    Report_ID + " - " + ReportForm + "\r" + NewNote;
+                InsertTranshist(exception, "X", strCuffMemo, "Reject Notification", PrepCode);
+            }
+
+            var properties = new List<string>
+            {
+                "VENDNAME",
+                "RRAMOUNT"
+            };
+
+            exception.VENDNAME = RRFrmQuery.VENDNAME;
+            exception.RRAMOUNT = RRFrmQuery.AMOUNT;
+
+            UpdateException(exception, properties);           
+        }
+
+        /// <summary>
+        /// Handles A226 exceptions
+        /// If notes.returnVal2 does not contain "DUPLICATE", it adds a notification and transhist record
+        /// Update PegasysRR record to "REJECT"
+        /// </summary>
+        private void ExceptionA226(EXCEPTION exception, AddressValuesModel Search, AddressValuesModel Address)
+        {
+            var rtnRR = GetPegasysRRByKey(exception.RR_ID);
+            UpdatePegasysRRToReject(rtnRR);
+
+            var Ex_Date = exception.EX_DATE;
+            ReportForm = "";
+
+            //Generating EA Rejection notification
+            var S_Note = "No";
+            Report_ID = "F05";
+            ReportForm = "PRRReject";
+
+            if (!notes.returnVal2.Contains("DUPLICATE"))
+            {
+                if (!CheckNotificationExists())
+                {
+                    InsertNotification();
+                }
+
+                S_Note = "Yes";
+
+                var strCuffMemo = "Reject - " + "\r\n" + "Send Notification " + S_Note + ": " +
+                    Report_ID + " - " + ReportForm + "\r" + NewNote;
+                InsertTranshist(exception, "X", strCuffMemo, "Reject Notification", PrepCode);
+            }           
+        }
+
+        /// <summary>
+        /// Handles A237 exceptions
+        /// If notes.returnVal2 does not contain "DUPLICATE", it adds a notification and transhist record
+        /// Update PegasysRR record to "REJECT"
+        /// </summary>
+        private void ExceptionA237(EXCEPTION exception, AddressValuesModel Search, AddressValuesModel Address)
+        {
+            var rtnRR = GetPegasysRRByKey(exception.RR_ID);
+            UpdatePegasysRRToReject(rtnRR);
+
+            var Ex_Date = exception.EX_DATE;
+            ReportForm = "";
+
+            //Generating EA Rejection notification
+            var S_Note = "No";
+            Report_ID = "F05";
+            ReportForm = "PRRReject";
+
+            if (!notes.returnVal2.Contains("DUPLICATE"))
+            {
+                if (!CheckNotificationExists())
+                {
+                    InsertNotification();
+                }
+
+                S_Note = "Yes";
+
+                var strCuffMemo = "Reject - " + "\r\n" + "Send Notification " + S_Note + ": " +
+                    Report_ID + " - " + ReportForm + "\r" + NewNote;
+                InsertTranshist(exception, "X", strCuffMemo, "Reject Notification", PrepCode);
             }
         }
 
@@ -553,7 +752,7 @@ namespace VITAP.SharedLogic.Buttons
             var DateQueued = DateTime.Now;
             Report_ID = "F05";
             ReportForm = "RR Reject";
-            //Don't hae the RRQuery...Need to get it set up
+            //Don't have the RRQuery...Need to get it set up
             if (RRFrmQuery != null)
             {
                 exception.RR_ID = RRFrmQuery.RR_ID;
@@ -581,7 +780,6 @@ namespace VITAP.SharedLogic.Buttons
                     if (!CheckNotificationExists())
                     {
                         Status = "Pending";
-                        var Address = GetAddressFromInvoice(exception.INV_KEY_ID);
                         InsertNotification();
                     }
                 }
@@ -906,6 +1104,23 @@ namespace VITAP.SharedLogic.Buttons
             rtnInv.ERR_CODE = null;
 
             UpdatePegasysInvoice(rtnInv, fieldsToUpdate);
+        }
+
+        /// <summary>
+        /// Sets the PegasysAEFrm.AE_STATUS = "REJECT"
+        /// </summary>
+        /// <param name="rtnAE"></param>
+        private void UpdatePegasysAEToReject(PEGASYSAE_FRM rtnAE)
+        {
+            var fieldsToUpdate = new List<string>
+                {
+                    "AE_STATUS",
+                    "ERR_CODE"
+                };
+            rtnAE.AE_STATUS = "REJECT";
+            rtnAE.ERR_CODE = null;
+
+            UpdatePegasysAE(rtnAE, fieldsToUpdate);
         }
 
         private void AddException(string allprocess, string err_code, string prepCode)

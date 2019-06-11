@@ -22,7 +22,7 @@ namespace VITAP.SharedLogic.Buttons
             SetNotesValues(notes);
         }
 
-        public void FinishCode()
+        public void FinishCode(List<NoRRArray> noRRArray)
         {
             //set err_response to Q because the P040 will have the M err_response***
             var responsenotes = exception.RESPONSENOTES + "\r\n" + NewNote;
@@ -30,10 +30,9 @@ namespace VITAP.SharedLogic.Buttons
 
             if (exception.RR_ID == "MRR")
             {
-                var rtnMFIC = GetMFICData(exception.ACT);
-                if (rtnMFIC.Count > 0)
+                if (noRRArray != null && noRRArray.Count > 0)
                 {
-                    foreach (var row in rtnMFIC)
+                    foreach (var row in noRRArray)
                     {
                         InsertMatchRRInv(exception.ACT, row.DOC_NUM, exception.INV_KEY_ID);
                     }

@@ -32,7 +32,7 @@
                                             @foreach (var RadioVal in Model.ReasonsItems)
                                             {
                                                 <div class="radio">
-                                                    <label><input value="@RadioVal.Text" type="radio" name="ReasonsGroup">@RadioVal.Text</label>
+                                                    <label><input @((Model.PrevButton == "ACCEPT" && Model.ErrCode == "M224" && RadioVal.Text.ToLower() != "other") ? "disabled" : "")  @((Model.PrevButton == "ACCEPT" && Model.ErrCode == "M224" && RadioVal.Text.ToLower() == "other") ? "checked=checked" : "checked=false") value="@RadioVal.Text" type="radio" name="ReasonsGroup">@RadioVal.Text</label>
                                                 </div>
                                             }
                                         </div>
@@ -385,6 +385,12 @@
                         $("#Amount").prop("disabled", true);
                     }
                 }
+                if (ErrCode == "A224")
+                {                         
+                        $("input[name='ReasonsGroup'][value='Freight']").prop('disabled', true)
+                        $('input[name=ReasonsGroup][value=Freight]').prop('checked', false)
+                        $("input[name='ReasonsGroup'][value='Qty Variance']").prop('disabled', true)                                           
+                }
             }
         }
 
@@ -594,6 +600,23 @@
                 if (PrevButton == "REJECT" && reason.indexOf("DUPLICATE") !== -1)
                 {
                     //Checkbox remains in prior state
+                    if(ErrCode=="A224"&&PrevButton == "REJECT" && reason=="DUPLICATE RECEIPT")
+                    {
+                        $('.email-chk').attr('checked', false);
+                        $('.email-chk').attr("disabled", true);
+                        faxNotesMandatory = false;
+                    }
+                    if(ErrCode=="A226"&&PrevButton == "REJECT" && reason=="DUPLICATE RECEIPT")
+                    {
+                        $('.email-chk').attr('checked', false);
+                        $('.email-chk').attr("disabled", true);
+                        faxNotesMandatory = false;
+                    }
+                } 
+                else if (PrevButton == "CORRECT" && ErrCode=='U044')
+                {
+                        $('.email-chk').attr('checked', false);
+                        $('.email-chk').attr("disabled", true);                  
                 }
                 else
                 {
@@ -765,7 +788,7 @@
         function cancel() {
             var vm = $('form').serialize();
             var url = ('@Html.Raw(Url.Action("FinishNotes", "Exceptions", new {
-                           errCode = "ERRCODE",
+                           err_Code = "ERRCODE",
                            returnExId = "EXID",
                            Act = "ACT",
                            pDocNo = "PDOCNO",
@@ -852,6 +875,7 @@
             // check first item
             if($('[name="ReasonsGroup"]')[0] != null)
             {
+                if(!(ErrCode=="M224" && PrevButton=="ACCEPT"))
                 $('[name="ReasonsGroup"]')[0].checked = true;
             }
 
@@ -882,7 +906,6 @@
                     selectedOption.id = count;
                 }
             });
-
             return selectedOption;
         }
 
@@ -897,7 +920,7 @@
                     message: ""
                 };
 
-            var SrcVis = $(".sourceContainer").is(":visible"); 
+            var SrcVis = $(".sourceContainer").is(":visible");
 
             if (selReas.id != 0) {
                 if ($('#returnVal2').val().toUpperCase() == "OTHER" && intNotes == "") {
@@ -937,7 +960,7 @@
                     message: ""
                 };
 
-            var SrcVis = $(".sourceContainer").is(":visible"); 
+            var SrcVis = $(".sourceContainer").is(":visible");
 
             $('#returnVal10').val($('.txt-susp').val());
 
@@ -949,22 +972,31 @@
                 }
                 valid = false;
             } else {
-                if (PrevButton == "Accept") {
+                if (PrevButton == "ACCEPT") {
                     if (getSelectedRadio("PaymentAmtGroup").id == 0) {
                         message = "Payment amount must be annotated.";
                         valid = false;
-                    } else if ($('.txt-amt').val() > '@(Model.PegInvData == null || Model.PegInvData.AMOUNT == null ? 0 : Model.PegInvData.AMOUNT)') {
+                    } else if ($('.txt-amt').val() > parseFloat('@(Model.PegInvData == null || Model.PegInvData.AMOUNT == null ? 0 : Model.PegInvData.AMOUNT)')) {
                         message = "Payment cannot be greater than Invoice Amount.";
                         valid = false;
-                    } else if ($('.txt-amt').val() != null && $('.txt-amt').is('[disabled]')) {
-                        message = "Payment Amount.";
+                    }
+                    else if ($('.txt-amt').val() != null && $('.txt-amt').val() <= 0) {
+                        message = "Payment amount must be greater than zero.";
                         valid = false;
-                    } else if (SrcVis) {
-                        if (SelSrc.id == 0) {
+                    }
+                    else if (SrcVis) {
+                        if (typeof selSrc !== "undefined" && selSrc && selSrc.id == 0) {
                             message = "Type of Quantity Variance.";
                             valid = false;
                         }
                     }
+
+                    if (selReas.val.toUpperCase() == "RR DEDUCTION")
+                    {
+                        message = '';
+                        valid = confirm("Are you sure you'd like to accept this RR Deduction?");
+                    }
+
                 } else if (PrevButton == "CHANGE") {
                     //Creates validation object (o2Valid)
                     //If returnvalY.Left(1) is not a letter
@@ -1011,7 +1043,7 @@
                     message: ""
                 };
 
-            var SrcVis = $(".sourceContainer").is(":visible"); 
+            var SrcVis = $(".sourceContainer").is(":visible");
 
             $('#returnVal10').val($('.txt-susp').val());
 
@@ -1027,11 +1059,11 @@
                     if (getSelectedRadio("PaymentAmtGroup").id == 0) {
                         message = "Payment amount must be annotated.";
                         valid = false;
-                    } else if ($('.txt-amt').val > '@(Model.PegInvData == null || Model.PegInvData.AMOUNT == null ? 0 : Model.PegInvData.AMOUNT)') {
+                    } else if ($('.txt-amt').val() > parseFloat('@(Model.PegInvData == null || Model.PegInvData.AMOUNT == null ? 0 : Model.PegInvData.AMOUNT)')) {
                         message = 'Payment cannot be greater than Invoice Amount.';
                         valid = false;
-                    } else if ($('.txt-amt').val() != null && $('.txt-amt').is('[disabled]')) {
-                        message = "Payment Amount.";
+                    } else if ($('.txt-amt').val() != null && $('.txt-amt').val() <= 0) {
+                        message = "Payment amount must be greater than zero.";
                         valid = false;
                     } else if (SrcVis) {
                         if (selSrc.id == 0) {
@@ -1060,7 +1092,7 @@
             return retObj
         }
 
-        function finish() {
+        function finish() {          
             var vm = $('form').serialize(),
                 reason = getSelectedRadio("ReasonsGroup"),
                 miscVal = $('.misc-cbo').val(),
@@ -1068,7 +1100,7 @@
                 selReas = getSelectedRadio("ReasonsGroup"),
                 intNotes = $('.int-notes').val();
 
-            var SrcVis = $(".sourceContainer").is(":visible"); 
+            var SrcVis = $(".sourceContainer").is(":visible");
 
             if (PrevButton == 'ROUTE' && miscVal == 'PEGASYS' && miscVal != 'PEGASYS/NON-VITAP') {
                 var ret = confirm("Are you sure you want to route directly to PEGASYS?");
@@ -1091,7 +1123,12 @@
                 if (ErrCode != 'Z237' || ErrCode != 'Z310') {
                     if ($('#returnVal2').val().toUpperCase() == "DUPLICATE" && PrevButton == "REJECT") {
                         faxNotesMandatory = false;
-                    } else if ($('#returnVal7').val() == null || $('#returnVal7').val() == "") {
+                    }
+                    else if(ErrCode=="A226"&&PrevButton == "EAREQUEST")
+                    {
+                        faxNotesMandatory = false;
+                    }
+                    else if ($('#returnVal7').val() == null || $('#returnVal7').val() == "") {
                         alert('Email/Fax Notes are mandatory');
 
                         OpenFaxNotes();
@@ -1139,7 +1176,7 @@
                 }
             } else {
                 if (ErrCode == "P060" || ErrCode == "P061" /*reason code stuff*/ ) {
-
+                
                 }
                 if (ErrCode.slice(-3) == "230" && PrevButton == "PROCESSED") {
                     if (selReas == "Other" && intNotes == "") {
@@ -1195,9 +1232,9 @@
                     //Displays message "Change not made..."
 
                     return;
-                }
+                }                                                
 
-                if (faxNotesMandatory && selReas.val != "OTHER") {
+                if (faxNotesMandatory && selReas.val.toUpperCase() != "OTHER") {
                     $('#returnVal3').val(selReas.val + "\n\r" + $('#returnVal7').val());
                 }
 
@@ -1207,26 +1244,42 @@
                         alert(ret.message);
                         return;
                     }
-                } else if (ErrCode.substring(0, 1) == "C" && (PrevButton == "CHANGE" || PrevButton == "ACCEPT") && selSrc.id == 0) {
-                    alert('You must select a Source of Information before "FINISH"ing.');
-                    return;
-                } else if (ErrCode == "P001" || ErrCode == "P002" || ErrCode == "P004" || ErrCode == "P024") {
-                    var ret = P001Fin();
-                    if (!ret.valid) {
-                        alert(ret.message);
+                } 
+                if(ErrCode=="U044"&&PrevButton=="CORRECT") 
+                {
+                    if (intNotes == "") {
+                        alert("Internal notes is mandatory");
                         return;
                     }
-                } else if (ErrCode == "P060" || ErrCode == "P061") {
+                }
+                else if (ErrCode.substring(0, 1) == "C" && (PrevButton == "CHANGE" || PrevButton == "ACCEPT") && selSrc.id == 0) {
+                    alert('You must select a Source of Information before "FINISH"ing.');
+                    return;
+                } 
+                else if (ErrCode == "P001" || ErrCode == "P002" || ErrCode == "P004" || ErrCode == "P024") {
+                    var ret = P001Fin();
+                    if (!ret.valid) {
+                        if (ret.message.length > 0)
+                        {
+                            alert(ret.message);
+                        }
+
+                        return;
+                    }
+                } 
+                else if (ErrCode == "P060" || ErrCode == "P061") {
                     P060Fin();
-                } else if (ErrCode == "P201") {
+                } 
+                else if (ErrCode == "P201") {
                     var ret = P201Fin();
 
                     if (!ret.valid) {
                         alert(ret.message);
                         return;
                     }
-                } else {
-                    if (selReas.val == "OTHER" && intNotes == "") {
+                } 
+                else {                   
+                    if (selReas.val.toUpperCase() == "OTHER" && intNotes == "") {
                         alert('You must type Internal notes when selecting "OTHER".');
                         return;
                     }

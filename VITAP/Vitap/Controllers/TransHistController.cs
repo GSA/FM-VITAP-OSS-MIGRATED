@@ -17,6 +17,7 @@ using VITAP.Data.Models.MainNav;
 using VITAP.Utilities;
 using VITAP.Data.Models.Exceptions;
 using Elmah;
+using VITAP.Data.Models.CombineAccruals;
 
 namespace VITAP.Controllers
 {
@@ -681,20 +682,27 @@ namespace VITAP.Controllers
 
         public ActionResult ViewRR(string rr_Id)
         {
-
+            // Clear old Rrchoice.
+            Session[SessionKey.Rrchoice] = null;
             if (rr_Id == null)
             {
                 ViewBag.Message = "No RR ID was passed in";
                 return View("ViewErrorMessage");
             }
 
+            var rejectStatusMessage = Request.QueryString["RejectStatusMessage"];
+            if (rejectStatusMessage != null && rejectStatusMessage.Length > 0)
+            {
+                ViewBag.RejectStatusMessage = rejectStatusMessage;
+            }
             var mgrRR = new ReceivingReportManager();
             var mgrRRAccting = new ReceivingReportAccountingManager();
             var mgrRREdi = new RREdiManager();
 
             try
             {
-                var vmRR = mgrRR.GetPegasysRR(rr_Id);
+                var vmRR = null as PegasysRRModel;
+                vmRR = mgrRR.GetPegasysRR(rr_Id);
                 if (vmRR != null)
                 {
                     if (!string.IsNullOrWhiteSpace(vmRR.InboxUidy))
@@ -715,6 +723,10 @@ namespace VITAP.Controllers
                         vmRR.PegasysRREdi = mgrRREdi.GetPegasysRREdi(vmRR.InboxUidy).ToList();
                         vmRR.ImageId = mgrRR.GetPegasysRRImageId(rr_Id);
                         vmRR.IsEnabledViewTJ = true;
+
+                        // Reject is not enabled for Pegasys RRs.
+                        vmRR.ViewRRRejectButtonText = ControllerAction.Exception.Reject;
+                        vmRR.ViewRRRejectButtonDisabled = true;
                     }
                 }
                 else
@@ -725,13 +737,20 @@ namespace VITAP.Controllers
                         ViewBag.Message = "No Receiving Report was found.";
                         return View("ViewErrorMessage");
                     }
+                    vmRR.OrderNumber = vmRR.PONumber;
                     vmRR.InboxUidy = vmRR.InboxUidy ?? "";
                     vmRR.IsSourcePegasys = false;
                     vmRR.RRAccounting.IsSourcePegasys = false;
                     vmRR.RRAccounting.VitapRRAccounting = mgrRRAccting.GetRRAccountingById(rr_Id).ToList();
                     vmRR.IsEnabledViewTJ = false;
+
+                    var roleList = Session[SessionKey.RoleModel] as RoleListModel;
+
+                    // roleList.ASSIGN_SRV needs to be 'FTS' to be enabled.
+                    SetRejectButtonForRR(vmRR, roleList.ASSIGN_SRV);
                 }
                 vmRR.PegasysRRDetail.Description = vmRR.Description;
+                Session[SessionKey.Rrchoice] = vmRR;
 
                 return View("ViewRR/Index", vmRR);
             }
@@ -745,84 +764,124 @@ namespace VITAP.Controllers
             }
         }
 
-        private void SetRejectButtonForRR(string rrId, string status, bool hasExceptions)
+        // Set Enabled and text for Reject button.
+        private void SetRejectButtonForRR(PegasysRRModel vmRR, string userAssignedService)
         {
-            if (status == "REJECT" || status == "REJECTED")
+            vmRR.ViewRRRejectButtonAction = "";
+
+            if (vmRR.Status == DataEntry.Reject || vmRR.Status == DataEntry.Reject)
             {
-                if (hasExceptions)
+                var exceptionManager = new ExceptionsManager();
+                var exceptionHistManager = new ExceptionHistManager();
+
+                // These exception lists are already filtered by A230 and Err_Response = 'X'
+                var exceptionList = exceptionManager.GetExceptionsByRRId(vmRR.RR_ID).ToList();
+                IEnumerable<Data.ExceptionHist> exceptionHistList = Enumerable.Empty<Data.ExceptionHist>();
+                if (exceptionList.Count() == 0)
                 {
-                    ViewBag.RejectButtonDisabled = true;
-                    ViewBag.RejectButtonText = "Un-Reject RR";
+                    exceptionHistList = exceptionHistManager.GetExceptionHistListByRRId(vmRR.RR_ID).ToList();
+                }
+
+
+                // Pseudo code checks Exceptions table first, then if count == 0 checks ExceptionHist.
+                // Current Vitap DEV DB contains no records with A230 and Err_Response = 'X', this is a temporary state,
+                // may have to create state for testing.
+                if (exceptionList.Count() > 0 || exceptionHistList.Count() > 0)
+                {
+                    vmRR.ViewRRRejectButtonDisabled = true;
+                    vmRR.ViewRRRejectButtonText = "Un-Reject RR";
                 }
                 else
                 {
-                    var exceptionHistManager = new ExceptionHistManager();
-                    var exceptionHistList = exceptionHistManager.GetExceptionHistListByRRId(rrId).ToList();
-                    if (exceptionHistList.Count() > 0)
+                    // COOP role is eliminated
+                    // Enabled is FTS for 2C or HC docs
+                    // ImageBatch is no longer used.
+                    if (new List<string> { "2C", "HC" }.Contains(vmRR.RR_ID.Substring(0, 2)) && userAssignedService == "FTS")
                     {
-                        ViewBag.RejectButtonDisabled = true;
-                        ViewBag.RejectButtonText = "Un-Reject RR";
+                        vmRR.ViewRRRejectButtonDisabled = false;
+                        vmRR.ViewRRRejectButtonText = "Un-Reject RR";
+                        vmRR.ViewRRRejectButtonAction = ControllerAction.Exception.UnReject;
                     }
                     else
                     {
-                        // Here need to add to check "Assigned Service" in real project
-                        // If it’s COOP then it allows it - COOP role is elinated
-                        // It is FTS for 2C or HC docs
-                        // If the rr_id is found in pegasysrr_frm / pegasysrr table it checks the imagebatch.If imagebatch = ‘R6’ then it is FTS, otherwise PBS.If imagebatch is null it’s FTS,
-                        // If not found in tables it’s ‘NA’ so it won’t
-                        ViewBag.RejectButtonDisabled = false;
-                        ViewBag.RejectButtonText = "Un-Reject RR";
+                        vmRR.ViewRRRejectButtonDisabled = true;
+                        vmRR.ViewRRRejectButtonText = "Un-Reject RR";
                     }
                 }
             }
-            else if ("ROUTE/INPEG/OUTBOX/EXCEPTION/CANCELLED/PROCESSED/IMGREJECT".Split('/').Contains(status))
+            else if (vmRR.Status.Contains("EXCEPTION") || "ROUTE/INPEG/OUTBOX/CANCELLED/PROCESSED/IMGREJECT".Split('/').Contains(vmRR.Status))
             {
-                ViewBag.RejectButtonDisabled = true;
-                ViewBag.RejectButtonText = "Reject";
+                vmRR.ViewRRRejectButtonDisabled = true;
+                vmRR.ViewRRRejectButtonText = "Reject RR";
             }
-            else if ("KEYED/RE-VERIFY/VERIFY/PREOUT".Split('/').Contains(status))
+            else if ("KEYED/RE-VERIFY/VERIFY/PREOUT".Split('/').Contains(vmRR.Status))
             {
-                // Here need to add to check "Assigned Service" in real project
-                // If assigned service allows
-                ViewBag.RejectButtonDisabled = false;
-                ViewBag.RejectButtonText = "Reject";
+                if (new List<string> { "2C", "HC" }.Contains(vmRR.RR_ID.Substring(0, 2)) && userAssignedService == "FTS")
+                {
+                    vmRR.ViewRRRejectButtonDisabled = false;
+                    vmRR.ViewRRRejectButtonText = "Reject RR";
+                    vmRR.ViewRRRejectButtonAction = ControllerAction.Exception.Reject;
+                }
+                else
+                {
+                    vmRR.ViewRRRejectButtonDisabled = true;
+                    vmRR.ViewRRRejectButtonText = "Reject RR";
+                }
             }
             else
             {
-                ViewBag.RejectButtonDisabled = true;
-                ViewBag.RejectButtonText = "Reject";
+                vmRR.ViewRRRejectButtonDisabled = true;
+                vmRR.ViewRRRejectButtonText = "Reject RR";
             }
+
+            // Check if exception is being worked - This was only checked after they clicked Reject/Unreject button
+            // so only looking for working exceptions if button is enabled.
+            if (vmRR.ViewRRRejectButtonDisabled == false)
+            {
+                var exceptionManager = new ExceptionsManager();
+                var workingExceptionList = exceptionManager.GetWorkingExceptionsByRRId(vmRR.RR_ID).ToList();
+                if (workingExceptionList.Where(x => x.OUT == "T").Count() > 0)
+                {
+                    // Disable button
+                    vmRR.ViewRRRejectButtonDisabled = true;
+
+                    // Update Button Text.
+                    vmRR.ViewRRRejectButtonText += " - Being Worked";
+                    vmRR.ViewRRRejectButtonAction = "";
+                }
+            }
+
         }
 
-        // This is just a copy of ViewRR. What's up with that???
-        public ActionResult ReceivingReport(string rr_Id)
-        {
-            // Get RR Accounting
-            var rrAcctManager = new ReceivingReportAccountingManager();
-            var rrAcctList = rrAcctManager.GetRRAccountingById(rr_Id).ToList();
+        //// This is just a copy of ViewRR. What's up with that???
+        //public ActionResult ReceivingReport(string rr_Id)
+        //{
+        //    // Get RR Accounting
+        //    var rrAcctManager = new ReceivingReportAccountingManager();
+        //    var rrAcctList = rrAcctManager.GetRRAccountingById(rr_Id).ToList();
 
-            ViewBag.RRAccounting = rrAcctList;
-            ViewBag.RejectButtonDisabled = true;
-            ViewBag.RejectButtonText = "Reject";
+        //    ViewBag.RRAccounting = rrAcctList;
+        //    ViewBag.RejectButtonDisabled = true;
+        //    ViewBag.RejectButtonText = "Reject";
 
-            ViewBag.RREdi = GetRREdiListById(rr_Id);
+        //    ViewBag.RREdi = GetRREdiListById(rr_Id);
 
-            var rrManager = new ReceivingReportManager();
-            var rrList = rrManager.GetRRById(rr_Id).ToList();
-            if (rrList.Count() == 0)
-                return GetIndexView();
+        //    var rrManager = new ReceivingReportManager();
+        //    var rrList = rrManager.GetRRById(rr_Id).ToList();
+        //    if (rrList.Count() == 0)
+        //        return GetIndexView();
 
-            // Decide Reject Button Text and Disabled
-            var exceptionsManager = new ExceptionsManager();
-            var exceptionsList = exceptionsManager.GetExceptionsByRRId(rr_Id).ToList();
-            var hasExceptions = exceptionsList.Count() > 0;
+        //    // Decide Reject Button Text and Disabled
+        //    var exceptionsManager = new ExceptionsManager();
+        //    var exceptionsList = exceptionsManager.GetExceptionsByRRId(rr_Id).ToList();
+        //    var hasExceptions = exceptionsList.Count() > 0;
 
-            var rr = rrList.Single();
-            rr.RR_STATUS = rr.RR_STATUS.ToUpper();
-            SetRejectButtonForRR(rr.RR_ID, rr.RR_STATUS, hasExceptions);
+        //    var rr = rrList.Single();
+        //    rr.RR_STATUS = rr.RR_STATUS.ToUpper();
+        //    SetRejectButtonForRR(rr.RR_ID, rr.RR_STATUS, hasExceptions);
 
-            return View(rr);
-        }
+        //    return View(rr);
+        //}
 
         #endregion Receiving Report
 
@@ -1035,6 +1094,10 @@ namespace VITAP.Controllers
                 ViewBag.ViewEAButtonStatus = ListEAManager.ViewEAButtonStatus;
                 //ViewBag.ListUEButtonStatus = ListEAManager.ListUEButtonStatus;
 
+                // Combined Accruals - available if non-PBS and pdocno set.
+                ViewBag.CombinedAccrualsButtonStatus = (pdocno.HasValue() && AssignSrv != "PBS" ? ListEAManager.CombinedAccrualsButtonStatus : "disabled");
+                ViewBag.pdocno = pdocno;
+
                 return View(EAList);
             }
             catch (System.Exception ex)
@@ -1122,7 +1185,7 @@ namespace VITAP.Controllers
             //recur_id = "1B9N01166";
             //recur_id = "ARC86C9490";
             try
-            {
+            {                
                 ListPOManager ListPO = new ListPOManager();
 
                 act = act.ToLower() == "null" ? "" : act.Trim();
@@ -1292,7 +1355,6 @@ namespace VITAP.Controllers
                     {
                         rr.IMAGEBATCH = pegasysRR.IMAGEBATCH;
                         rr.IMAGEID = pegasysRR.IMAGEID;
-                        rr.RR_STATUS = pegasysRR.RR_STATUS;
                         rr.EDI_IND = pegasysRR.EDI_IND;
                     }
                 }
@@ -1524,14 +1586,7 @@ namespace VITAP.Controllers
             model = BindEstimatedAccrualModel(ae_Id);
             return View(model);
         }
-
-        //[HttpPost]
-        //public ActionResult ViewEstimatedAccrual(EstimatedAccrualModel model)
-        //{
-        //    BindEstimatedAccrualModel(model);
-        //    return View(model);
-        //}
-
+        
         public void BindInvoiceModel(InvoiceModel model)
         {
             model.InvoiceAccountingModel = new InvoiceAccountingModel();
@@ -1545,37 +1600,37 @@ namespace VITAP.Controllers
 
             if (!string.IsNullOrEmpty(model.Closed))
             {
-                model.Closed = string.Format("{0:n}", double.Parse(model.Closed));
+                model.Closed = string.Format("{0:c2}", double.Parse(model.Closed));
             }
 
             if (!string.IsNullOrEmpty(model.AppliedCredits))
             {
-                model.AppliedCredits = string.Format("{0:n}", double.Parse(model.AppliedCredits));
+                model.AppliedCredits = string.Format("{0:c2}", double.Parse(model.AppliedCredits));
             }
 
             if (!string.IsNullOrEmpty(model.Net))
             {
-                model.Net = string.Format("{0:n}", double.Parse(model.Net));
+                model.Net = string.Format("{0:c2}", double.Parse(model.Net));
             }
 
             if (!string.IsNullOrEmpty(model.Outstanding))
             {
-                model.Outstanding = string.Format("{0:n}", double.Parse(model.Outstanding));
+                model.Outstanding = string.Format("{0:c2}", double.Parse(model.Outstanding));
             }
 
             if (!string.IsNullOrEmpty(model.InvoicedAmount))
             {
-                model.InvoicedAmount = string.Format("{0:n}", double.Parse(model.InvoicedAmount));
+                model.InvoicedAmount = string.Format("{0:c2}", double.Parse(model.InvoicedAmount));
             }
 
             if (!string.IsNullOrEmpty(model.Freight))
             {
-                model.Freight = string.Format("{0:n}", double.Parse(model.Freight));
+                model.Freight = string.Format("{0:c2}", double.Parse(model.Freight));
             }
 
             if (!string.IsNullOrEmpty(model.TaxAmount))
             {
-                model.TaxAmount = string.Format("{0:n}", double.Parse(model.TaxAmount));
+                model.TaxAmount = string.Format("{0:c2}", double.Parse(model.TaxAmount));
             }
         }
 
@@ -1596,10 +1651,7 @@ namespace VITAP.Controllers
         /// </summary>
         /// <param name="model"></param>
         public EstimatedAccrualModel BindEstimatedAccrualModel(string aeId)
-        {
-            //model.EstimatedAccrualAEAccountingModel = new EstimatedAccrualAEAccountingModel();
-            //model.EstimatedAccrualAEDetailModel = new EstimatedAccrualAEDetailModel();
-            //model.EstimatedAccrualOtherInformationModel = new EstimatedAccrualOtherInformationModel();
+        {            
             var aeModel = new EstimatedAccrualModel();
             var mgr = new TransHistManager();
 
@@ -1608,7 +1660,6 @@ namespace VITAP.Controllers
                 aeModel = mgr.FetchEstimatedAccrual(aeId);
             }
             return aeModel;
-
         }
 
         public void BindNovationHistoryModel(NovationHistoryModel model)
@@ -1878,42 +1929,7 @@ namespace VITAP.Controllers
             var items = mgr.FetchExpenseAccrualEdiRecords(search).AsQueryable();
             var result = items.ToDataSourceResult(request);
             return Json(result, JsonRequestBehavior.AllowGet);
-        }
-
-        //[HttpPost]
-        //public ActionResult EstimatedAccrualAEDetailRecords([DataSourceRequest]DataSourceRequest request, EstimatedAccrualModel search)
-        //{
-        //    var mgr = new TransHistManager();
-        //    var item = mgr.FetchEstimatedAccrualDetail(new EstimatedAccrualModel() { AeId = search.AeId });
-        //    var list = new List<EstimatedAccrualAEDetailModel>();
-
-        //    if (item != null)
-        //    {
-        //        list.Add(item);
-        //    }
-
-        //    var result = list.AsQueryable().ToDataSourceResult(request);
-        //    return Json(result, JsonRequestBehavior.AllowGet);
-        //}
-
-        //[HttpPost]
-        //public ActionResult EstimatedAccrualAccountingRecords([DataSourceRequest]DataSourceRequest request, EstimatedAccrualModel search)
-        //{
-        //    var mgr = new TransHistManager();
-        //    var items = mgr.FetchEstimatedAccrualAccounting(new EstimatedAccrualModel() { AeId = search.AeId });
-
-        //    var result = items.AsQueryable().ToDataSourceResult(request);
-        //    return Json(result, JsonRequestBehavior.AllowGet);
-        //}
-
-        //[HttpPost]
-        //public ActionResult EstimatedAccrualOtherInformationRecords([DataSourceRequest]DataSourceRequest request, EstimatedAccrualModel search)
-        //{
-        //    var mgr = new TransHistManager();
-        //    var items = mgr.FetchEstimatedAccrualOther(new EstimatedAccrualModel() { AeId = search.AeId });
-        //    var result = items.AsQueryable().ToDataSourceResult(request);
-        //    return Json(result, JsonRequestBehavior.AllowGet);
-        //}
+        }        
 
         [HttpPost]
         public ActionResult EDIInvoiceDetailRecords([DataSourceRequest]DataSourceRequest request, EDIInvoiceDetailModel search)
@@ -1923,96 +1939,7 @@ namespace VITAP.Controllers
             var result = items.ToDataSourceResult(request);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
-
-        //[HttpPost]
-        //public ActionResult RecurringMasterLeaseRecords([DataSourceRequest]DataSourceRequest request, RecurringMasterModel search)
-        //{
-        //    var mgr = new RecurringMasterManager();
-        //    var items = mgr.GetLeaseChains(search.Uidy);            
-        //    var result = items.ToDataSourceResult(request);
-        //    return Json(result, JsonRequestBehavior.AllowGet);
-        //}
-
-        //private List<RecurringMasterModel> GetDummyRecurringMasterLeaseRecords(RecurringMasterModel search)
-        //{
-        //    var items = new List<RecurringMasterModel>()
-        //        {
-        //            new RecurringMasterModel
-        //            {
-        //                ChainNumber= "111"
-        //            },
-        //             new RecurringMasterModel
-        //            {
-        //              ChainNumber= "111"
-        //            },
-        //            new RecurringMasterModel
-        //            {
-        //             ChainNumber= "111"
-        //            }
-        //       };
-        //    return items;
-        //}
-
-        //[HttpPost]
-        //public ActionResult RecurringMasterLeaseAmountRecords([DataSourceRequest]DataSourceRequest request, RecurringMasterModel search)
-        //{
-        //    var items = GetDummyRecurringMasterLeaseAmountRecords(search).AsQueryable();
-        //    if (!string.IsNullOrWhiteSpace(search.ChainNumber))
-        //        items = items.Where(x => x.ChainNumber == search.ChainNumber);
-        //    var result = items.ToDataSourceResult(request);
-        //    return Json(result, JsonRequestBehavior.AllowGet);
-        //}
-
-        //private List<RecurringMasterModel> GetDummyRecurringMasterLeaseAmountRecords(RecurringMasterModel search)
-        //{
-        //    var items = new List<RecurringMasterModel>()
-        //        {
-        //            new RecurringMasterModel
-        //            {
-        //                Amount= "111"
-        //            },
-        //             new RecurringMasterModel
-        //            {
-        //              Amount= "111"
-        //            },
-        //            new RecurringMasterModel
-        //            {
-        //             Amount= "111"
-        //            }
-        //       };
-        //    return items;
-        //}
-
-        //[HttpPost]
-        //public ActionResult RecurringMasterDocumentTemplateRecords([DataSourceRequest]DataSourceRequest request, RecurringMasterModel search)
-        //{
-        //    var items = GetDummyRecurringMasterDocumentTemplateRecords(search).AsQueryable();
-        //    if (!string.IsNullOrWhiteSpace(search.RecordNumber))
-        //        items = items.Where(x => x.RecordNumber == search.RecordNumber);
-        //    var result = items.ToDataSourceResult(request);
-        //    return Json(result, JsonRequestBehavior.AllowGet);
-        //}
-
-        //private List<RecurringMasterModel> GetDummyRecurringMasterDocumentTemplateRecords(RecurringMasterModel search)
-        //{
-        //    var items = new List<RecurringMasterModel>()
-        //        {
-        //            new RecurringMasterModel
-        //            {
-        //                RecordNumber= "111"
-        //            },
-        //             new RecurringMasterModel
-        //            {
-        //              RecordNumber= "111"
-        //            },
-        //            new RecurringMasterModel
-        //            {
-        //             RecordNumber= "111"
-        //            }
-        //       };
-        //    return items;
-        //}
-
+        
         [HttpPost]
         public ActionResult RecurringMasterDocumentRecords([DataSourceRequest]DataSourceRequest request, RecurringMasterDocumentModel search)
         {
@@ -2346,6 +2273,7 @@ namespace VITAP.Controllers
         }
 
         [HttpPost]
+        [ValidateInput(false)]
         public ActionResult SummNotes(string act, string pDocNo, SummaryNote note)
         {
             act = FixTextNullAndWhiteSpace(act);
@@ -2774,15 +2702,6 @@ namespace VITAP.Controllers
                 {
                     InboxUidy = pegasysPo.INBOX_UIDY;
                 }
-                else
-                {
-                    var poFrmManager = new PegasysPO_FrmManager();
-                    var pegasysPoAcct = poFrmManager.GetPegasysPOAcctAmdHistByPoId(Po_Id).FirstOrDefault();
-                    if (pegasysPoAcct != null)
-                    {
-                        InboxUidy = pegasysPoAcct.INBOX_UIDY;
-                    }
-                }
             }
 
             if (String.IsNullOrEmpty(Act))
@@ -2911,6 +2830,104 @@ namespace VITAP.Controllers
             return View("ViewEDIReceivingReport", inboxHeader);
         }
 
+
+        [HttpPost]
+        public JsonResult RejectRR(string currentAction, string rrId, string notes, string faxNotes)
+        {
+            string statusMessage = "";
+
+            if (string.IsNullOrWhiteSpace(rrId))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "RejectRR Failed - rrId was not received.",
+                    rejectButtonText = string.Empty,
+                    rejectButtonAction = string.Empty
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            rrId = rrId.Trim();
+
+            try
+            {
+                // Get this RR. No need to look in Pegasys because Reject button would not be enabled.
+                var vmRR = null as PegasysRRModel;
+                var mgrRR = new ReceivingReportManager();
+
+                if (Session[SessionKey.Rrchoice] != null && ((PegasysRRModel)Session[SessionKey.Rrchoice]).RR_ID == rrId)
+                {
+                    vmRR = Session[SessionKey.Rrchoice] as PegasysRRModel;
+                }
+                else
+                {
+                    vmRR = mgrRR.GetVitapRR(rrId);
+                }
+                if (vmRR == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = vmRR.ViewRRRejectButtonAction + " Failed - No Receiving Report was found for rrId = " + rrId + ".",
+                        rejectButtonText = string.Empty,
+                        rejectButtonAction = string.Empty
+                    }, JsonRequestBehavior.AllowGet);
+                }
+
+                // Reject this RR.
+                vmRR.Notes = notes;
+                vmRR.FaxNotes = faxNotes;
+                var roleList = Session[SessionKey.RoleModel] as RoleListModel;
+                if ((statusMessage = vmRR.RejectRR(roleList.PREPCODE)).Length > 0)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = statusMessage,
+                        rejectButtonText = string.Empty,
+                        rejectButtonAction = string.Empty
+                    }, JsonRequestBehavior.AllowGet);
+                }
+
+                // Reload the updated RR.
+                vmRR = mgrRR.GetVitapRR(rrId);
+                Session[SessionKey.Rrchoice] = vmRR;
+
+                // Reset page to new available action. Assuming enabled button remains the same.
+                if (vmRR.Status == DataEntry.Reject || vmRR.Status == DataEntry.Rejected)
+                {
+                    vmRR.ViewRRRejectButtonAction = ControllerAction.Exception.UnReject;
+                    vmRR.ViewRRRejectButtonText = "Un-Reject RR";
+                }
+                else
+                {
+                    vmRR.ViewRRRejectButtonAction = ControllerAction.Exception.Reject;
+                    vmRR.ViewRRRejectButtonText = "Reject RR";
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    message = "RR has been " + currentAction + "ed.",
+                    rejectButtonText = vmRR.ViewRRRejectButtonText,
+                    rejectButtonAction = vmRR.ViewRRRejectButtonAction,
+                    newStatus = vmRR.Status
+                }, JsonRequestBehavior.AllowGet);
+            }
+            catch (System.Exception ex)
+            {
+                var msg = "Error in TransHist/RejectRR:\n\n\t" + ex.Message;
+                Logging.AddWebError(msg, "TransHist", "RejectRR");
+                Elmah.ErrorSignal.FromCurrentContext().Raise(ex);
+                return Json(new
+                {
+                    success = false,
+                    message = "RejectRR Failed - Data exception.",
+                    rejectButtonText = string.Empty,
+                    rejectButtonAction = string.Empty
+                }, JsonRequestBehavior.AllowGet);
+            }
+        }
         public ActionResult RejectShowFaxNotesStep2(string inv_Key_Id)
         {
             var model = Session["currentInvoice"] as InvoiceModel;
@@ -3035,17 +3052,145 @@ namespace VITAP.Controllers
             return RedirectToAction("ViewInvoice", new { @modelStatus = "Invoice UnRejected!", inv_Key_Id = currentInvoice.InvKeyId });
         }
 
-        protected override JsonResult Json(object data, string contentType, System.Text.Encoding contentEncoding, JsonRequestBehavior behavior)
+        public ActionResult GetAccrualsTocombine(string act, string pdocno)
         {
-            return new JsonResult()
-            {
-                Data = data,
-                ContentType = contentType,
-                ContentEncoding = contentEncoding,
-                JsonRequestBehavior = behavior,
-                MaxJsonLength = int.MaxValue
-            };
+
+            var model = new CombineAccrualsManager().GetAccrualsInfo(pdocno, act);
+
+                Session[SessionKey.CombineAccrualsModel] = model;
+          
+
+            return View("combineAccruals/CombinedAccruals", model);
         }
+
+        public ActionResult combineAccruals(List<AccrualsGrid> combineAccrualsList)
+        {
+            var aeList = "";
+            var noAEList = "";
+            var model = Session[SessionKey.CombineAccrualsModel] as CombineAccrualsModel ?? null;
+            decimal? combineAccrualsTotal = 0M;
+            combineAccrualsList.ForEach(x => combineAccrualsTotal += x.AMT);
+
+            if (combineAccrualsTotal < 0 && ((model.OriginalAccrualBalance ?? 0) < Math.Abs(Convert.ToDecimal(combineAccrualsTotal))))
+            {              
+                    return Json(new { success = true, Type = "error", Message = "Original Accrual does not have enough money available for accruals to combine." }, JsonRequestBehavior.AllowGet);
+            }
+            else if (model.POTabModel.POAmount < combineAccrualsTotal)
+            {
+                return Json(new { success = true, Type = "error", Message = "PO does not have enough money available for accruals to combine." }, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                CombineAccrualsManager mgr = new CombineAccrualsManager();
+
+                combineAccrualsList.ForEach(x => aeList += "','" + x.AE_ID);
+                model.AccrualsNotCombined.ForEach(x =>
+                {
+                    if (!aeList.Contains(x.AE_ID))
+                    {
+                        noAEList += "','" + x.AE_ID;
+                    }
+
+                }
+                );
+                aeList = aeList.TrimStart('\'', ',') + "'";
+                aeList = "'" + aeList;
+                noAEList = noAEList.TrimStart('\'', ',') + "'";
+                noAEList = "'" + noAEList;
+                TempData["aeList"] = aeList;
+                TempData["noAEList"] = noAEList;
+
+                var result = mgr.CombineAccruals(aeList, noAEList, model, PrepCode);
+
+                if (result.Count() > 0)
+                {
+                    if (result.ContainsKey("warning"))
+                    {
+                       if( result.ContainsKey("recycleAEEX"))
+                        {
+                            TempData["recycleAEEX"] = true;
+                            TempData["recycle"] = true;
+                        }
+                       else if (result.ContainsKey("recycleAEEXNo"))
+                        {
+                            TempData["recycleAEEX"] = false;
+                            TempData["recycle"] = true;
+                        }
+                            return Json(new { success = true, Type = "warning", Message = result["warning"] }, JsonRequestBehavior.AllowGet);
+                    }
+                    else if (result.ContainsKey("error"))
+                    {
+                        ViewBag.Message = result["error"];
+                        return Json(new { success = true, Type = "error", Message = result["error"] }, JsonRequestBehavior.AllowGet);
+                    }
+                    else if (result.ContainsKey("success"))
+                    {                       
+                        return Json(new { success = true, Type = "success" }, JsonRequestBehavior.AllowGet);
+                    }
+                    else 
+                    {
+                        return Json(new { success = false, Type = "success" }, JsonRequestBehavior.AllowGet);
+                    }
+                }
+                else
+                {
+                    mgr.CombineAccrualsConfirmed(aeList, noAEList,false,false, model, PrepCode);
+                    return Json(new { success = true, Type = "success" }, JsonRequestBehavior.AllowGet);
+                }
+            }
+
+        }
+
+        public ViewResult combineAccrualsShowError(string msg, string type)
+        {
+            if (type == "error")
+            {
+                ViewBag.Message = msg;
+                return View("ViewErrorMessage");
+            }
+            else if (type == "warning")
+            {
+                var vmConfirm = new MessageDisplay()
+                {
+                    Title = "Combine Accruals",
+                    Question = msg,
+                    Origin = "CombineAccruals",
+                    Controller = "TransHist",
+                    ReturnAction = "CombineAccrualsConfirm",
+                    ReturnController = "TransHist"
+                };
+                return View("ConfirmYesNo", vmConfirm);
+            }
+            else
+            {
+                var model = Session[SessionKey.CombineAccrualsModel] as CombineAccrualsModel ?? null;
+                return View("combineAccruals/CombinedAccruals", model);
+            }
+        }
+
+        public RedirectToRouteResult CombineAccrualsConfirm()
+        {
+            var model = Session[SessionKey.CombineAccrualsModel] as CombineAccrualsModel ?? null;
+            var aeList = TempData.Peek("aeList") as string;
+            var noAEList = TempData.Peek("noAEList") as string;
+
+            bool isRecycle = TempData.Peek("recycle") as bool? ?? false;
+            bool isAEEX = TempData.Peek("recycleAEEX") as bool? ?? false; 
+
+
+             var msg= new CombineAccrualsManager().CombineAccrualsConfirmed(aeList, noAEList, isRecycle, isAEEX, model, PrepCode);
+
+            if (string.IsNullOrEmpty(msg))
+                return RedirectToAction("ListEA", new System.Web.Routing.RouteValueDictionary(
+                                                             new { act = model.ACT, pDocNo = model.PDOCNO }));
+            else
+            {
+                ViewBag.Message = msg;
+                return RedirectToAction("combineAccrualsShowError", new System.Web.Routing.RouteValueDictionary(
+                                                             new { msg = msg, type = "error" }));
+            }
+        }
+
     }
 }
 

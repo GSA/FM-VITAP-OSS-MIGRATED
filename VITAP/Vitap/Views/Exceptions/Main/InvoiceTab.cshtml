@@ -7,6 +7,8 @@
     var attrLabel = new { @class = "label-control" };
 }
 
+@Html.HiddenFor(x => Model.BtnInvoiceImage.Id)
+
 <div id="tabInvoice" class="container-fluid peg-main-ex">
   <div class="row no-buffer">
         <div class="col-xs-2 sm-buffer">
@@ -70,7 +72,7 @@
             @Html.TextBoxFor(m => m.TotalInterestToDate, attrTextAlignRight)
             <br />
             <button type="button" id="btnViewInvoice" class="btn sm-buffer" style="width:70px;">View Invoice</button>
-            <button type="button" id="btnViewImage" class="btn sm-buffer" style="width:70px;">View Image</button>
+            <button type="button" id="btnViewImageInvoiceTab" class="btn sm-buffer" style="width:70px;">View Image</button>
         </div>
     </div>
     <div class="row" style="margin-left: 0px">
@@ -126,9 +128,9 @@
         else
             $('#btnViewInvoice').removeAttr('disabled');
         if ('@Model.BtnInvoiceImage.Enabled' != 'True')
-            $('#btnViewImage').attr('disabled', 'disabled');
+            $('#btnViewImageInvoiceTab').attr('disabled', 'disabled');
         else
-            $('#btnViewImage').removeAttr('disabled');
+            $('#btnViewImageInvoiceTab').removeAttr('disabled');
         $('.k-grid-excel').removeAttr('disabled');
     });
 
@@ -137,8 +139,8 @@
             window.location = url;
     });
 
-    $("#btnViewImage").on("click", function () {
-        var url = '@Url.Action("ViewImageByImageID", "Exceptions", new { docId = Model.BtnInvoiceImage.Id })';
+    $("#btnViewImageInvoiceTab").on("click", function () {
+        var url = '@Url.Action("ViewImageByImageID", "Exceptions")' + '?docId=' + $("#BtnInvoiceImage_Id").val();
         window.location = url;
     });
 </script>

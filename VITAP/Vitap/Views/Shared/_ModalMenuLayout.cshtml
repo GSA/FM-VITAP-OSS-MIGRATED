@@ -6,15 +6,23 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<title>@ViewBag.Title</title>
 
-	@Scripts.Render("~/Scripts/jquery-1.10.2.js")
+	@Scripts.Render("~/Scripts/kendo/jquery.min.js")
 
 	@*Can move to bundle if we want*@
 	<link rel="stylesheet" href="~/Content/kendo/kendo.common.min.css">
 	<link rel="stylesheet" href="~/Content/kendo/kendo.default.min.css">
 
 	<link href="~/Content/bootstrap.min.css" rel="stylesheet" />
-	<link href="~/Content/Main.css?v=1" rel="stylesheet" />
+	<link href="~/Content/Main.css?v=3" rel="stylesheet" />
 	<link href="~/Content/Site.css" rel="stylesheet" />
+
+    @*Can move to bundle *@
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/Scripts/modernizr-2.6.2.js"></script>
+    <script src="~/Scripts/site.js?v=10"></script>
+    @Scripts.Render("~/Scripts/kendo/jszip.min.js")
+    @Scripts.Render("~/Scripts/kendo/kendo.all.min.js")
+    @Scripts.Render("~/Scripts/kendo/kendo.aspnetmvc.min.js")
 
 	@RenderSection("Head", false)
 </head>
@@ -26,13 +34,7 @@
 		</div>
 	</div>
 
-	@*Can move to bundle *@
-	<script src="~/Scripts/bootstrap.min.js"></script>
-	<script src="~/Scripts/modernizr-2.6.2.js"></script>
-    <script src="~/Scripts/site.js?v=8"></script>
-    @Scripts.Render("~/Scripts/kendo/jszip.min.js")
-	@Scripts.Render("~/Scripts/kendo/kendo.all.min.js")
-	@Scripts.Render("~/Scripts/kendo/kendo.aspnetmvc.min.js")
+	
 
 	@RenderSection("Scripts", false)
 </body>

@@ -1,30 +1,30 @@
 ﻿@model VITAP.Data.Models.Exceptions.P039InvoiceTabModel
 
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-md-3">
+    <div class="row" style="padding-left:15px">
+        <div class="col-md-3 padding-zero">
             <div class="row">
                 <div class="col-md-12">
-                    <lable class="fill">
+                    <label class="fill">
                         INV Key ID <br />
-                        @Html.TextBoxFor(x => x.InvKeyID, new { @class = "fill text-primary" })
-                    </lable>
+                        @Html.TextBoxFor(x => x.InvKeyID, new Dictionary<string, object> { { "class", "text-primary" }, { "style", "width:200px" } })
+                    </label>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-12">
-                    <lable class="fill">
+                    <label class="fill">
                         Invoice Number <br />
-                        @Html.TextBoxFor(x => x.InvNum, new { @class = "fill text-primary" })
-                    </lable>
+                        @Html.TextBoxFor(x => x.InvNum, new Dictionary<string, object> { { "class", "text-primary" }, { "style", "width:200px" } })
+                    </label>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-12">
-                    <lable>
+                    <label>
                         Invoice Date <br />
                         @Html.TextBoxFor(x => x.InvDate, new Dictionary < string, object > { {"class","text-primary" },{ "style", "width:200px" } })
-                    </lable>
+                    </label>
                 </div>
             </div>
             <div class="row">
@@ -36,21 +36,21 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-3 padding-zero">
             <div class="row">
                 <div class="col-md-12">
-                    <lable>
+                    <label>
                         ACT Number <br />
-                        @Html.TextBoxFor(x => x.ActNum, new { @class = "text-primary" })
-                    </lable>
+                        @Html.TextBoxFor(x => x.ActNum, new Dictionary<string, object> { { "class", "text-primary" }, { "style", "width:200px" } })
+                    </label>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-12">
-                    <lable>
+                    <label>
                         PO Number <br />
                         @Html.TextBoxFor(x => x.PONum, new Dictionary<string, object> { { "class", "text-primary" }, { "style", "width:200px" } })
-                    </lable>
+                    </label>
                 </div>
             </div>
             <div class="row">
@@ -62,7 +62,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 padding-zero">
             <div class="row">
                 <div class="col-md-12">
                     <label class="fill">
@@ -76,7 +76,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 padding-zero">
             <div class="row">
                 <div class="col-md-12">
                     <label>
@@ -90,16 +90,14 @@
                 <div class="col-md-12">
                     <label>
                         INV Receipt Date <br />
-                        @Html.TextBoxFor(x => x.InvRecDate, new { @class = "text-primary" })
+                        @Html.TextBoxFor(x => x.InvRecDate, new Dictionary<string, object> { { "class", "text-primary" }, { "style", "width:200px" } })
                     </label>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <button onclick="viewInv()" type="button" class="btn btn-info">View INV</button>
-                </div>
-            </div>
         </div>
+    </div>
+    <div class="col-md-2" style="float:right">
+        <button onclick="viewInv()" type="button" class="btn btn-info">View INV</button>
     </div>
 </div>
 

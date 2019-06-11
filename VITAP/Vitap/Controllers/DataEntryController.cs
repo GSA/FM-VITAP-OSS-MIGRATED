@@ -205,6 +205,7 @@ namespace VITAP.Controllers
             {
                 TH_ID = null,
                 PDOCNO = inv.PDOCNOPO,
+                TRANSDATE = DateTime.Now,
                 INV_KEY_ID = inv.INV_KEY_ID,
                 ACT = inv.ACT,
                 ALLPROCESS = allProcess,
@@ -333,10 +334,9 @@ namespace VITAP.Controllers
             IMAGELIST il = mgrIL.GetImageListByImageId(viewModel.IMAGEID);
             if (il != null) {
                 // Mark as rejected and update.
-                MarkImageListAsRejected(il, reason);
-                mgrIL.UpdateImageList(il);
-            } else {
-                var mgrILH = new ImageListHistManager();
+                mgrIL.RejectImageList(viewModel.IMAGEID, prepcode, reason);                    
+            } else {                                           
+                var mgrILH = new ImageListHistManager();       
                 IMAGELISTHIST ilh = mgrILH.GetImageListHistByImageId(viewModel.IMAGEID);
                 if (ilh != null) {
                     // Convert to ImageList and mark as rejected.

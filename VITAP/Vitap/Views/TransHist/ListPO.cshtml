@@ -10,7 +10,8 @@
     var CurrentPOGridTitle = "";
     if (Model.CurrentPurchaseOrder.Count > 0)
     {
-        CurrentPOGridTitle = "Current PO"; }
+        CurrentPOGridTitle = "Current PO";
+    }
 
 }
 
@@ -53,7 +54,8 @@
                     columns.Bound(curPO => curPO.act).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("ACT");
                     columns.Bound(curPO => curPO.po_id).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("PO_ID");
                     columns.Bound(curPO => curPO.modno).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("Mod No");
-                    columns.Bound(curPO => curPO.po_amount).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("PO Amount").Format("{0:0.00}");
+                    columns.Bound(curPO => curPO.po_amount).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("PO Amount").Format("{0:c2}");
+                    columns.Bound(curPO => curPO.perd_dt).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Format("{0:MM/dd/yyyy}").Title("POP");
                     columns.Bound(curPO => curPO.stampdate).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Format("{0:MM/dd/yyyy}").Title("Stamp Date");
                     columns.Bound(curPO => curPO.po_status).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("Status");
                     columns.Bound(curPO => curPO.err_code).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("Err Code");
@@ -93,7 +95,8 @@
                 columns.Bound(allPO => allPO.act).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("ACT");
                 columns.Bound(allPO => allPO.po_id).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("PO_ID");
                 columns.Bound(allPO => allPO.modno).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("Mod No");
-                columns.Bound(allPO => allPO.po_amount).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("PO Amount").Format("{0:0.00}");
+                columns.Bound(allPO => allPO.po_amount).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("PO Amount").Format("{0:c2}");
+                columns.Bound(curPO => curPO.perd_dt).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Format("{0:MM/dd/yyyy}").Title("POP");
                 columns.Bound(allPO => allPO.stampdate).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Format("{0:MM/dd/yyyy}").Title("Stamp Date");
                 columns.Bound(allPO => allPO.po_status).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("Status");
                 columns.Bound(allPO => allPO.err_code).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("Err Code");
@@ -148,35 +151,31 @@
 
             var currentPOCount = $("#grdCurrentPurchaseOrder").data("kendoGrid").dataSource.total()
 
-            if (currentPOCount == 0)
-            {
+            if (currentPOCount == 0) {
                 $("#grdCurrentPurchaseOrder").hide();
                 var grdPO = $("#grdAllPurchaseOrder").data("kendoGrid");
-                if (grdPO != null)
-                {
+                if (grdPO != null) {
                     grdPO.element.find('tbody tr:first').addClass('k-state-selected');
                     var poListGridID = "grdAllPurchaseOrder"; // get grid ID
                     ConfigureKendoGridPaginationControlsFor508(poListGridID);
                     MakeKendoGridScrollable(poListGridID, "300px");
                 }
 
-                    //var selectedRow = grdPO.dataItem(grdPO.select());
+                //var selectedRow = grdPO.dataItem(grdPO.select());
             }
-            else
-            {
-                    var grdPO = $("#grdCurrentPurchaseOrder").data("kendoGrid");
-                    if (grdPO != null)
-                    {
-                        grdPO.element.find('tbody tr:first').addClass('k-state-selected');
-                        var poListGridID = "grdCurrentPurchaseOrder"; // get grid ID
-                        ConfigureKendoGridPaginationControlsFor508(poListGridID);
-                        MakeKendoGridScrollable(poListGridID, "300px");
-                    }
+            else {
+                var grdPO = $("#grdCurrentPurchaseOrder").data("kendoGrid");
+                if (grdPO != null) {
+                    grdPO.element.find('tbody tr:first').addClass('k-state-selected');
+                    var poListGridID = "grdCurrentPurchaseOrder"; // get grid ID
+                    ConfigureKendoGridPaginationControlsFor508(poListGridID);
+                    MakeKendoGridScrollable(poListGridID, "300px");
+                }
             }
         });
 
-    var exportFlag = false;
-    function excelExport(e) {
+        var exportFlag = false;
+        function excelExport(e) {
             if (!exportFlag) {
                 e.sender.showColumn(10);
                 e.sender.showColumn(11);
@@ -190,234 +189,236 @@
                 e.sender.hideColumn(11);
                 exportFlag = false;
             }
-    }
-    function RefreshClick()
-    {
-        window.location.reload();
-    }
-
-    function TransHistClick() {
-        var currentPOCount = $("#grdCurrentPurchaseOrder").data("kendoGrid").dataSource.total();
-        var allPOCount = $("#grdAllPurchaseOrder").data("kendoGrid").dataSource.total();
-
-        var grid = $('#grdCurrentPurchaseOrder').data('kendoGrid');
-        if (currentPOCount == 0) {
-            grid = $('#grdAllPurchaseOrder').data('kendoGrid');
+        }
+        function RefreshClick() {
+            window.location.reload();
         }
 
-        var row = grid.select();
-        var dataItem = grid.dataItem(row);
-        var po_Id = dataItem.po_id;
-        var Act = dataItem.act;
+        function TransHistClick() {
+            var currentPOCount = $("#grdCurrentPurchaseOrder").data("kendoGrid").dataSource.total();
+            var allPOCount = $("#grdAllPurchaseOrder").data("kendoGrid").dataSource.total();
+            var Pdocno = "";
+            var Act = "";
+            var ModNo = "";
+            var InboxUidy = "";
 
-        if (po_Id != null)
-        {
-            window.open("@Url.Action("OraTwo")" + "?searchFor=" + po_Id.encodeUriComponent() + "&searchIn=PO_ID", '_blank');
-        }
-        else
-        {
-            alert("Select a line in the grid before clicking on View TransHist button.");
-        }
-    }
+            if (currentPOCount > 0) {
+                Act = GetSelectedCurrentInvoiceKeyID().act.trim();
+                Pdocno = GetSelectedCurrentInvoiceKeyID().po_id;
+                ModNo = GetSelectedCurrentInvoiceKeyID().modno;
+            }
+            else if (allPOCount > 0) {
+                Act = GetSelectedAllInvoiceKeyID().act.trim();
+                Pdocno = GetSelectedAllInvoiceKeyID().po_id;
+                ModNo = GetSelectedAllInvoiceKeyID().modno;
+            }
 
-    function ViewPOClick()
-    {
-        var currentPOCount = $("#grdCurrentPurchaseOrder").data("kendoGrid").dataSource.total();
-        var allPOCount = $("#grdAllPurchaseOrder").data("kendoGrid").dataSource.total();
-
-        var grid = $('#grdCurrentPurchaseOrder').data('kendoGrid');
-        if (currentPOCount == 0) {
-            grid = $('#grdAllPurchaseOrder').data('kendoGrid');
-        }
-
-        var row = grid.select();
-        var dataItem = grid.dataItem(row);
-
-        var Pdocno = dataItem.po_id;
-        //Pdocno = Pdocno.replace("&", "-");
-
-        if (Pdocno != null)
-        {
-            var url = '@Url.Action("ViewPO", "TransHist")';
-            window.location = (url + '?po_Id=' + Pdocno.encodeUriComponent());
-        }
-        else
-        {
-            alert("Select a line in the grid before clicking on View PO button.");
-        }
-    }
-    function ViewEDIPOClick()
-    {
-        var currentPOCount = $("#grdCurrentPurchaseOrder").data("kendoGrid").dataSource.total();
-        var allPOCount = $("#grdAllPurchaseOrder").data("kendoGrid").dataSource.total();
-        var Pdocno = "";
-        var Act = "";
-        var ModNo = "";
-        var InboxUidy = "";
-
-        if (currentPOCount > 0) {
-            Act = GetSelectedCurrentInvoiceKeyID().act.trim();
-            Pdocno = GetSelectedCurrentInvoiceKeyID().po_id;
-            ModNo = GetSelectedCurrentInvoiceKeyID().modno;
-        }
-        else if (allPOCount > 0) {
-            Act = GetSelectedAllInvoiceKeyID().act.trim();
-            Pdocno = GetSelectedAllInvoiceKeyID().po_id;
-            ModNo = GetSelectedAllInvoiceKeyID().modno;
+            if (Pdocno == null || Pdocno.length == 0) {
+                alert("The PO_ID is empty");
+                return;
+            }
+            else {
+                var url = '@Url.Action("OraTwo", "TransHist")';                
+                window.open(url + "?searchFor=" + Pdocno.encodeUriComponent() + "&searchIn=PO_ID", '_blank');
+            }
         }
 
-        if (Pdocno == null || Pdocno.length == 0) {
-            alert("The Pdocno is empty");
-            return;
-        }
-        else
-        {
-            var url = '@Url.Action("ViewEDIPO", "TransHist")';
-            window.location = (url + '?Act=' + Act + '&ModNo=' + ModNo + '&InboxUidy=' + InboxUidy.encodeUriComponent() +
-                '&Po_Id=' + Pdocno + '&');
-        }
-    }
-    function ViewImageClick() {
-        // Local variables for Current Purchase Order List Count
-        // and All Purchase Order List Count
-        var currentPOCount = $("#grdCurrentPurchaseOrder").data("kendoGrid").dataSource.total();
-        var allPOCount = $("#grdAllPurchaseOrder").data("kendoGrid").dataSource.total();
-        var selectedImageID = "";
+        function ViewPOClick() {
+            var currentPOCount = $("#grdCurrentPurchaseOrder").data("kendoGrid").dataSource.total();
+            var allPOCount = $("#grdAllPurchaseOrder").data("kendoGrid").dataSource.total();
+            var Pdocno = "";
+            var Act = "";
+            var ModNo = "";
+            var InboxUidy = "";
 
-        // Check Purchase Order List count and decide which Grid to get the selected row
-        if (currentPOCount > 0) {
-            selectedImageID = GetSelectedCurrentInvoiceKeyID().imageid;
+            if (currentPOCount > 0) {
+                Act = GetSelectedCurrentInvoiceKeyID().act.trim();
+                Pdocno = GetSelectedCurrentInvoiceKeyID().po_id;
+                ModNo = GetSelectedCurrentInvoiceKeyID().modno;
+            }
+            else if (allPOCount > 0) {
+                Act = GetSelectedAllInvoiceKeyID().act.trim();
+                Pdocno = GetSelectedAllInvoiceKeyID().po_id;
+                ModNo = GetSelectedAllInvoiceKeyID().modno;
+            }
 
+            if (Pdocno == null || Pdocno.length == 0) {
+                alert("The PO_ID is empty");
+                return;
+            }
+            else {
+                var url = '@Url.Action("ViewPO", "TransHist")';
+                window.location = (url + '?po_Id=' + Pdocno.encodeUriComponent());
+            }
         }
-        else if (allPOCount > 0) {
-             selectedImageID = GetSelectedAllInvoiceKeyID().imageid;
+        function ViewEDIPOClick() {
+            var currentPOCount = $("#grdCurrentPurchaseOrder").data("kendoGrid").dataSource.total();
+            var allPOCount = $("#grdAllPurchaseOrder").data("kendoGrid").dataSource.total();
+            var Pdocno = "";
+            var Act = "";
+            var ModNo = "";
+            var InboxUidy = "";
+
+            if (currentPOCount > 0) {
+                Act = GetSelectedCurrentInvoiceKeyID().act.trim();
+                Pdocno = GetSelectedCurrentInvoiceKeyID().po_id;
+                ModNo = GetSelectedCurrentInvoiceKeyID().modno;
+            }
+            else if (allPOCount > 0) {
+                Act = GetSelectedAllInvoiceKeyID().act.trim();
+                Pdocno = GetSelectedAllInvoiceKeyID().po_id;
+                ModNo = GetSelectedAllInvoiceKeyID().modno;
+            }
+
+            if (Pdocno == null || Pdocno.length == 0) {
+                alert("The Pdocno is empty");
+                return;
+            }
+            else {
+                var url = '@Url.Action("ViewEDIPO", "TransHist")';
+                window.location = (url + '?Act=' + Act + '&ModNo=' + ModNo + '&InboxUidy=' + InboxUidy.encodeUriComponent() +
+                    '&Po_Id=' + Pdocno + '&');
+            }
+        }
+        function ViewImageClick() {
+            // Local variables for Current Purchase Order List Count
+            // and All Purchase Order List Count
+            var currentPOCount = $("#grdCurrentPurchaseOrder").data("kendoGrid").dataSource.total();
+            var allPOCount = $("#grdAllPurchaseOrder").data("kendoGrid").dataSource.total();
+            var selectedImageID = "";
+
+            // Check Purchase Order List count and decide which Grid to get the selected row
+            if (currentPOCount > 0) {
+                selectedImageID = GetSelectedCurrentInvoiceKeyID().imageid;
+
+            }
+            else if (allPOCount > 0) {
+                selectedImageID = GetSelectedAllInvoiceKeyID().imageid;
+            }
+
+            //alert(selectedImageID);
+            if (selectedImageID != null && selectedImageID.length > 0) {
+                //ViewTiffImage('#dialog', 'Exceptions', 'UserTiffViewer', 'po', selectedImageID);
+                url = '@Url.Action("ViewImageByImageID", "Exceptions")';
+                window.location = url + '?docID=' + selectedImageID;
+            }
+            else {
+                alert("Select a line in the grid before clicking on View Image button.");
+            }
         }
 
-        //alert(selectedImageID);
-        if (selectedImageID != null && selectedImageID.length > 0) {
-            //ViewTiffImage('#dialog', 'Exceptions', 'UserTiffViewer', 'po', selectedImageID);
-            url = '@Url.Action("ViewImageByImageID", "Exceptions")';
-            window.location = url + '?docID=' + selectedImageID;
-        }
-        else {
-            alert("Select a line in the grid before clicking on View Image button.");
-        }
-    }
+        function GetSelectedCurrentInvoiceKeyID() {
+            /// This function is to find the selected row's
+            /// Invoice Keyd ID and ImageID
+            var grid = $('#grdCurrentPurchaseOrder').data('kendoGrid');
+            var selectedRows = grid.select();
+            var selected = $.map(selectedRows, function (item) {
+                var checked = $(item).find('.check-box').attr('checked');
+                return {
+                    actNumber: $(item).find(':nth-child(2)').text(),
+                    po_id: $(item).find(':nth-child(3)').text(),
+                    modno: $(item).find(':nth-child(4)').text(),
+                    imageID: $(item).find(':nth-child(9)').text()
+                };
+            });
 
-    function GetSelectedCurrentInvoiceKeyID() {
-        /// This function is to find the selected row's
-        /// Invoice Keyd ID and ImageID
-        var grid = $('#grdCurrentPurchaseOrder').data('kendoGrid');
-        var selectedRows = grid.select();
-        var selected = $.map(selectedRows, function (item) {
-            var checked = $(item).find('.check-box').attr('checked');
+            //alert("find: " + selected[0].imageID);
+
             return {
-                actNumber: $(item).find(':nth-child(2)').text(),
-                po_id: $(item).find(':nth-child(3)').text(),
-                modno: $(item).find(':nth-child(4)').text(),
-                imageID: $(item).find(':nth-child(9)').text()
+                act: selected[0].actNumber,
+                po_id: selected[0].po_id,
+                modno: selected[0].modno,
+                imageid: selected[0].imageID
             };
-        });
+        }
 
-        //alert("find: " + selected[0].imageID);
+        function GetSelectedAllInvoiceKeyID() {
+            /// This function is to find the selected row's
+            /// Purchase Order ID and ImageID
+            var grid = $('#grdAllPurchaseOrder').data('kendoGrid');
+            var selectedRows = grid.select();
+            var selected = $.map(selectedRows, function (item) {
+                var checked = $(item).find('.check-box').attr('checked');
+                return {
+                    actNumber: $(item).find(':nth-child(2)').text(),
+                    po_id: $(item).find(':nth-child(3)').text(),
+                    modno: $(item).find(':nth-child(4)').text(),
+                    imageID: $(item).find(':nth-child(9)').text()
+                };
+            });
 
-        return {
-            act: selected[0].actNumber, 
-            po_id: selected[0].po_id,
-            modno: selected[0].modno,
-            imageid: selected[0].imageID
-        };
-    }
+            //alert("find: " + selected[0].imageID);
 
-    function GetSelectedAllInvoiceKeyID() {
-        /// This function is to find the selected row's
-        /// Purchase Order ID and ImageID
-        var grid = $('#grdAllPurchaseOrder').data('kendoGrid');
-        var selectedRows = grid.select();
-        var selected = $.map(selectedRows, function (item) {
-            var checked = $(item).find('.check-box').attr('checked');
             return {
-                actNumber: $(item).find(':nth-child(2)').text(),
-                po_id: $(item).find(':nth-child(3)').text(),
-                modno: $(item).find(':nth-child(4)').text(),
-                imageID: $(item).find(':nth-child(9)').text()
+                act: selected[0].actNumber,
+                po_id: selected[0].po_id,
+                modno: selected[0].modno,
+                imageid: selected[0].imageID
             };
-        });
-
-        //alert("find: " + selected[0].imageID);
-
-        return {
-            act: selected[0].actNumber, 
-            po_id: selected[0].po_id,
-            modno: selected[0].modno,
-            imageid: selected[0].imageID
-        };
-    }
-
-
-    function grdCurrentPurchaseOrderChanged() {
-        var grid = $("#grdCurrentPurchaseOrder").data("kendoGrid");
-        var row = grid.select();
-        var dataItem = grid.dataItem(row);
-        grdCurrentPurchaseOrderSelecting(dataItem);
-    }
-
-    function grdCurrentPurchaseOrderSelected(e) {
-
-        // Highlight the row when "Select" button clicked
-        $("#grdAllPurchaseOrder table tr").removeClass('k-state-selected');
-        $(e.currentTarget).closest("tr").addClass('k-state-selected');
-
-        // Get the data from the current row
-        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
-        grdCurrentPurchaseOrderSelecting(dataItem);
-    }
-
-    function grdCurrentPurchaseOrderSelecting(dataItem)
-    {
-        var imageId = $.trim(dataItem.imageid);
-
-        if (imageId.length > 0) {
-            $("#btnViewImage").prop("disabled", false);
-        }
-        else {
-            $("#btnViewImage").prop("disabled", true);
         }
 
-    }
 
-    function grdAllPurchaseOrderChanged() {
-        var grid = $("#grdAllPurchaseOrder").data("kendoGrid");
-        var row = grid.select();
-        var dataItem = grid.dataItem(row);
-        grdAllPurchaseOrderSelecting(dataItem);
-    }
-
-    function grdAllPurchaseOrderSelected(e) {
-
-        // Highlight the row when "Select" button clicked
-        $("#grdAllPurchaseOrder table tr").removeClass('k-state-selected');
-        $(e.currentTarget).closest("tr").addClass('k-state-selected');
-
-        // Get the data from the current row
-        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
-        grdAllPurchaseOrderSelecting(dataItem);
-    }
-
-    function grdAllPurchaseOrderSelecting(dataItem) {
-        var imageId = $.trim(dataItem.imageid);
-
-        if (imageId.length > 0) {
-            $("#btnViewImage").prop("disabled", false);
+        function grdCurrentPurchaseOrderChanged() {
+            var grid = $("#grdCurrentPurchaseOrder").data("kendoGrid");
+            var row = grid.select();
+            var dataItem = grid.dataItem(row);
+            grdCurrentPurchaseOrderSelecting(dataItem);
         }
-        else
-        {
-            $("#btnViewImage").prop("disabled", true);
+
+        function grdCurrentPurchaseOrderSelected(e) {
+
+            // Highlight the row when "Select" button clicked
+            $("#grdAllPurchaseOrder table tr").removeClass('k-state-selected');
+            $(e.currentTarget).closest("tr").addClass('k-state-selected');
+
+            // Get the data from the current row
+            var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+            grdCurrentPurchaseOrderSelecting(dataItem);
         }
-    }
+
+        function grdCurrentPurchaseOrderSelecting(dataItem) {
+            var imageId = $.trim(dataItem.imageid);
+
+            if (imageId.length > 0) {
+                $("#btnViewImage").prop("disabled", false);
+            }
+            else {
+                $("#btnViewImage").prop("disabled", true);
+            }
+
+        }
+
+        function grdAllPurchaseOrderChanged() {
+            var grid = $("#grdAllPurchaseOrder").data("kendoGrid");
+            var row = grid.select();
+            var dataItem = grid.dataItem(row);
+            grdAllPurchaseOrderSelecting(dataItem);
+        }
+
+        function grdAllPurchaseOrderSelected(e) {
+
+            // Highlight the row when "Select" button clicked
+            $("#grdAllPurchaseOrder table tr").removeClass('k-state-selected');
+            $(e.currentTarget).closest("tr").addClass('k-state-selected');
+
+            // Get the data from the current row
+            var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+            grdAllPurchaseOrderSelecting(dataItem);
+        }
+
+        function grdAllPurchaseOrderSelecting(dataItem) {
+            var imageId = $.trim(dataItem.imageid);
+
+            if (imageId.length > 0) {
+                $("#btnViewImage").prop("disabled", false);
+            }
+            else {
+                $("#btnViewImage").prop("disabled", true);
+            }
+        }
 
 
     </script>
- }
+}
 
 

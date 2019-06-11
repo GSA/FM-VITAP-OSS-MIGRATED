@@ -24,6 +24,7 @@ namespace VITAP.Controllers
 
             var model = new AssoProdViewModel();
             model.Answer = "1";
+            model.SelectedAssignedService = AssignSrv;
             return View(new AssoProdViewModel());
         }
 
@@ -56,16 +57,16 @@ namespace VITAP.Controllers
                     break;
             }
 
-            model.AssociateProd = GetAssociateProductivity(clearDate);
+            model.AssociateProd = GetAssociateProductivity(clearDate, model.SelectedAssignedService);
 
             return (View(model));
         }
 
-        private List<AssociateProductivity> GetAssociateProductivity(string strClearDate)
+        private List<AssociateProductivity> GetAssociateProductivity(string strClearDate, string assignedService)
         {
             var mgr = new ExceptionsManager();
             List<AssociateProductivity> model = new List<AssociateProductivity>();
-            model = mgr.GetAssoProd(AssignSrv, strClearDate);
+            model = mgr.GetAssoProd(assignedService, strClearDate);
             return model;
         }
     }

@@ -116,6 +116,7 @@ namespace VITAP.Controllers
             {
                 search.FtsOrgCodeList = FetchFtsOrgCodeList();
                 search.PbsOrgCodeList = FetchPbsOrgCodeList();
+                search.AssignedService = AssignSrv;
 
                 data = manager.Get(search);
             }

@@ -36,7 +36,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-5">
+                <div class="col-md-4">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -61,9 +61,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label for="ChkBox" class="control-label">Show Backend Autorun (PC = VI)</label>
                     @Html.Kendo().CheckBox().Name("ChkBox")
+                </div>
+                <div class="col-md-2">
+                    <label for="SelectedAssignedService" class="control-label">Assigned Service</label>
+                    @Html.DropDownListFor(x => x.SelectedAssignedService, Model.AssignedServiceListOptions)
                 </div>
             </div>
 

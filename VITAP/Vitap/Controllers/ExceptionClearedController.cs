@@ -24,7 +24,10 @@ namespace VITAP.Controllers
                 RedirectToAction("Index", "Home");
             }
 
-            return View(new ExceptionClearedViewModel());
+            var model = new ExceptionClearedViewModel();
+            model.SelectedAssignedService = AssignSrv;
+
+            return View(model);
         }
 
         [HttpPost]
@@ -76,16 +79,16 @@ namespace VITAP.Controllers
 
             // Legacy adds one day to the To date.
             String nextDay = DateTime.Parse(model.To).AddDays(1).ToString("MM/dd/yyyy");
-            model.ExceptCleared = GetExceptionCleared(extrasel, model.From, nextDay, model.ChkBox);
+            model.ExceptCleared = GetExceptionCleared(extrasel, model.From, nextDay, model.ChkBox, model.SelectedAssignedService);
 
             return (View(model));
         }
 
-        private List<ExceptionCleared> GetExceptionCleared(string strExtrasel, string strFrom, string strTo, string strCheck)
+        private List<ExceptionCleared> GetExceptionCleared(string strExtrasel, string strFrom, string strTo, string strCheck, string assignedService)
         {
             var mgr = new ExceptionsManager();
             List<ExceptionCleared> model = new List<ExceptionCleared>();
-            model = mgr.SearchExceptClearedRpt(AssignSrv, strExtrasel, strFrom, strTo, strCheck);
+            model = mgr.SearchExceptClearedRpt(assignedService, strExtrasel, strFrom, strTo, strCheck);
             return model;
         }
     }

@@ -5,6 +5,8 @@ using VITAP.Data.Managers.Buttons;
 using VITAP.Data;
 using VITAP.Data.Models.Exceptions;
 using VITAP.Library.Strings;
+using VITAP.Data.Managers;
+using VITAP.Data.Models.PegasysPA;
 
 namespace VITAP.SharedLogic.Buttons
 {
@@ -35,6 +37,11 @@ namespace VITAP.SharedLogic.Buttons
 
             switch (exception.ERR_CODE)
             {
+                case "M230":
+                    return ExceptionM230();
+                case "A230":
+                    return ExceptionA230();
+
                 case "P230":
                     return ExceptionP230();
 
@@ -44,6 +51,122 @@ namespace VITAP.SharedLogic.Buttons
                     return ExceptionP231(exception);
             }
             return "";
+        }
+
+        /// <summary>
+        /// Handles M230 exceptions
+        /// Get M230 exceptions for the ae_id
+        /// Pulls the MF_IC data for the ae_id
+        /// </summary>
+        protected string ExceptionM230()
+        {
+            var rtnExc = GetExceptionM230();
+
+            if (rtnExc.Count == 0)
+            {
+                return "Exception not found.";
+            }
+            else 
+            {
+                var aeId = exception.AE_ID;
+                var mgr = new PegasysAEManager();
+
+                if (aeId.Right(1) == "C")
+                {
+                    // Use pdocnoae.
+                    var frmtblAE = mgr.GetPegasysAEByKey(aeId);
+                    if (frmtblAE == null) {
+                        // Should not happen in Prod, but sending the user a message so we don't waste time on it again in test.
+                        return "No row found in PEGASYSAE_FRM for AE_ID: " + aeId + ".";
+                    }
+                }
+
+                // Just figure out if any records exist.
+                if (!mgr.FindAEByDocNumCh(aeId))
+                {
+                    //Update the exceptions table 
+                    string responsenotes = exception.RESPONSENOTES + "\r\n" + NewNote + "\r" +
+                        "M230 cleared because the AE is no longer in the Pegasys form table -- it was revised and processed by the user.";
+                    UpdateException(exception, "Q", notes.returnVal7, exception.EX_MEMO2, responsenotes, "");
+
+                    UpdatePegasysAEToInPeg(exception.AE_ID);
+
+                    return "";
+                }
+                else
+                {
+                    return "The Expense Accrual is still in the form tables.";
+                }
+            }
+        }
+
+        private void UpdatePegasysAEToInPeg(string ae_id)
+        {
+            var rtnAE = GetPegasysAEByKey(ae_id);
+
+            var fieldsToUpdate = new List<string>
+                                {
+                                    "AE_STATUS",
+                                    "ERR_CODE"
+                                };
+
+            rtnAE.AE_STATUS = "INPEG";
+            rtnAE.ERR_CODE = null;
+
+            UpdatePegasysAE(rtnAE, fieldsToUpdate);
+        }
+
+        /// <summary>
+        /// Handles A230 exceptions
+        /// Get A230 exceptions for the rr_id
+        /// Pulls the MF_IC data for the rr_id
+        /// </summary>
+        protected string ExceptionA230()
+        {
+            var rtnExc = GetExceptionA230();
+
+            if (rtnExc.Count == 0)
+            {
+                return "Exception not found.";
+            }
+            else
+            {
+                var rrId = exception.RR_ID;
+                var mgr = new PegasysRRManager();
+
+                // Just figure out if any records exist.
+                if (!mgr.FindRRByDocNumCh(rrId))
+                {
+                    //Update the exceptions table 
+                    string responsenotes = exception.RESPONSENOTES + "\r\n" + NewNote + "\r" +
+                        "A230 cleared because the RR is no longer in the Pegasys form table -- it was revised and processed by the user.";
+                    UpdateException(exception, "Q", notes.returnVal7, exception.EX_MEMO2, responsenotes, "");
+
+                    UpdatePegasysRRToOutbox(exception.RR_ID);
+
+                    return "";
+                }
+                else
+                {
+                    return "The Receiving Report is still in the form tables.";
+                }
+            }
+        }
+
+        private void UpdatePegasysRRToOutbox(string rr_id)
+        {
+            var rtnRR = GetPegasysRRByKey(rr_id);
+
+            var fieldsToUpdate = new List<string>
+                                {
+                                    "RR_STATUS",
+                                    "ERR_CODE"
+                                };
+
+            rtnRR.RR_STATUS = "OUTBOX";
+            rtnRR.ERR_CODE = null;
+
+            UpdatePegasysRR(rtnRR, fieldsToUpdate);
         }
 
         /// <summary>
@@ -147,7 +270,7 @@ namespace VITAP.SharedLogic.Buttons
             }
             else
             {
-                var invPegPA = new List<MF_IP>();
+                var invPegPA = new List<MFIPDataResult>();
 
                 foreach (var row in InvPeg)
                 {
@@ -287,7 +410,7 @@ namespace VITAP.SharedLogic.Buttons
             return "";
         }
 
-        private decimal? getPayAmt(MF_IP invPegPA)
+        private decimal? getPayAmt(MFIPDataResult invPegPA)
         {
             decimal? PayAmt = 0;
 

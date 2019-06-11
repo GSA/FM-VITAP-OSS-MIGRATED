@@ -101,7 +101,12 @@ namespace VITAP.SharedLogic.Buttons
                     return rtnMatchRR;
                 }
             }
-            return null;
+
+            if (exception.ERR_CODE == "M224" || exception.ERR_CODE == "M303")
+            {
+                Recycle_M244_M303();                
+            }
+                return null;
         }
 
         public void DeleteRRInv(List<MATCHRRINV> rtnMatchRR)
@@ -150,6 +155,11 @@ namespace VITAP.SharedLogic.Buttons
             //}
 
             notes.returnVal1 = "RECYCLE";
+        }
+
+        private void Recycle_M244_M303()
+        {
+            new Data.Managers.M224Manager().Recycle(exception.AE_ID);
         }
     }
 }

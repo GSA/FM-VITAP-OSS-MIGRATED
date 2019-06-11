@@ -380,7 +380,7 @@ else
             po_Id = "";
             pDocNo = GetPDocNoWithPoData(dataItem.PDOCNO);            
         }
-
+        $('#btnViewPO').unbind('click');
         $("#btnViewPO").click(function () {
             location = '@Html.Raw(@Url.Action("ViewPO", "TransHist"))' + '?po_Id=' + ConvertNullToEmptyString(po_Id).encodeUriComponent() + '&pDocNo=' + ConvertNullToEmptyString(pDocNo).encodeUriComponent();
         });
@@ -390,6 +390,7 @@ else
         if (dataItem.RECUR_ID != null) {
             $("#btnViewRecur").prop("disabled", false);
             $("#btnViewRecur").show();
+            $('#btnViewRecur').unbind('click');
             $("#btnViewRecur").click(function () {
                 location = '@Html.Raw(@Url.Action("ViewRecurringMaster", "TransHist"))' + '?recur_Id=' + ConvertNullToEmptyString(dataItem.RECUR_ID).encodeUriComponent();
             });
@@ -399,7 +400,8 @@ else
     function SetupButtonViewRR(dataItem) {
         if (dataItem.RR_ID != null && dataItem.RR_ID.length > 3) {
             $("#btnViewRR").prop("disabled", false);
-            $("#btnViewRR").click(function () {
+            $('#btnViewRR').unbind('click');
+            $("#btnViewRR").click(function (e) {
                 location = '@Html.Raw(@Url.Action("ViewRR", "TransHist"))' + '?rr_Id=' + ConvertNullToEmptyString(dataItem.RR_ID).encodeUriComponent();
             });
         }
@@ -408,6 +410,7 @@ else
     function SetupButtonViewInvs(dataItem) {
         if (dataItem.INV_KEY_ID != null && dataItem.INV_KEY_ID.length > 7) {
             $("#btnViewInvs").prop("disabled", false);
+            $('#btnViewInvs').unbind('click');
             $("#btnViewInvs").click(function () {
                 location = '@Html.Raw(@Url.Action("ViewInvoice", "TransHist"))' + '?inv_Key_Id=' + ConvertNullToEmptyString(dataItem.INV_KEY_ID).encodeUriComponent();
             });
@@ -417,6 +420,7 @@ else
     function SetupButtonViewEAs(dataItem) {
         if (dataItem.AE_ID != null) {
             $("#btnViewEAs").prop("disabled", false);
+            $('#btnViewEAs').unbind('click');
             $("#btnViewEAs").click(function () {
                 location = '@Html.Raw(@Url.Action("ViewEstimatedAccrual", "TransHist"))' + '?ae_Id=' + ConvertNullToEmptyString(dataItem.AE_ID).encodeUriComponent();
             });
@@ -426,6 +430,7 @@ else
     function SetupButtonOpenItems(dataItem) {
         if (dataItem.ACT != null || dataItem.PDOCNO != null) {            
             $("#btnOpenItems").prop("disabled", false);
+            $('#btnOpenItems').unbind('click');
             $("#btnOpenItems").click(function () {
                 location = '@Html.Raw(@Url.Action("OpenItems", "TransHist"))'
                     + '?pDocNo=' + ConvertNullToEmptyString(dataItem.PDOCNO).encodeUriComponent()
@@ -437,6 +442,7 @@ else
     function SetupButtonViewPAs(dataItem) {
         if (dataItem.PA_ID != null) {
             $("#btnViewPAs").prop("disabled", false);
+            $('#btnViewPAs').unbind('click');
             $("#btnViewPAs").click(function () {
                 location = '@Html.Raw(@Url.Action("ViewPAs", "TransHist"))' + '?pa_Id=' + ConvertNullToEmptyString(dataItem.PA_ID).encodeUriComponent();
             });
@@ -507,6 +513,7 @@ else
 
     function SetupButtonMatch(dataItem, pDocNo) {
         $("#btnMatch").prop("disabled", false);
+        $('#btnMatch').unbind('click');
         $("#btnMatch").click(function () {
             location = '@Html.Raw(@Url.Action("Match", "TransHist"))'
                 + '?pDocNo=' + ConvertNullToEmptyString(pDocNo).encodeUriComponent()
@@ -515,6 +522,7 @@ else
     }
 
     function SetupButtonListPO(dataItem, pDocNo) {
+        $('#btnListPOs').unbind('click');
         $("#btnListPOs").click(function () {
             var url = "";
 
@@ -548,6 +556,7 @@ else
     }
 
     function SetupButtonListRR(dataItem, pDocNo) {
+        $('#btnListRRs').unbind('click');
         $("#btnListRRs").click(function () {
             var url = "";
 
@@ -592,6 +601,7 @@ else
     }
 
     function SetupButtonListInv(dataItem, pDocNo) {
+        $('#btnListInvs').unbind('click');
         $("#btnListInvs").click(function () {
             var url = "";
 
@@ -630,14 +640,15 @@ else
                 }
             }
             url = '@Html.Raw(@Url.Action("ListInv", "TransHist"))'
-                + '?act=' + ConvertNullToEmptyString(act).encodeUriComponent()
+                + '?actNumber=' + ConvertNullToEmptyString(act).encodeUriComponent()
                 + '&pDocNo=' + ConvertNullToEmptyString(localPDocNo).encodeUriComponent()
-                + '&recur_Id=' + ConvertNullToEmptyString(recur_Id).encodeUriComponent();
+                + '&recurring_id=' + ConvertNullToEmptyString(recur_Id).encodeUriComponent();
             location = url;
         });
     }
 
     function SetupButtonListEA(dataItem, pDocNo) {
+        $('#btnListEAs').unbind('click');
         $("#btnListEAs").click(function () {
             var url = "";
             var act = "";
@@ -653,6 +664,7 @@ else
     }    
 
     function SetupButtonListPA(dataItem, pDocNo) {
+        $('#btnListPAs').unbind('click');
         $("#btnListPAs").click(function () {
             var url = "";
             var act = dataItem.ACT;

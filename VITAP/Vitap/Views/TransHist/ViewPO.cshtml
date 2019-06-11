@@ -6,6 +6,8 @@
     List<PEGASYSPOACCT_FRM> poAccountings = ViewBag.POAccountings;
 }
 
+@Html.HiddenFor(x => Model.IMAGEID)
+
 <fieldset>
     <legend>View PO</legend>
 </fieldset>
@@ -405,7 +407,7 @@
                             @Html.LabelFor(x => x.VendorData.DGGT_CD)<br />
                             @{ 
                                 String dggt_cdDisplay = "";
-                                if (!String.IsNullOrEmpty(Model.VendorData.DGGT_CD))
+                                if (Model.VendorData != null && !String.IsNullOrEmpty(Model.VendorData.DGGT_CD))
                                 {
                                     string[] splitdggt = Model.VendorData.DGGT_CD.Split('&');
                                     if (splitdggt.Length >= 3)
@@ -415,7 +417,7 @@
                                 }
 
                                 String dggt_addr_cdDisplay = "";
-                                if (!String.IsNullOrEmpty(Model.VendorData.DGGT_ADDR_CD))
+                                if (Model.VendorData != null &&  !String.IsNullOrEmpty(Model.VendorData.DGGT_ADDR_CD))
                                 {
                                     string[] splitdggtaddr = Model.VendorData.DGGT_ADDR_CD.Split('&');
                                     if (splitdggtaddr.Length >= 4)
@@ -492,8 +494,11 @@ Discount:
 <script>
     $("#btnViewImage").on("click", function () {
         var url = '';
-        if ('@Model.IMAGEID') {
-            url = '@Url.Action("ViewImageByImageID", "Exceptions", new { docId = Model.IMAGEID })';
+
+        var imageId = $("#IMAGEID").val();
+
+        if (imageId) {
+            url = '@Url.Action("ViewImageByImageID", "Exceptions")' + '?docId=' + imageId;
 
         }
         else {
@@ -502,17 +507,6 @@ Discount:
 
         window.location = url;
     });
-
-    //function setFullAmountCol()
-    //{
-    //    var hasFullAmount = '@Model.POAcctHasFullAmount';
-    //
-    //    if (hasFullAmount == false)
-    //     {
-    //         var grid = $("#grdPOAccounting").data("kendoGrid");
-    //        grid.hideColumn("FullAmt");
-    //    }
-    //}
 
     function setCCR() {
 
@@ -555,6 +549,7 @@ Discount:
         if (recurId != '') {
             $("#btnViewRecur").prop("disabled", false);
             $("#btnViewRecur").show();
+            $('#btnViewRecur').unbind('click');        // unbind previous events
             $("#btnViewRecur").click(function () {
                 window.location = '@Html.Raw(@Url.Action("ViewRecur", "TransHist"))' + '?recur_Id=' + Model.RECUR_ID;
             });
@@ -582,10 +577,6 @@ Discount:
         setCCR();
         SetupButtonViewRecur();
         setGrids();
-        // the following line causes View EDI/View Image button not disbaled based on the underline data
-        //$("#btnViewImage").prop("disabled", false);
-        //setFullAmountCol();
-
     });
 
     function ViewNovationHistory() {

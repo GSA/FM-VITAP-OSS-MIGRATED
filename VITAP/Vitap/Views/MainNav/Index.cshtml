@@ -34,7 +34,7 @@
                                   {
                                       if (Model.HasApacctRole ||
                                           Model.HasExceptionsRole)
-                                      {
+                                      { 
                                           childlevel1.Add()
                                               .Text("Maintain Contact")
                                               .Url("~/Contacts/Edit?openOption=menu");
@@ -63,14 +63,14 @@
                                       }
                                   });
                           }
-                          //items.Add()
-                          //    .Text("Searches")
-                          //    .Items(childlevel1 =>
-                          //    {
-                          //        childlevel1.Add()
-                          //          .Text("Utilities Payment Query")
-                          //          .Url("~/Payments/Index");
-                          //    });
+                          items.Add()
+                              .Text("Searches")
+                              .Items(childlevel1 =>
+                              {
+                                  childlevel1.Add()
+                                    .Text("Vendor Search")
+                                    .Url("~/Searches/VendorSearch");
+                              });
                           items.Add()
                               .Text("TransHist")
                               .Url("~/TransHist");

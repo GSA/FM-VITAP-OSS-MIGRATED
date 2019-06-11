@@ -8,7 +8,7 @@
 }
 
 
-@using (Html.BeginForm("P039Accept", "Exceptions", FormMethod.Post))
+@using (Html.BeginForm())
 {
 
 @Html.HiddenFor(x => x.PDOCNO)
@@ -16,6 +16,8 @@
 @Html.HiddenFor(x => x.ExId)
 @Html.HiddenFor(x => x.InvKeyId)
 @Html.HiddenFor(x => x.YesRRArrayJson)
+@Html.HiddenFor(x => x.NoRRArrayJson)
+@Html.HiddenFor(x => x.AcceptButtonEnabled)
 
 <div class="container-fluid">
     <br />
@@ -51,9 +53,9 @@
         <div class="col-md-10 col-md-offset-4">
             <button id="btnListRRs" type="button" class="btn btn-info">List RRs</button>
             <button type="button" class="btn btn-info" onclick = "TransHist()">TRANSHIST</button>
-            <button onclick="accept()" type="submit" class="btn btn-info btn-exception-type"  @(Model.AcceptButtonEnabled == false ? "disabled" : "")>Accept</button>
-            <button id="btnRRREquest" type="button" class="btn btn-info">RR Request</button>
-            <button onclick="notThisOne()" type="button" class="btn btn-info">Not This One</button>
+            <button id="btnAccept" onclick="accept()" type="submit" class="btn btn-info btn-exception-type" formaction='@Url.Action("P039Accept")'  formmethod="post">Accept</button>
+            <button onclick="rrrequest()" id="btnRRREquest" type="submit" class="btn btn-info btn-exception-type" formaction='@Url.Action("P039RRRequest")'  formmethod="post">RR Request</button>
+            <button type="submit" onclick="notThisOne()"  class="btn btn-info btn-exception-type" formaction='@Url.Action("P039NotThisOne")'  formmethod="post">Not This One</button>
             <button onclick="skip()" type="button" class="btn btn-info">Skip</button>
             <button id="btnReject" type="button" class="btn btn-info">Reject</button>
         </div>
@@ -71,6 +73,8 @@
             $("input[type='hidden']").attr('disabled', false);
 
             SetupButtonListRR('@Model.InvoiceTab.ActNum', '@Model.PDOCNO');
+
+            SetAcceptButtonState();
         });
 
         function SetupButtonListRR(act, pDocNo) {
@@ -82,7 +86,16 @@
 
         function notThisOne() {
 
-            location = '@Url.Action("P039NotThisOne", "Exceptions")';
+            var noRRArray = $("#grid1").data("kendoGrid").dataSource.data();
+
+            $("#NoRRArrayJson").val(JSON.stringify(noRRArray));
+        }
+
+        function rrrequest() {
+
+            var noRRArray = $("#grid1").data("kendoGrid").dataSource.data();
+
+            $("#NoRRArrayJson").val(JSON.stringify(noRRArray));
         }
 
          function skip() {
@@ -98,11 +111,6 @@
 
             $("#YesRRArrayJson").val(JSON.stringify(yesRRArray));
         }
-
-        $("#btnRRREquest").on("click", function (e) {
-            var url = '@Url.Action("RRRequest", "Exceptions")';
-            window.location = url;
-        });
 
         $("#btnReject").on("click", function (e) {
             var url = '@Url.Action("Reject", "Exceptions", new { PDocNo = @Model.PDOCNO })';
@@ -124,6 +132,21 @@
             }
 
             window.open(url, "_blank");
+        }
+
+        function SetAcceptButtonState()
+        {
+            var serverEnabled = $("#AcceptButtonEnabled").val() == 'True';
+            var yesRRArrayHasValues = $('#grid2').data('kendoGrid').dataSource._data.length > 0;
+
+            if (serverEnabled && yesRRArrayHasValues)
+            {
+                $('#btnAccept').removeAttr('disabled');
+            }
+            else
+            {
+                $('#btnAccept').attr('disabled', 'disabled');
+            }
         }
     </script>
 

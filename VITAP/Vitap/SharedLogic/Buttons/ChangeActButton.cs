@@ -51,6 +51,44 @@ namespace VITAP.SharedLogic.Buttons
                     UpdatePegasysInvoice(rtnInv, fieldsToUpdate);
                 }
             }
+            else if (exception.ERR_CODE == "A200")
+            {
+                TransHistManager transHistManager = new TransHistManager();
+                transHistManager.UpdateActByRRId(exception.RR_ID, strACT);
+
+                var rtnRR = GetPegasysRRByKey(exception.RR_ID);
+
+                if (rtnRR != null)
+                {
+                    fieldsToUpdate = new List<string>
+                    {
+                        "ACT"
+                    };
+
+                    rtnRR.ACT = strACT;
+
+                    UpdatePegasysRR(rtnRR, fieldsToUpdate);
+                }
+            }
+            else if (exception.ERR_CODE == "M200")
+            {
+                TransHistManager transHistManager = new TransHistManager();
+                transHistManager.UpdateActByAeId(exception.AE_ID, strACT);
+
+                var rtnAE = GetPegasysAEByKey(exception.AE_ID);
+
+                if (rtnAE != null)
+                {
+                    fieldsToUpdate = new List<string>
+                    {
+                        "ACT"
+                    };
+
+                    rtnAE.ACT = strACT;
+
+                    UpdatePegasysAE(rtnAE, fieldsToUpdate);
+                }
+            }
 
             //Insert a Transhist Record recording the change to Act number
             //Used thisform.r_act before

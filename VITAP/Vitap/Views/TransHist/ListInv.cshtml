@@ -55,14 +55,16 @@
                     columns.Bound(curInvoice => curInvoice.ACT).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
                     columns.Bound(curInvoice => curInvoice.INV_KEY_ID).HeaderHtmlAttributes(headerAttr).Width(100).HtmlAttributes(alignRight);
                     columns.Bound(curInvoice => curInvoice.INVOICE).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
-                    columns.Bound(curInvoice => curInvoice.AMOUNT).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Format("{0:0.00}");
-                    columns.Bound(curInvoice => curInvoice.PAY_AMT).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Format("{0:0.00}");
+                    columns.Bound(curInvoice => curInvoice.AMOUNT).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Format("{0:c2}");
+                    columns.Bound(curInvoice => curInvoice.PAY_AMT).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Format("{0:c2}");
                     columns.Bound(curInvoice => curInvoice.INVDATE).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Format("{0:MM/dd/yyyy}");
                     columns.Bound(curInvoice => curInvoice.INV_STATUS).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
                     columns.Bound(curInvoice => curInvoice.ERR_CODE).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
                     columns.Bound(curInvoice => curInvoice.PRIORITY).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
                     columns.Bound(curInvoice => curInvoice.IMAGEID).Width(450).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignLeft);
                     columns.Bound(curInvoice => curInvoice.IMAGEBATCH).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
+                    columns.Bound(curInvoice => curInvoice.PDOCNOPO).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("Order PDN");
+                    columns.Bound(curInvoice => curInvoice.STAMPDATE).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Format("{0:MM/dd/yyyy}");
                 })
                 .Pageable() //Enable the paging.
                 .Sortable() //Enable the sorting.
@@ -93,14 +95,16 @@
                 columns.Bound(allInvoice => allInvoice.ACT).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
                 columns.Bound(allInvoice => allInvoice.INV_KEY_ID).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
                 columns.Bound(allInvoice => allInvoice.INVOICE).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
-                columns.Bound(allInvoice => allInvoice.AMOUNT).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Format("{0:0.00}");
-                columns.Bound(allInvoice => allInvoice.PAY_AMT).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Format("{0:0.00}");
+                columns.Bound(allInvoice => allInvoice.AMOUNT).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Format("{0:c2}");
+                columns.Bound(allInvoice => allInvoice.PAY_AMT).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Format("{0:c2}");
                 columns.Bound(allInvoice => allInvoice.INVDATE).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Format("{0:MM/dd/yyyy}");
                 columns.Bound(allInvoice => allInvoice.INV_STATUS).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
                 columns.Bound(allInvoice => allInvoice.ERR_CODE).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
                 columns.Bound(allInvoice => allInvoice.PRIORITY).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight);
                 columns.Bound(allInvoice => allInvoice.IMAGEID).Width(450).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignLeft).Title("Image ID");
                 columns.Bound(allInvoice => allInvoice.IMAGEBATCH).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("Image Batch");
+                columns.Bound(curInvoice => curInvoice.PDOCNOPO).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Title("Order PDN");
+                columns.Bound(curInvoice => curInvoice.STAMPDATE).Width(100).HeaderHtmlAttributes(headerAttr).HtmlAttributes(alignRight).Format("{0:MM/dd/yyyy}");
             })
             .Pageable() //Enable the paging.
             .Sortable() //Enable the sorting.

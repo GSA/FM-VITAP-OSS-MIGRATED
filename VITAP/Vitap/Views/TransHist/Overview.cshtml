@@ -118,6 +118,7 @@
         // Setup "View PO" button
         if (dataItem.INV_KEY_ID != null) {
             $("#btnViewInvs").prop("disabled", false);
+            $('#btnViewInvs').unbind('click');        // unbind previous events
             $("#btnViewInvs").click(function () {
                 location = '@Html.Raw(@Url.Action("ViewInvoice", "TransHist"))' + '?Inv_Key_Id=' + dataItem.INV_KEY_ID;
             });
@@ -150,6 +151,7 @@
         // Setup "View PO" button
         if (dataItem.RR_ID != null) {
             $("#btnViewRR").prop("disabled", false);
+            $('#btnViewRR').unbind('click');        // unbind previous events
             $("#btnViewRR").click(function () {
                 location = '@Html.Raw(@Url.Action("ViewRR", "TransHist"))' + '?rr_Id=' + dataItem.RR_ID;
             });
