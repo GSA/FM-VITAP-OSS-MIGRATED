@@ -24,6 +24,8 @@ using VITAP.Data.Models.Exceptions.U066;
 using VITAP.Data.Models.Exceptions.NotificationExceptions;
 using System.Web.Routing;
 using Newtonsoft.Json;
+using VITAP.Data.Models.Exceptions.M237;
+using VITAP.Data.Models.Exceptions.A237;
 
 namespace VITAP.Controllers
 {
@@ -44,13 +46,16 @@ namespace VITAP.Controllers
             Session[SessionKey.ExceptionsListModel] = model;
             roleModel = model;
 
+            // Clear out any exception-specific state.
+            TempData.Remove("P200Search");
+
             //if (!model.RoleModel.HasExceptionsRole || !model.RoleModel.HasApacctRole)
             //{
             //    return View("NoPermission");
             //}
             //else
             //{
-                return View(model);
+            return View(model);
             //}
         }
 
@@ -63,10 +68,14 @@ namespace VITAP.Controllers
             }
             var exceptionListModel = Session[SessionKey.ExceptionsListModel] as ExceptionListModel;
             if (exceptionListModel == null)
-                exceptionListModel = GetExceptionsViewModel();
             {
-                search.Role = exceptionListModel.RoleModel.ASSIGN_SRV;
+                exceptionListModel = GetExceptionsViewModel();
             }
+                
+            
+            search.Role = exceptionListModel.RoleModel.ASSIGN_SRV;
+            search.HasVendCoderRole = exceptionListModel.RoleModel.HasVendCoderRole;
+            
 
             VitapExceptionManager manager = new VitapExceptionManager();
 
@@ -114,7 +123,7 @@ namespace VITAP.Controllers
 
             model.RoleModel = Session[SessionKey.RoleModel] as RoleListModel;
 
-            
+
             searchCriteria.Role = Session[SessionKey.AssignSrv].ToString();
 
             searchCriteria.RadioVals = manager.GetRadioVals();
@@ -164,7 +173,8 @@ namespace VITAP.Controllers
             ExceptionListModel model = new ExceptionListModel();
             Dictionary<string, string> details = new Dictionary<string, string>();
             details.Add("Page", request.Page.ToString());
-            if (request.PageSize > 0) {
+            if (request.PageSize > 0)
+            {
                 details.Add("PageSize", request.PageSize.ToString());
             }
             else
@@ -228,7 +238,7 @@ namespace VITAP.Controllers
                 ExceptionsManager manager = new ExceptionsManager();
                 manager.CheckoutException(efExceptionModel.EX_ID, PrepCode);
             }
-            
+
 
             return ReturnViewResult(exCode, exId, efExceptionModel);
         }
@@ -239,7 +249,7 @@ namespace VITAP.Controllers
             // Save exception and invoice in TempData for subsequent processing.
             var efExceptionModel = GetExceptionByExId(exId);
             TempData["exception"] = efExceptionModel;
-            
+
             return ReturnViewResult(exCode, exId, efExceptionModel);
         }
 
@@ -247,11 +257,11 @@ namespace VITAP.Controllers
         {
             try
             {
-                if ("P001/P002/P004/P023/P024/P060/P061/P201/P230/P231/P232/P234".Split('/').Contains(exCode))
+                if ("P001/P002/P004/P023/P024/P060/P061/P201/M230/A230/P230/P231/P232/P234".Split('/').Contains(exCode))
                 {
                     return GetMainExceptionsView(efExceptionModel);
                 }
-                else if ("P200".Split('/').Contains(exCode))
+                else if ("P200/A200/M200/O200/A230".Split('/').Contains(exCode))
                 {
                     return GetP200View(efExceptionModel);
                 }
@@ -274,6 +284,95 @@ namespace VITAP.Controllers
                     Session[SessionKey.R200Model] = R200Model;
                     Session[SessionKey.X200] = R200Model.R200Recs;
                     return View("R200/Exception", R200Model);
+                }
+                else if (exCode == "M224")
+                {
+                    M224Manager manager = new M224Manager();
+                    var exception = TempData["exception"] as EXCEPTION;
+                    if (exception == null || exception.EX_ID != exId)
+                    {
+                        exception = GetExceptionByExId(exId);
+                    }
+                    // Preserve for subsequent postbacks
+                    TempData["exception"] = exception;
+                    var model = manager.BuildModel(exception);
+
+                    TempData["M224Model"] = model;
+                    return View("M303/Exception", model);
+                }
+                else if (exCode == "M237")
+                {
+                    M237Manager manager = new M237Manager();
+                    var exception = TempData["exception"] as EXCEPTION;
+                    if (exception == null || exception.EX_ID != exId)
+                    {
+                        exception = GetExceptionByExId(exId);
+                    }
+                    // Preserve for subsequent postbacks
+                    TempData["exception"] = exception;
+                    var model = manager.BuildModel(exception);
+
+                    return View("M237/Exception", model);
+                }
+                //Test A237,A224,A226,poedit,rredit mockup
+                else if (exCode == "A237")
+                {
+                    A237Manager manager = new A237Manager();
+                    var exception = TempData["exception"] as EXCEPTION;
+                    if (exception == null || exception.EX_ID != exId)
+                    {
+                        exception = GetExceptionByExId(exId);
+                    }
+                    // Preserve for subsequent postbacks
+                    TempData["exception"] = exception;
+                    var model = manager.BuildModel(exception);
+
+                    return View("A237/Exception", model);
+                }
+                else if (exCode == "A224")
+                {
+                    var manager = new A224Manager();
+                    var model = manager.BuildModel(exCode, exId);
+
+                    return View("A224/Exception", model);
+                }
+
+                else if (exCode == "A226")
+                {
+                    var manager = new A226Manager();
+                    var prepcode = Session[SessionKey.PrepCode].ToString();
+                    var model = manager.BuildModel(exCode, exId, prepcode);
+
+                    return View("A226/Exception", model);
+                }
+                else if (exCode == "M303")
+                {
+                    M303manager manager = new M303manager();
+                    var exception = TempData["exception"] as EXCEPTION;
+                    if (exception == null || exception.EX_ID != exId)
+                    {
+                        exception = GetExceptionByExId(exId);
+                    }
+                    // Preserve for subsequent postbacks
+                    TempData["exception"] = exception;
+                    var model = manager.BuildModel(exception);
+
+                    TempData["M303Model"] = model;
+                    return View("M303/Exception", model);
+                }
+                else if (exCode == "O305")
+                {
+                    O305Manager manager = new O305Manager();
+                    var exception = TempData["exception"] as EXCEPTION;
+                    if (exception == null || exception.EX_ID != exId)
+                    {
+                        exception = GetExceptionByExId(exId);
+                    }
+                    // Preserve for subsequent postbacks
+                    TempData["exception"] = exception;
+                    var model = manager.BuildModel(exception);
+
+                    return View("O305/Exception", model);
                 }
                 else if (exCode == "P039")
                 {
@@ -515,7 +614,7 @@ namespace VITAP.Controllers
 
             if (vmException.ErrorCode == "U044")
             {
-                var memo2String = "{0} \r\n {1} Invoice: {2} Amount: {3}";
+                var memo2String = "\r\n {0} Invoice: {1} Amount: {2}";
                 vmException.Memo2 = string.Format(memo2String, vmException.Memo2, PegInvData.INVOICE, PegInvData.AMOUNT);
             }
 
@@ -560,14 +659,38 @@ namespace VITAP.Controllers
             var prepCode = roleModel.RoleModel.PREPCODE;
 
             var Misc = new MiscValuesModel { ORGCODE = orgCode.ReplaceNull(""), BA = BA.ReplaceNull(""), DUNS = Duns.ReplaceNull(""), DUNSPLUS4 = dunsPlus4.ReplaceNull("") };
-            var Search = new AddressValuesModel { VENDORNAME = searchVendorName.ReplaceNull(""), CUSTOMERNAME = searchCustomerName.ReplaceNull(""), VENDORCODE = searchVendorCode.ReplaceNull(""),
-                VENDORADDRESS = searchVendorAddress.ReplaceNull(""), ADDR1 = searchAddr1.ReplaceNull(""), ADDR2 = searchAddr2.ReplaceNull(""), ADDR3 = searchAddr3.ReplaceNull(""),
-                CITY = searchCity.ReplaceNull(""), STATE = searchState.ReplaceNull(""), ZIP = searchZip.ReplaceNull(""), EMAIL = searchEmail.ReplaceNull(""),
-                PHONE = searchPhone.ReplaceNull(""), FAX = searchFax.ReplaceNull("")
+            var Search = new AddressValuesModel
+            {
+                VENDORNAME = searchVendorName.ReplaceNull(""),
+                CUSTOMERNAME = searchCustomerName.ReplaceNull(""),
+                VENDORCODE = searchVendorCode.ReplaceNull(""),
+                VENDORADDRESS = searchVendorAddress.ReplaceNull(""),
+                ADDR1 = searchAddr1.ReplaceNull(""),
+                ADDR2 = searchAddr2.ReplaceNull(""),
+                ADDR3 = searchAddr3.ReplaceNull(""),
+                CITY = searchCity.ReplaceNull(""),
+                STATE = searchState.ReplaceNull(""),
+                ZIP = searchZip.ReplaceNull(""),
+                EMAIL = searchEmail.ReplaceNull(""),
+                PHONE = searchPhone.ReplaceNull(""),
+                FAX = searchFax.ReplaceNull("")
             };
-            var Address = new AddressValuesModel { VENDORNAME = vendorName.ReplaceNull(""), CUSTOMERNAME = customerName.ReplaceNull(""), VENDORCODE = vendorCode.ReplaceNull(""),
-                VENDORADDRESS = vendorAddress.ReplaceNull(""), ADDR1 = Addr1.ReplaceNull(""), ADDR2 = Addr2.ReplaceNull(""), ADDR3 = Addr3.ReplaceNull(""),
-                CITY = City.ReplaceNull(""), STATE = State.ReplaceNull(""), ZIP = Zip.ReplaceNull(""), EMAIL = Email.ReplaceNull(""), PHONE = Phone.ReplaceNull(""), FAX = Fax.ReplaceNull("") };
+            var Address = new AddressValuesModel
+            {
+                VENDORNAME = vendorName.ReplaceNull(""),
+                CUSTOMERNAME = customerName.ReplaceNull(""),
+                VENDORCODE = vendorCode.ReplaceNull(""),
+                VENDORADDRESS = vendorAddress.ReplaceNull(""),
+                ADDR1 = Addr1.ReplaceNull(""),
+                ADDR2 = Addr2.ReplaceNull(""),
+                ADDR3 = Addr3.ReplaceNull(""),
+                CITY = City.ReplaceNull(""),
+                STATE = State.ReplaceNull(""),
+                ZIP = Zip.ReplaceNull(""),
+                EMAIL = Email.ReplaceNull(""),
+                PHONE = Phone.ReplaceNull(""),
+                FAX = Fax.ReplaceNull("")
+            };
             if (bDunsMatched == null) { bDunsMatched = false; }
 
             var helper = new AcceptButton();
@@ -758,7 +881,7 @@ namespace VITAP.Controllers
                 var search = Session[SessionKey.MainSearch] as ExceptionListModel;
                 return RedirectToAction("Index", new { request, search });
             }
-                
+
             var vmConfirm = new MessageDisplay()
             {
                 Title = "Pegasys Key Exception Error",
@@ -781,6 +904,7 @@ namespace VITAP.Controllers
         /// </summary>
         /// <param name="vmNotes"></param>
         /// <returns></returns>
+        [ValidateInput(false)]
         public ActionResult AcceptNotes(NotesViewModel vmNotes)
         {
             if (vmNotes.returnVal1 != "FINISH")
@@ -805,6 +929,7 @@ namespace VITAP.Controllers
 
         #region Accept Notes
 
+        [ValidateInput(false)]
         private ViewResult AcceptNoteViewResult(EXCEPTION exception, NotesViewModel vmNotes)
         {
             //Check data and display messages before proceeding to get user input on how to proceed
@@ -1041,6 +1166,14 @@ namespace VITAP.Controllers
                     helper.ExceptionV295(Search, Address);
                     break;
 
+                case "A224":
+                    helper.ExceptionA224();
+                    break;
+
+                case "A226":
+                    helper.ExceptionA226();
+                    break;
+
                 default:
                     if (exception.ERR_CODE.Right(3) == "046")
                     {
@@ -1098,15 +1231,67 @@ namespace VITAP.Controllers
             }
             return RedirectToAction("DisplayException", new { exCode = exception.ERR_CODE, exId = exception.EX_ID });
         }
+        public ActionResult ChangeA237(List<A237GridModel> ChangeRecList)
+        {
+            foreach (var item in ChangeRecList)
+            {
+                if (item.POLineNo == null)
+                {
 
+                    // A237 Fix by JunL 12-06-18
+                    // The A237 in .NET isn't producing an error that should be there when changing only one line among multiple that need changed. 
+                    return Json(new
+                    {
+                        success = true,
+                        IsAllPOLineNoHaveValues = false,
+                        Notes = "Cannot accept the Changes because one or more lines do not have the Refd_lnum entered."
+                    }, JsonRequestBehavior.AllowGet);
+                }
+            }
+
+            var helper = new ChangeButton();
+            var exception = TempData.Peek("exception") as EXCEPTION;
+            var roles = Session[SessionKey.RoleModel] as RoleListModel;
+
+            Session[SessionKey.Helper] = helper;
+            Session[SessionKey.PDocNo] = exception.PDOCNO;
+
+            Session[SessionKey.A237Model] = ChangeRecList;
+
+            var vmNotes = new NotesViewModel(exception, exception.ERR_CODE, exception.ACT, exception.EX_ID, exception.PDOCNO,
+                ControllerAction.Exception.Change, ControllerAction.Exception.ChangeNotes, "Exceptions", string.Empty);
+
+            TempData["ChangeA237vmNotes"] = vmNotes;
+
+            return Json(new
+            {
+                success = true,
+                IsAllPOLineNoHaveValues = true,
+                Notes = vmNotes }, 
+                JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult ChangeA237Notes()
+        {
+            return View("other/notes", TempData.Peek("ChangeA237vmNotes") as NotesViewModel);
+
+        }
+
+        [ValidateInput(false)]
         public ActionResult ChangeNotes(NotesViewModel vmNotes)
         {
+            string PDocNo;
+            PEGASYSPO_FRM POFrmQuery = new PEGASYSPO_FRM();
+
             if (vmNotes.returnVal1 != "FINISH") { return RedirectToAction("Index", Session[SessionKey.ExceptionsListModel] as ExceptionListModel); }
 
             var helper = Session[SessionKey.Helper] as ChangeButton;
             var exception = TempData.Peek("exception") as EXCEPTION;
-            var PDocNo = Session[SessionKey.PDocNo].ToString();
-            var POFrmQuery = Session[SessionKey.Pofrmquery] as PEGASYSPO_FRM;
+
+            if (Session[SessionKey.PDocNo] != null)
+                PDocNo = Session[SessionKey.PDocNo].ToString();
+
+            if (Session[SessionKey.Pofrmquery] != null)
+                POFrmQuery = Session[SessionKey.Pofrmquery] as PEGASYSPO_FRM;
 
             //If Finish button was not pushed, exit now
             if (vmNotes.returnVal1 != "FINISH") { return RedirectToAction("Index", Session[SessionKey.ExceptionsListModel] as ExceptionListModel); }
@@ -1127,21 +1312,38 @@ namespace VITAP.Controllers
                 return View("ConfirmOk", vmConfirm);
             }
 
+
+
             helper.SetNotes(vmNotes);
-            if (!helper.FinishCode(POFrmQuery))
+
+            if (exception.ERR_CODE == "M237")
             {
-                var vmConfirm = new MessageDisplay()
+                UpdateM237Exception(vmNotes.returnVal3, exception.RESPONSENOTES);
+            }
+           else  if (exception.ERR_CODE == "A237")
+            {
+                var changeRecList = Session[SessionKey.A237Model] as List<A237GridModel>;
+                new A237Manager().Change(changeRecList, exception.EX_ID, exception.RR_ID, vmNotes.returnVal7, PrepCode, vmNotes.returnVal3);
+                Session.Remove(SessionKey.A237Model);
+            }
+            else if (POFrmQuery != null)
+            {
+                if (!helper.FinishCode(POFrmQuery))
                 {
-                    Title = "",
-                    Question = "Unexplained ERROR - Change not successful!",
-                    Origin = ControllerAction.Exception.Change,
-                    Controller = "Exceptions",
-                    ReturnAction = ControllerAction.Exception.DisplayException,
-                    ReturnController = "Exceptions",
-                    ExId = exception.EX_ID,
-                    ErrCode = exception.ERR_CODE,
-                };
-                return View("ConfirmOk", vmConfirm);
+                    var vmConfirm = new MessageDisplay()
+                    {
+                        Title = "",
+                        Question = "Unexplained ERROR - Change not successful!",
+                        Origin = ControllerAction.Exception.Change,
+                        Controller = "Exceptions",
+                        ReturnAction = ControllerAction.Exception.DisplayException,
+                        ReturnController = "Exceptions",
+                        ExId = exception.EX_ID,
+                        ErrCode = exception.ERR_CODE,
+                    };
+                    return View("ConfirmOk", vmConfirm);
+                }
+
             }
 
             var request = Session[SessionKey.MainRequest] as DataSourceRequest;
@@ -1150,7 +1352,7 @@ namespace VITAP.Controllers
         }
 
         /// <summary>
-        /// Change Act for P200 exceptions - this needs to update on the screen with AJAX, but use Message, notes and Input display screens as well
+        /// Change Act for M200/P200 exceptions - this needs to update on the screen with AJAX, but use Message, notes and Input display screens as well
         /// </summary>
         /// <param name="newAct"></param>
         /// <returns></returns>
@@ -1286,6 +1488,7 @@ namespace VITAP.Controllers
             return RedirectToAction("DisplayException", new { exCode = exception.ERR_CODE, exId = exception.EX_ID });
         }
 
+        [ValidateInput(false)]
         public ActionResult ChangeActFinish(NotesViewModel vmNotes)
         {
             //If Finish button was not pushed, exit now
@@ -1300,7 +1503,7 @@ namespace VITAP.Controllers
         }
 
         /// <summary>
-        /// Change Pdocno for P200 exceptions - this needs to update on the screen with AJAX, but needs to display message and Input screens also
+        /// Change Pdocno for M200/P200 exceptions - this needs to update on the screen with AJAX, but needs to display message and Input screens also
         /// </summary>
         /// <param name="newPDocNo"></param>
         /// <returns></returns>
@@ -1423,12 +1626,48 @@ namespace VITAP.Controllers
             //If not continued it should go back to the calling exception screen
             return RedirectToAction("DisplayException", new { exCode = exception.ERR_CODE, exId = exception.EX_ID });
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="PO_ID"></param>
+        /// <param name="RR_ID"></param>
+        /// <param name="PDocNo"></param>
+        /// <returns></returns>
+
+        public ActionResult ChangeM237(List<AEaccountingModel> matchLineRecs)
+        {
+            var helper = new ChangeButton();
+
+            var exception = TempData.Peek("exception") as EXCEPTION;
+            var roles = Session[SessionKey.RoleModel] as RoleListModel;
+            Session[SessionKey.Helper] = helper;
+            Session[SessionKey.PDocNo] = exception.PDOCNO;
+
+            TempData[SessionKey.M237Model] = matchLineRecs;
+
+
+            var vmNotes = new NotesViewModel(exception, exception.ERR_CODE, exception.ACT, exception.EX_ID, exception.PDOCNO,
+                ControllerAction.Exception.Change, ControllerAction.Exception.ChangeNotes, "Exceptions", string.Empty);
+
+            TempData["Change237vmNotes"] = vmNotes;
+
+            return Json(new { success = true, Notes = vmNotes }, JsonRequestBehavior.AllowGet);
+
+        }
+
+        public ActionResult ChangeM237Notes()
+        {
+            return View("other/notes", TempData.Peek("Change237vmNotes") as NotesViewModel);
+
+        }
+
 
         /// <summary>
         /// This is called from the Notes screen
         /// </summary>
         /// <param name="vmNotes"></param>
         /// <returns></returns>
+        [ValidateInput(false)]
         public ActionResult CorrectDENotes(NotesViewModel vmNotes)
         {
             //If Finish button was not pushed, exit now
@@ -1444,7 +1683,7 @@ namespace VITAP.Controllers
             var POExists = Session[SessionKey.POExists] as bool?;
             var InvExists = Session[SessionKey.InvExists] as bool?;
             var RRExists = Session[SessionKey.RRExists] as bool?;
-            var sNotesType = Session[SessionKey.SNotesType]!=null? Session[SessionKey.SNotesType].ToString():null;
+            var sNotesType = Session[SessionKey.SNotesType] != null ? Session[SessionKey.SNotesType].ToString() : null;
             var PDocNo = Session[SessionKey.PDocNo].ToString();
 
             helper.Initialize(exception, PDocNo, roles.PREPCODE);
@@ -1498,6 +1737,7 @@ namespace VITAP.Controllers
         /// </summary>
         /// <param name="vmNotes"></param>
         /// <returns></returns>
+        [ValidateInput(false)]
         public ActionResult CorrectDEUserNotes(NotesViewModel vmNotes)
         {
             if (vmNotes.returnVal1 != "FINISH") { return RedirectToAction("Index", Session[SessionKey.ExceptionsListModel] as ExceptionListModel); }
@@ -1569,6 +1809,7 @@ namespace VITAP.Controllers
             return RedirectToAction("Index", new { request, search });
         }
 
+        [ValidateInput(false)]
         //Part of the CorrectDEUser Button Code
         private ActionResult CorrectDETemp(CorrectDEUserButton helper, EXCEPTION exception, NotesViewModel notes, string sNotesType, bool InvExists, PEGASYSINVOICE InvQuery)
         {
@@ -1598,6 +1839,7 @@ namespace VITAP.Controllers
         /// </summary>
         /// <param name="vmNotes"></param>
         /// <returns></returns>
+        [ValidateInput(false)]
         public ActionResult CorrectDETempNotes(NotesViewModel vmNotes)
         {
             if (vmNotes.returnVal1 != "FINISH") { return RedirectToAction("Index", Session[SessionKey.ExceptionsListModel] as ExceptionListModel); }
@@ -1755,6 +1997,7 @@ namespace VITAP.Controllers
         /// </summary>
         /// <param name="vmNotes"></param>
         /// <returns></returns>
+        [ValidateInput(false)]
         public ActionResult NotAModNotes(NotesViewModel vmNotes)
         {
             if (vmNotes.returnVal1 != "FINISH") { return RedirectToAction("Index", Session[SessionKey.ExceptionsListModel] as ExceptionListModel); }
@@ -1830,12 +2073,14 @@ namespace VITAP.Controllers
 
             return RedirectToAction("DisplayException", new { exCode = exception.ERR_CODE, exId = exception.EX_ID });
         }
+
+        [ValidateInput(false)]
         public ActionResult NotThisOneNotes(NotesViewModel vmNotes)
         {
             if (vmNotes.returnVal1 != "FINISH") { return RedirectToAction("Index", Session[SessionKey.ExceptionsListModel] as ExceptionListModel); }
 
             var helper = Session[SessionKey.Helper] as NotThisOneButton;
-            var TheQueue = Session[SessionKey.TheQueue] as List<MF_IC>;
+            var TheQueue = Session[SessionKey.TheQueue] as List<NoRRArray>;
             var RRChoice = Session[SessionKey.Rrchoice] as List<RRCHOICE>;
 
             helper.SetNotes(vmNotes);
@@ -1880,9 +2125,9 @@ namespace VITAP.Controllers
             if (Continue == true)
             {
                 Session[SessionKey.Helper] = helper;
-                Session[SessionKey.PDocNo] = Pdocno;
-                Session[SessionKey.NewAct] = NewAct;
-                Session[SessionKey.NewPDocNo] = NewPDocNo;
+                Session[SessionKey.PDocNo] = Pdocno.ReplaceNull("");
+                Session[SessionKey.NewAct] = NewAct.ReplaceNull("");
+                Session[SessionKey.NewPDocNo] = NewPDocNo.ReplaceNull("");
                 Session[SessionKey.Vcpo] = Vcpo;
                 Session[SessionKey.Vpo] = vpo;
 
@@ -1906,6 +2151,7 @@ namespace VITAP.Controllers
         /// </summary>
         /// <param name="vmNotes"></param>
         /// <returns></returns>
+        [ValidateInput(false)]
         public ActionResult POMatchNotes(NotesViewModel vmNotes)
         {
             if (vmNotes.returnVal1 != "FINISH") { return RedirectToAction("Index", Session[SessionKey.ExceptionsListModel] as ExceptionListModel); }
@@ -1962,9 +2208,9 @@ namespace VITAP.Controllers
             if (Continue == true)
             {
                 Session[SessionKey.Helper] = helper;
-                Session[SessionKey.PDocNo] = Pdocno;
-                Session[SessionKey.NewAct] = NewAct;
-                Session[SessionKey.NewPDocNo] = NewPDocNo;
+                Session[SessionKey.PDocNo] = Pdocno.ReplaceNull("");
+                Session[SessionKey.NewAct] = NewAct.ReplaceNull("");
+                Session[SessionKey.NewPDocNo] = NewPDocNo.ReplaceNull("");
                 Session[SessionKey.Vcpo] = Vcpo;
                 Session[SessionKey.StartDate] = StartDate;
                 Session[SessionKey.Vpo] = vpo;
@@ -1986,6 +2232,7 @@ namespace VITAP.Controllers
             return RedirectToAction("DisplayException", new { exCode = exception.ERR_CODE, exId = exception.EX_ID });
         }
 
+        [ValidateInput(false)]
         public ActionResult POMatchP200Notes(NotesViewModel vmNotes)
         {
             if (vmNotes.returnVal1 != "FINISH") { return RedirectToAction("Index", Session[SessionKey.ExceptionsListModel] as ExceptionListModel); }
@@ -2165,6 +2412,7 @@ namespace VITAP.Controllers
             return RedirectToAction("DisplayException", new { exCode = exception.ERR_CODE, exId = exception.EX_ID });
         }
 
+        [ValidateInput(false)]
         public ActionResult POModNotes(NotesViewModel vmNotes)
         {
             //If Finish button was not pushed, exit now
@@ -2177,13 +2425,13 @@ namespace VITAP.Controllers
             {
                 double.TryParse(Session[SessionKey.InvAmount].ToString(), out InvAmount);
             }
-            
+
             double POAmount = 0;
             if (Session[SessionKey.POAmount] != null)
             {
                 double.TryParse(Session[SessionKey.POAmount].ToString(), out POAmount);
             }
-            
+
             var VendName = Session[SessionKey.VendName].ToString();
 
             vmNotes.FaxNotes = vmNotes.returnVal7;
@@ -2243,6 +2491,7 @@ namespace VITAP.Controllers
             return RedirectToAction("DisplayException", new { exCode = exception.ERR_CODE, exId = exception.EX_ID });
         }
 
+        [ValidateInput(false)]
         public ActionResult PORequestNotes(NotesViewModel vmNotes)
         {
             //If Finish button was not pushed, exit now
@@ -2291,6 +2540,7 @@ namespace VITAP.Controllers
             return RedirectToAction("DisplayException", new { exCode = exception.ERR_CODE, exId = exception.EX_ID });
         }
 
+        [ValidateInput(false)]
         public ActionResult PrintNotes(NotesViewModel vmNotes)
         {
             //If Finish button was not pushed, exit now
@@ -2352,6 +2602,7 @@ namespace VITAP.Controllers
         /// </summary>
         /// <param name="vmNotes"></param>
         /// <returns></returns>
+        [ValidateInput(false)]
         public ActionResult ProcessedNotes(NotesViewModel vmNotes)
         {
             if (vmNotes.returnVal1 != "FINISH") { return RedirectToAction("Index", Session[SessionKey.ExceptionsListModel] as ExceptionListModel); }
@@ -2400,7 +2651,7 @@ namespace VITAP.Controllers
                 return Json(resultFailed, JsonRequestBehavior.AllowGet);
             }
             X200 = helper.Initialize(r200Search.FieldName.ToUpper(), r200Search.SearchValue, exception.PO_ID);
-         
+
             Session[SessionKey.X200] = X200;
 
             //If X200 is populated, enable the POMatch button and also enable and populate the grid on the screen.
@@ -2453,6 +2704,7 @@ namespace VITAP.Controllers
             return RedirectToAction("DisplayException", new { exCode = exception.ERR_CODE, exId = exception.EX_ID });
         }
 
+        [ValidateInput(false)]
         public ActionResult RecycleNotes(NotesViewModel vmNotes)
         {
             //If Finish button was not pushed, exit now
@@ -2539,7 +2791,7 @@ namespace VITAP.Controllers
         }
 
         /// <summary>
-        /// Reject butt for P039Exception, P140Exception, PegException_200, PegasysMainExceptions, PegVendorExceptions (override), 
+        /// Reject button for P039Exception, P140Exception, PegException_200, PegasysMainExceptions, PegVendorExceptions (override), 
         /// R200Exception, U066Exception, UserExceptions screens - Displays notes, mandmemo and message screens
         /// </summary>
         /// <param name="PDocNo"></param>
@@ -2585,6 +2837,7 @@ namespace VITAP.Controllers
             }
         }
 
+        [ValidateInput(false)]
         public ActionResult RejectNotes(NotesViewModel vmNotes)
         {
             //If Finish button was not pushed, exit now
@@ -2698,7 +2951,7 @@ namespace VITAP.Controllers
             helper.SetNotes(vmNotes);
             helper.FinishCode(exception, Search, Address, InvQuery, RRFrmQuery, POFrmQuery, PrepCode);
             helper.HandleInvoice(Search, vmMandMemo.NoteValue);
-            
+
 
             var request = Session[SessionKey.MainRequest] as DataSourceRequest;
             var search = Session[SessionKey.MainSearch] as ExceptionListModel;
@@ -2741,6 +2994,7 @@ namespace VITAP.Controllers
             }
 
             helper.SetNotes(vmNotes);
+            helper.FinishCode(exception, Search, null, null, RRFrmQuery, null, PrepCode);
             helper.HandleRR(Search, RRFrmQuery, vmMandMemo.NoteValue);
 
             var request = Session[SessionKey.MainRequest] as DataSourceRequest;
@@ -2844,6 +3098,23 @@ namespace VITAP.Controllers
             return RedirectToAction("Index", new { request, search });
         }
 
+        public ActionResult RejectM237Exception(string PDocNo)
+        {
+            var helper = new RejectButton();
+            var exception = TempData.Peek("exception") as EXCEPTION;
+            var roles = Session[SessionKey.RoleModel] as RoleListModel;
+
+            Session[SessionKey.Helper] = helper;
+            Session[SessionKey.PDocNo] = PDocNo;
+
+            var vmNotes = new NotesViewModel(exception, exception.ERR_CODE, exception.ACT, exception.EX_ID, exception.PDOCNO,
+                    ControllerAction.Exception.Reject, ControllerAction.Exception.RejectNotes, "Exceptions", string.Empty);
+
+            return View("other/notes", vmNotes);
+
+        }
+
+
         /// <summary>
         /// Reprocess button for PegasysMainExceptions screen - Displays notes and message screens
         /// </summary>
@@ -2902,7 +3173,7 @@ namespace VITAP.Controllers
                     return View("ConfirmOk", vmConfirm);
                 }
             }
-            
+
             return ReprocessMessage1(vmConfirm);
         }
 
@@ -2932,6 +3203,7 @@ namespace VITAP.Controllers
             return View("other/notes", vmNotes);
         }
 
+        [ValidateInput(false)]
         public ActionResult ReprocessNotes(NotesViewModel vmNotes)
         {
             //If Finish button was not pushed, exit now
@@ -3045,6 +3317,7 @@ namespace VITAP.Controllers
             }
         }
 
+        [ValidateInput(false)]
         public ActionResult RouteNotes(NotesViewModel vmNotes)
         {
             //If Finish button was not pushed, exit now
@@ -3127,6 +3400,7 @@ namespace VITAP.Controllers
             return RedirectToAction("DisplayException", new { exCode = exception.ERR_CODE, exId = exception.EX_ID });
         }
 
+        [ValidateInput(false)]
         public ActionResult RRRequestNotes(NotesViewModel vmNotes)
         {
             //If Finish button was not pushed, exit now
@@ -3134,8 +3408,10 @@ namespace VITAP.Controllers
 
             var helper = Session[SessionKey.Helper] as RRRequestButton;
 
+            var noRRList = Session[SessionKey.TheQueue] as List<NoRRArray>;
+
             helper.SetNotes(vmNotes);
-            helper.FinishCode();
+            helper.FinishCode(noRRList);
 
             var request = Session[SessionKey.MainRequest] as DataSourceRequest;
             var search = Session[SessionKey.MainSearch] as ExceptionListModel;
@@ -3179,6 +3455,7 @@ namespace VITAP.Controllers
             return RedirectToAction("DisplayException", new { exCode = exception.ERR_CODE, exId = exception.EX_ID });
         }
 
+        [ValidateInput(false)]
         public ActionResult SendAsapNotes(NotesViewModel vmNotes)
         {
             //If Finish button was not pushed, exit now
@@ -3449,6 +3726,7 @@ namespace VITAP.Controllers
             }
         }
 
+        [ValidateInput(false)]
         public ActionResult SkipNotes(NotesViewModel vmNotes)
         {
             //If Finish button was not pushed, exit now
@@ -3573,6 +3851,7 @@ namespace VITAP.Controllers
         /// </summary>
         /// <param name="vmNotes"></param>
         /// <returns></returns>
+        [ValidateInput(false)]
         public ActionResult UnMatchNotes(NotesViewModel vmNotes)
         {
             if (vmNotes.returnVal1 != "FINISH") { return RedirectToAction("Index", Session[SessionKey.ExceptionsListModel] as ExceptionListModel); }
@@ -3657,11 +3936,11 @@ namespace VITAP.Controllers
         }
         */
 
-        
+
         public ActionResult NextDay(string ex_id, string prepcode, string po_id, string err_code)
         {
             var helper = new NextDayButton();
-            
+
             var exception = TempData.Peek("exception") as EXCEPTION;
             helper.Initialize(exception, prepcode);
 
@@ -3677,9 +3956,10 @@ namespace VITAP.Controllers
                 ControllerAction.Exception.NextDay, ControllerAction.Exception.NextDayNotes, "Exceptions", dailyInterestAmount);
 
             return View("other/notes", vmNotes);
-            
+
         }
 
+        [ValidateInput(false)]
         public ActionResult NextDayNotes(NotesViewModel vmNotes)
         {
             //If Finish button was not pushed, exit now
@@ -3745,7 +4025,7 @@ namespace VITAP.Controllers
                     string _sNotesType = "";
                     if (efException.ERR_CODE == "U044")
                     {
-                        var changes = GetInvoiceChanges(vm);
+                        var changes = GetInvoiceChanges(vm, false);
                         if (changes.ContainsKey("INVOICE"))
                         {
                             _sNotesType = "U049CRCT";
@@ -3769,19 +4049,23 @@ namespace VITAP.Controllers
             }
         }
 
-        private void InvEditBtnNextUpdates(InvEditViewModel vm, EXCEPTION efException)
+        private void InvEditBtnNextUpdates(InvEditViewModel vm, EXCEPTION efException, bool U049 = false)
         {
             UpdateInvoice(vm, true);
 
-            var mgrInvoice = new PegasysInvoiceManager();
-            var efInvoice = mgrInvoice.GetPegasysInvoiceByKeyId(vm.InvoiceKeyId);
-            efInvoice.INV_STATUS = "KEYED";
-            efInvoice.PREVALIDATION_FL = "F";
-            efInvoice.ERR_CODE = null;
-            mgrInvoice.UpdatePegasysInvoice(efInvoice);
+            // Invoices on U049 exceptions don't go to KEYED status.
+            if (!U049)
+            {
+                var mgrInvoice = new PegasysInvoiceManager();
+                var efInvoice = mgrInvoice.GetPegasysInvoiceByKeyId(vm.InvoiceKeyId);
+                efInvoice.INV_STATUS = "KEYED";
+                efInvoice.PREVALIDATION_FL = "F";
+                efInvoice.ERR_CODE = null;
+                mgrInvoice.UpdatePegasysInvoice(efInvoice);
+            }
 
             var mgrException = new ExceptionsManager();
-            
+
             efException.ERR_RESPONSE = "C";
             efException.CLEARED_DATE = DateTime.Now;
             mgrException.UpdateException(efException);
@@ -3841,7 +4125,7 @@ namespace VITAP.Controllers
         private void UpdateInvoice(InvEditViewModel vmNewInvoice, bool updateException)
         {
             var pegInvoice = GetPegasysInvoiceByExId(vmNewInvoice.ExceptionId);
-            var changes = GetInvoiceChanges(vmNewInvoice);
+            var changes = GetInvoiceChanges(vmNewInvoice, true);
             if (changes.Count == 0)
                 return;
             ProcessInvoiceChanges(pegInvoice, changes, updateException);
@@ -3925,12 +4209,12 @@ namespace VITAP.Controllers
             return th;
         }
 
-        private Dictionary<string, object> GetInvoiceChanges(InvEditViewModel vmNewInvoice)
+        private Dictionary<string, object> GetInvoiceChanges(InvEditViewModel vmNewInvoice, bool updateTempData)
         {
             var efInv = new PegasysInvoice();
             var changes = new Dictionary<string, object>();
             var oldInvoice = TempData["vmInvoice"] as InvEditViewModel;
-            TempData["vmInvoice"] = vmNewInvoice;
+            TempData["vmInvoice"] = (updateTempData ? vmNewInvoice : oldInvoice);
 
             if (oldInvoice.InvoiceNumber != vmNewInvoice.InvoiceNumber)
                 changes.Add("INVOICE", vmNewInvoice.InvoiceNumber);
@@ -3987,7 +4271,7 @@ namespace VITAP.Controllers
                 var roles = Session[SessionKey.RoleModel] as RoleListModel;
 
                 TempData["exception"] = helper.Skip(exception, roles.PREPCODE);
-            
+
                 return CancelInvEdit(exception.ERR_CODE, exceptionId);
             }
             catch (System.Exception ex)
@@ -4021,7 +4305,7 @@ namespace VITAP.Controllers
                     vmNotes = new NotesViewModel(null, exceptionCode, "", "", "", "RESET",
                         ControllerAction.Exception.BackToU044Notes, "Exceptions", dailyInterestAmount);
                 }
-                
+
 
                 return View("Other/Notes", vmNotes);
             }
@@ -4036,7 +4320,7 @@ namespace VITAP.Controllers
             try
             {
                 new ExceptionsManager().CheckinException(exceptionId);
-                
+
                 TempData.Remove("vmInvoice");
                 TempData.Remove("vmInvoiceUpdated");
 
@@ -4151,8 +4435,9 @@ namespace VITAP.Controllers
                 NoteResult = Result
             };
 
-            if (exception.RR_ID != null) {
-                vmException.Id = exception.EX_ID;
+            if (exception.RR_ID != null)
+            {
+                vmException.Id = exception.RR_ID;
             }
             else if (exception.PO_ID != null)
             {
@@ -4167,32 +4452,40 @@ namespace VITAP.Controllers
             vmException.E052Recs = ActGridData;
 
             #region PO Data
-            if (vmException.PoId != null) {
+            if (vmException.PoId != null)
+            {
                 var PegPoFrmData = mgr.PegPoFrmData(vmException.PoId);
                 //if (PegPoFrmData == null) {
                 //    PegPoData = mgr.PegPoData(vmException.PoId);
                 //}
-                if (PegPoFrmData != null) {
+                if (PegPoFrmData != null)
+                {
                     vmException.PoExists = true;
                     vmException.RRExists = false;
                     vmException.InvExists = false;
 
-                    if(vmException.PoId.Contains("&")) {
+                    if (vmException.PoId.Contains("&"))
+                    {
                         vmException.ModNumStr = vmException.PoId.Right(4);
                     }
-                    else {
+                    else
+                    {
                         vmException.ModNumStr = "";
                     }
 
-                    if (vmException.r_pegasys) {
-                        if (PegPoFrmData.EDI_IND == "T") {
+                    if (vmException.r_pegasys)
+                    {
+                        if (PegPoFrmData.EDI_IND == "T")
+                        {
                             vmException.PoImageExists = false;
                         }
-                        else {
+                        else
+                        {
                             vmException.PoImageExists = true;
                         }
                     }
-                    else {
+                    else
+                    {
                         if (PegPoFrmData.EDI_IND != null)
                         {
                             vmException.PoImageExists = false;
@@ -4206,11 +4499,13 @@ namespace VITAP.Controllers
                     vmException.PrepCode = PegPoFrmData.PREPCODE;
                     vmException.PoImgageId = PegPoFrmData.IMAGEID;
                 }
-                else {
+                else
+                {
                     vmException.PoImageBtnTip = "No record in PO.";
                 }
             }
-            else {
+            else
+            {
                 vmException.PoImageBtnTip = "No PO.";
             }
             #endregion
@@ -4220,14 +4515,16 @@ namespace VITAP.Controllers
             {
                 var PegRRFrmData = mgr.PegRRFrmData(vmException.RRId);
 
-                if (PegRRFrmData != null) {
+                if (PegRRFrmData != null)
+                {
                     vmException.RRExists = true;
                     vmException.PoExists = false;
                     vmException.InvExists = false;
 
                     vmException.PDocNo = PegRRFrmData.PDOCNOPO;
 
-                    if(PegRRFrmData.EDI_IND == "T") {
+                    if (PegRRFrmData.EDI_IND == "T")
+                    {
                         vmException.RRImageExists = false;
                     }
                     else if (PegRRFrmData.IMAGEID != null)
@@ -4237,11 +4534,13 @@ namespace VITAP.Controllers
                     }
                     vmException.RRImageBtnTip = "Pagasys RR.";
                 }
-                else {
+                else
+                {
                     vmException.RRImageBtnTip = "No record in RR.";
                 }
             }
-            else {
+            else
+            {
                 vmException.RRImageBtnTip = "No RR.";
             }
             #endregion
@@ -4251,10 +4550,11 @@ namespace VITAP.Controllers
             {
                 var PegInvData = mgr.PegInvData(vmException.InvKeyId);
 
-                if (PegInvData != null) {
+                if (PegInvData != null)
+                {
                     if (vmException.ErrorCode == "U044" && vmException.Memo2 != null)
                     {
-                        var memo2String = "{0} \r\n {1} Invoice: {2} Amount: {3}";
+                        var memo2String = "\r\n {0} Invoice: {1} Amount: {2}";
                         vmException.Memo2 = string.Format(memo2String, vmException.Memo2, PegInvData.INVOICE, PegInvData.AMOUNT);
                     }
 
@@ -4264,23 +4564,28 @@ namespace VITAP.Controllers
 
                     vmException.PDocNo = PegInvData.PDOCNOPO;
                     vmException.VendCd = PegInvData.VEND_CD;
-                    if (PegInvData.EDI_IND == "T") {
+                    if (PegInvData.EDI_IND == "T")
+                    {
                         vmException.InvImageExists = false;
                     }
-                    else if (PegInvData.IMAGEID != null) {
+                    else if (PegInvData.IMAGEID != null)
+                    {
                         vmException.InvImageExists = true;
                         vmException.InvImageId = PegInvData.IMAGEID;
                     }
                 }
-                else {
+                else
+                {
                     vmException.InvImageBtnTip = "No record in Inv.";
                 }
             }
-            else { 
-                vmException.InvImageBtnTip = "No Inv."; 
+            else
+            {
+                vmException.InvImageBtnTip = "No Inv.";
             }
             #endregion
-            if (!(vmException.PoExists && vmException.PoExists && vmException.InvExists)) {
+            if (!(vmException.PoExists && vmException.PoExists && vmException.InvExists))
+            {
                 vmException.CorrectDe1Tip = "No data to change";
             }
             else { vmException.CorrectDe1Tip = ""; }
@@ -4290,7 +4595,8 @@ namespace VITAP.Controllers
             return View("UserException/Exception", vmException);
         }
 
-        private EXCEPTION GetExceptionByExId (string exId)
+
+        private EXCEPTION GetExceptionByExId(string exId)
         {
             var mgr = new ExceptionsManager();
             var exception = mgr.GetExceptionByExId(exId);
@@ -4314,7 +4620,78 @@ namespace VITAP.Controllers
             return invoice;
         }
 
-        #endregion InvEdit
+        #endregion InvEdit      
+
+        #region RREdit
+        public ActionResult RREdit()
+        {
+            return GetRREditView();
+        }
+
+        [ActionName("RREdit"), SubmitButton(Name = "btnNext")]
+        public ActionResult NextRREdit(RREditModel rm)
+        {
+            try
+            {
+
+                var efException = TempData["exception"] as EXCEPTION;
+
+                Session[SessionKey.RREditModel] = rm;
+                Session[SessionKey.Exception] = efException;
+
+                string _sNotesType = "CORRECT";
+
+                return GetNotesView(efException.ERR_CODE, _sNotesType, efException.ACT, efException.EX_ID, efException.PDOCNO, ControllerAction.Exception.FinishU044RREditNotes, "Exceptions");
+
+            }
+            catch (System.Exception ex)
+            {
+                return LogErrorAndReturnView(ex, "NextRREdit");
+            }
+        }
+
+        public ActionResult CancelRREdit(string exceptionId)
+        {
+            try
+            {
+                new ExceptionsManager().CheckinException(exceptionId);
+
+                TempData.Remove("rrEdit");
+
+                return RedirectToAction("Index");
+            }
+            catch (System.Exception ex)
+            {
+                return LogErrorAndReturnView(ex, "CancelRREdit");
+            }
+        }
+
+        private ViewResult GetRREditView()
+        {
+            try
+            {
+                PegasysRREditManager mgr = new PegasysRREditManager();
+                var exception = TempData.Peek("exception") as EXCEPTION;
+
+                var rrEdit = mgr.GetRREditModel(exception.ERR_CODE, exception.EX_ID);
+                TempData["rrEdit"] = rrEdit;
+                return View("Other/RREdit", rrEdit);
+            }
+            catch (System.Exception ex)
+            {
+                return LogErrorAndReturnView(ex, "GetRREditView");
+            }
+        }
+
+        public void UpdateRREdit(RREditModel model, EXCEPTION efException)
+        {
+            PegasysRREditManager mgr = new PegasysRREditManager();
+            //var exception = TempData.Peek("exception") as EXCEPTION;
+
+            var prepcode = Session[SessionKey.PrepCode].ToString();
+            mgr.UpdateRR(prepcode, efException.ERR_CODE, efException.RR_ID, model);
+        }
+        #endregion
 
         #region Notes
 
@@ -4330,7 +4707,7 @@ namespace VITAP.Controllers
             var vm = new NotesViewModel()
             {
                 Origin = origin,
-                Amount = !vmInvoice.InvoiceAmount.HasValue ? string.Empty 
+                Amount = !vmInvoice.InvoiceAmount.HasValue ? string.Empty
                     : vmInvoice.InvoiceAmount.Value.ToString(),
                 ExceptionCode = vmInvoice.ExceptionCode,
             };
@@ -4346,7 +4723,7 @@ namespace VITAP.Controllers
                 return CancelInvEdit(vm.ExceptionCode, vm.ExId);
             }
             TempData.Clear();
-            
+
             NotesResult ReturnObj = new NotesResult();
             ReturnObj.ErrCode = vm.ErrCode;
             ReturnObj.ExId = vm.ReturnExId;
@@ -4370,15 +4747,15 @@ namespace VITAP.Controllers
             //return RedirectToAction("Index");
         }
 
-
-        public ActionResult FinishNotes(string errCode, string returnExId, string Act, string pDocNo, string returnVal1, 
-            string returnVal2, string returnVal3, string returnVal4, string returnVal5, string returnVal6, string returnVal7, 
+        [ValidateInput(false)]
+        public ActionResult FinishNotes(string err_Code, string returnExId, string Act, string pDocNo, string returnVal1,
+            string returnVal2, string returnVal3, string returnVal4, string returnVal5, string returnVal6, string returnVal7,
             string returnVal8, string returnVal9, string returnVal10, string returnValX, string returnValY, string returnValZ,
             string ReturnAction, string ReturnController)
         {
             var vm = new NotesViewModel()
             {
-                ErrCode = errCode,
+                ErrCode = err_Code,
                 ExId = returnExId,
                 Act = Act,
                 PDocNo = pDocNo,
@@ -4398,16 +4775,18 @@ namespace VITAP.Controllers
                 ReturnAction = ReturnAction,
                 ReturnController = ReturnController,
             };
+
             if (String.IsNullOrWhiteSpace(vm.ReturnController))
                 vm.ReturnController = "Exceptions";
 
             if (returnVal1 == "CANCEL")
             {
-                return RedirectToAction(ControllerAction.Exception.DisplayException, "Exceptions", new { exCode = errCode, exId = returnExId.Replace("&amp;", "&") });
+                return RedirectToAction(ControllerAction.Exception.DisplayException, "Exceptions", new { exCode = err_Code, exId = returnExId.Replace("&amp;", "&") });
             }
-            return RedirectToAction(vm.ReturnAction, vm.ReturnController, vm);
+            return RedirectToAction(vm.ReturnAction==ControllerAction.Exception.EARequest? ControllerAction.Exception.EARequestNotes:vm.ReturnAction, vm.ReturnController, vm);
         }
 
+        [ValidateInput(false)]
         public ActionResult BackToU044Notes(NotesViewModel vm)
         {
             var exception = new ExceptionsManager().GetExceptionByExId(vm.ExId);
@@ -4423,6 +4802,7 @@ namespace VITAP.Controllers
             return RedirectToAction(ControllerAction.Exception.Index, "Exceptions");
         }
 
+        [ValidateInput(false)]
         public ActionResult FinishU049Notes(NotesViewModel vm)
         {
             var invEditViewModel = Session[SessionKey.InvEditViewModel] as InvEditViewModel;
@@ -4439,7 +4819,7 @@ namespace VITAP.Controllers
             string _sNotesType = "";
             if (exception.ERR_CODE == "U044")
             {
-                var changes = GetInvoiceChanges(invEditViewModel);
+                var changes = GetInvoiceChanges(invEditViewModel, false);
                 if (changes.ContainsKey("INVOICE"))
                 {
                     _sNotesType = "U049CRCT";
@@ -4456,7 +4836,33 @@ namespace VITAP.Controllers
 
             buttonCode.FinishCode(null, null, null, _sNotesType, POExists, InvExists, RRExists);
 
-            InvEditBtnNextUpdates(invEditViewModel, exception);
+            InvEditBtnNextUpdates(invEditViewModel, exception, (_sNotesType == "U049CRCT" ? true : false));
+
+
+            return RedirectToAction(ControllerAction.Exception.Index, "Exceptions");
+        }
+
+        [ValidateInput(false)]
+        public ActionResult FinishU044RREditNotes(NotesViewModel vm)
+        {
+            var RREditModel = Session[SessionKey.RREditModel] as RREditModel;
+            var exception = Session[SessionKey.Exception] as EXCEPTION;
+
+            bool POExists = GetPOExists(exception.PO_ID);
+            bool InvExists = GetInvExists(exception.INV_KEY_ID);
+            bool RRExists = GetRRExists(exception.RR_ID);
+
+            var buttonCode = new CorrectDEButton();
+            buttonCode.Initialize(exception, vm.PDocNo, this.PrepCode);
+            buttonCode.SetNotes(vm);
+
+
+            string _sNotesType = "CORRECT";
+
+
+            buttonCode.FinishCode(null, null, null, _sNotesType, POExists, InvExists, RRExists);
+
+            UpdateRREdit(RREditModel, exception);
 
 
             return RedirectToAction(ControllerAction.Exception.Index, "Exceptions");
@@ -4507,7 +4913,7 @@ namespace VITAP.Controllers
 
         private bool GetPOExists(string PO_ID)
         {
-            bool PoExists = false; 
+            bool PoExists = false;
 
             if (PO_ID != null)
             {
@@ -4546,23 +4952,36 @@ namespace VITAP.Controllers
 
         public ActionResult Message(MessageDisplay vmMessage)
         {
+            var exception = TempData.Peek("exception") as EXCEPTION;
+
             if (vmMessage.ReturnAction == ControllerAction.Exception.DisplayException && vmMessage.ErrCode == "P200")
             {
                 return RedirectToAction(ControllerAction.Exception.Index);
             }
             else if (vmMessage.ReturnAction == ControllerAction.Exception.DisplayException)
             {
-                return RedirectToAction(vmMessage.ReturnAction, vmMessage.ReturnController, new { exCode = vmMessage.ErrCode, exId = vmMessage.ExId.Replace("&amp;","&") });
+                return RedirectToAction(vmMessage.ReturnAction, vmMessage.ReturnController, new { exCode = vmMessage.ErrCode, exId = vmMessage.ExId.Replace("&amp;", "&") });
             }
             else if (vmMessage.Response == false)
             {
-                return RedirectToAction(vmMessage.ReturnAction, vmMessage.ReturnController, new { exCode = vmMessage.ErrCode, exId = vmMessage.ExId.Replace("&amp;", "&") });
+                if (("M224/M303/M237").Split('/').Contains(vmMessage.ErrCode))
+                {
+                    if(exception!=null && exception.OUT!=null && exception.OUT=="T")
+                    {
+                        return RedirectToAction(ControllerAction.Exception.DisplayExceptionWithoutCheckoutMessage, "Exceptions", new { exCode = vmMessage.ErrCode, exId = vmMessage.ExId.Replace("&amp;", "&") });
+                    }
+                    else
+                    return RedirectToAction(ControllerAction.Exception.DisplayException, "Exceptions", new { exCode = vmMessage.ErrCode, exId = vmMessage.ExId.Replace("&amp;", "&") });
+                }
+                else
+                    return RedirectToAction(vmMessage.ReturnAction, vmMessage.ReturnController, new { exCode = vmMessage.ErrCode, exId = vmMessage.ExId.Replace("&amp;", "&") });
             }
 
             return RedirectToAction(vmMessage.ReturnAction, vmMessage.ReturnController, vmMessage);
 
         }
 
+        [ValidateInput(false)]
         public ActionResult CancelNotes(NotesViewModel vm)
         {
             NotesResult ReturnObj = new NotesResult();
@@ -4590,7 +5009,8 @@ namespace VITAP.Controllers
             return Json(new { success = true, ContactName = ReturnData.CONTACTNAME, ContactPhone = ReturnData.PHONE }, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult GetNotesView (string ErrCode, string ButtonType, string Act, string ExId, string PDocNo, string ReturnAction, string ReturnController) {
+        public ActionResult GetNotesView(string ErrCode, string ButtonType, string Act, string ExId, string PDocNo, string ReturnAction, string ReturnController)
+        {
             var exception = GetExceptionByExId(ExId);
 
             String dailyInterestAmount = "";
@@ -4604,7 +5024,7 @@ namespace VITAP.Controllers
             return View("Other/Notes", NotesModel);
         }
 
-        
+
         public ActionResult GetPicklistView(List<PEGASYSINVOICE> rtnInv, string Act, string Pdocnopo, string VendCd)
         {
             var mgr = new ExceptionsManager();
@@ -4616,11 +5036,11 @@ namespace VITAP.Controllers
         public ActionResult Picklist_Read([DataSourceRequest]DataSourceRequest request, PickListViewModel p)
         {
             var mgr = new ExceptionsManager();
-            
+
             var data = mgr.GetPicklistData(p.PDocNo, p.Vend_Cd);
             var result = new DataSourceResult()
             {
-                Data = data                
+                Data = data
             };
 
             return Json(result);
@@ -4784,7 +5204,7 @@ namespace VITAP.Controllers
         {
             string unsized = Request.QueryString["unsized"];
             System.Drawing.Image TheImg;
-            if (String.IsNullOrEmpty(FilePath)) 
+            if (String.IsNullOrEmpty(FilePath))
             {
                 FilePath = GetImagePath("dummy.tif");
             }
@@ -4811,7 +5231,7 @@ namespace VITAP.Controllers
                         TheImg.RotateFlip(System.Drawing.RotateFlipType.Rotate270FlipNone);
                         break;
                 }
-                
+
                 Response.ContentType = "image/jpeg";
                 TheImg.Save(Response.OutputStream, System.Drawing.Imaging.ImageFormat.Jpeg);
                 TheImg.Dispose();
@@ -4886,7 +5306,7 @@ namespace VITAP.Controllers
             catch (System.Exception ex)
             {
                 Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-            
+
                 return null;
             }
         }
@@ -4970,18 +5390,25 @@ namespace VITAP.Controllers
 
         #endregion Mocked Views
 
-        public ActionResult ReturnToCaller(string Controller, string Action, NotesResult Result) {
+        public ActionResult ReturnToCaller(string Controller, string Action, NotesResult Result)
+        {
             return RedirectToAction(Action, Controller, Result);
         }
 
         public ActionResult BackToUserException(NotesResult Results)
-        {   
+        {
             return GetUserExceptionView(false, Results.ExId, Results);
+        }
+
+        public ActionResult U044Accept(string invKeyId)
+        {
+            return Accept("", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", null, invKeyId);
         }
 
         #region Notification Exceptions
 
-        public ViewResult GetNotificationExceptionsView(string exCode, string exId) {
+        public ViewResult GetNotificationExceptionsView(string exCode, string exId)
+        {
             var manager = new NotificationExceptionsManager();
             var model = manager.BuildModel(exCode, exId);
             Session[SessionKey.Model] = model;
@@ -4989,7 +5416,8 @@ namespace VITAP.Controllers
             return View("NotificationExceptions/Exception", model);
         }
 
-        public ActionResult ViewEDIPO(string Act, string ModNo, string InboxUidy, string Po_Id) {
+        public ActionResult ViewEDIPO(string Act, string ModNo, string InboxUidy, string Po_Id)
+        {
             var thc = new TransHistController();
 
             return thc.ViewEDIPO(Act, ModNo, InboxUidy, Po_Id);
@@ -4998,7 +5426,7 @@ namespace VITAP.Controllers
         public JsonResult NotificationExceptionsUpdate(NotificationExceptionUpdateModel model)
         {
             NotificationExceptionsManager manager = new NotificationExceptionsManager();
-            manager.Update(model);    
+            manager.Update(model);
 
             return Json("Success");
         }
@@ -5027,7 +5455,7 @@ namespace VITAP.Controllers
                 if ((vmExMain == null) || (vmExMain.ExceptionId != exMain.EX_ID))
                 {
                     vmExMain = new MainExceptionModel(exMain, this.PrepCode);
-                    
+
                     //Put this here for notes to use later
                     Session[SessionKey.DailyInterestAmount] = vmExMain.TabInvoice.DailyInterestAmount;
 
@@ -5047,7 +5475,7 @@ namespace VITAP.Controllers
 
         private ViewResult GetP200View(EXCEPTION exMain)
         {
-            ViewBag.ddlSearchIn = new List<SelectListItem>()
+            var searchList = new List<SelectListItem>()
                     {
                         new SelectListItem { Text = "ACT", Value = "ACT" },
                         new SelectListItem { Text = "PDocNo", Value = "PDocNo" },
@@ -5062,6 +5490,18 @@ namespace VITAP.Controllers
             {
                 var mgr = new ExceptionsManager();
                 var vmP200 = mgr.GetP200Exception(exMain);
+
+                // Restore search params if they exist.
+                var search = TempData.Peek("P200Search") as R200Search;
+                if (search != null)
+                {
+                    ViewBag.txtSearchFor = search.SearchValue;
+                    ViewBag.ddlSearchIn = new SelectList(searchList, ViewBag.txtSearchIn);
+                }
+                else
+                {
+                    ViewBag.ddlSearchIn = new SelectList(searchList);
+                }
 
                 return View("P200/Exception", vmP200);
             }
@@ -5083,6 +5523,8 @@ namespace VITAP.Controllers
                 return Json(resultFailed, JsonRequestBehavior.AllowGet);
             }
 
+            // Save so we can repopulate search params.
+            TempData["P200Search"] = search;
             X200 = helper.InitializeP200(search.FieldName.ToUpper(), search.SearchValue, exception.PO_ID.ReplaceNull(""));
             var results = X200.ToDataSourceResult(request);
 
@@ -5140,7 +5582,8 @@ namespace VITAP.Controllers
             return Json(result);
         }
 
-        public ActionResult P039NotThisOne()
+        [HttpPost]
+        public ActionResult P039NotThisOne(ExceptionP039Model model)
         {
             //We will maybe need this later.
             //EX_ID = Server.UrlDecode(EX_ID);
@@ -5156,7 +5599,7 @@ namespace VITAP.Controllers
             if (Continue == true)
             {
                 Session[SessionKey.Helper] = helper;
-                Session[SessionKey.TheQueue] = null;
+                Session[SessionKey.TheQueue] = JsonConvert.DeserializeObject<List<NoRRArray>>(model.NoRRArrayJson);
 
                 String dailyInterestAmount = "";
                 if (Session[SessionKey.DailyInterestAmount] != null)
@@ -5174,9 +5617,17 @@ namespace VITAP.Controllers
         }
 
         [HttpPost]
+        public ActionResult P039RRRequest(ExceptionP039Model model)
+        {
+            Session[SessionKey.TheQueue] = JsonConvert.DeserializeObject<List<NoRRArray>>(model.NoRRArrayJson);
+
+            return RedirectToAction("RRRequest");
+        }
+
+        [HttpPost]
         public ActionResult P039Accept(ExceptionP039Model model)
         {
-            model.YesRRArray =  JsonConvert.DeserializeObject<List<NoRRArray>>(model.YesRRArrayJson);
+            model.YesRRArray = JsonConvert.DeserializeObject<List<NoRRArray>>(model.YesRRArrayJson);
             Session[SessionKey.P039Model] = model;
 
             return Accept("", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", null, model.InvKeyId);
@@ -5184,7 +5635,17 @@ namespace VITAP.Controllers
 
         public ActionResult P202Accept(string invKeyId)
         {
-            return Accept("", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", null , invKeyId);
+            return Accept("", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", null, invKeyId);
+        }
+
+        public ActionResult A224Accept()
+        {
+            return Accept("", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", null, null);
+        }
+
+        public ActionResult A226Accept()
+        {
+            return Accept("", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", null, null);
         }
 
         #endregion P039
@@ -5207,5 +5668,492 @@ namespace VITAP.Controllers
 
             return RedirectToAction(ControllerAction.Exception.InvEdit);
         }
+
+
+        private void UpdateM237Exception(string returnVal3, string responseNotes)
+        {
+            var exception = TempData["exception"] as EXCEPTION;
+
+            List<AEaccountingModel> matchLineNumsList = new List<AEaccountingModel>();
+
+            if (TempData.Peek(SessionKey.M237Model) != null)
+            {
+                matchLineNumsList = TempData.Peek(SessionKey.M237Model) as List<AEaccountingModel>;
+                TempData["exception"] = new M237Manager().Change(exception, PrepCode, matchLineNumsList, returnVal3, exception.RESPONSENOTES);
+            }
+        }
+
+        public ActionResult ConfirmChangeLnumM303(List<AEgridModel> accountingInfoList)
+        {
+            var helper = Session[SessionKey.Helper] as ChangeButton;
+            var exception = TempData.Peek("exception") as EXCEPTION;
+
+            if (accountingInfoList != null)
+                Session["M303AccountingList"] = accountingInfoList;
+
+            if (exception.ERR_CODE == "M224")
+            {
+                var model = TempData.Peek("M224Model") as ExceptionM303Model;
+                var accrualsList = Session["M303AccountingList"] as List<AEgridModel>;
+
+                if (accrualsList != null)
+                {
+                    foreach (var item in accrualsList)
+                    {
+                        if (model.POTab.POAccountLineRecs.Where(x => x.lnum == item.refd_lnum).Count() == 0)
+                        {
+                            ViewBag.Message = item.refd_lnum + " is not a valid line number on the PO. ";
+                            return View("ViewErrorMessage");
+                        }
+
+                    }
+                }
+            }
+
+            if (exception.ERR_CODE == "M303")
+            {
+                var model = TempData.Peek("M303Model") as ExceptionM303Model;
+                var accrualsList = Session["M303AccountingList"] as List<AEgridModel>;
+
+                if (accrualsList != null)
+                {
+                    if (!string.IsNullOrEmpty(model.ExpenseAccrualTab.PDOCNOae))
+                    {
+                        var message = new M303manager().ValidateLNumChanges(accrualsList, model.ExpenseAccrualTab.PDOCNOae);
+
+                        if (!string.IsNullOrEmpty(message))
+                        {
+                            ViewBag.Message = message;
+                            return View("ViewErrorMessage");
+                        }
+                    }
+                }
+            }
+
+            if (accountingInfoList != null || Session["M303AccountingList"] != null)
+            {
+
+                var vmConfirm = new MessageDisplay()
+                {
+                    Title = "Clear",
+                    Question = "Are you sure that you want to change the Line numbers on the Accrual?",
+                    ReturnAction = "ChangeLnumM303",
+                    ReturnController = "Exceptions",
+                    ExId = exception.EX_ID,
+                    ErrCode = exception.ERR_CODE,
+                };
+
+                return View("ConfirmYesNo", vmConfirm);
+            }
+            else
+            {
+                Session.Remove("M303AccountingList");
+                return RedirectToAction(ControllerAction.Exception.DisplayException, "Exceptions", new { exCode = exception.ERR_CODE, exId = exception.EX_ID.Replace("&amp;", "&") });
+
+            }
+
+        }
+        public ActionResult ChangeLnumM303(MessageDisplay vmConfirm)
+        {
+            var exception = TempData.Peek("exception") as EXCEPTION;
+            var AEGridList = Session["M303AccountingList"] as List<AEgridModel>;
+
+            try
+            {
+                if (exception.ERR_CODE == "M303")
+                {
+                    new M303manager().UpdateLineNums(AEGridList, exception.AE_ID, exception.ACT, PrepCode);
+                }
+                else
+                {
+                    new M224Manager().UpdateLineNums(AEGridList, exception.PDOCNO, exception.AE_ID, exception.ACT, PrepCode);
+
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return LogErrorAndReturnView(ex, "ReturnViewResult");
+            }
+
+            Session.Remove("M303AccountingList");
+            return RedirectToAction(ControllerAction.Exception.DisplayException, "Exceptions", new { exCode = exception.ERR_CODE, exId = exception.EX_ID.Replace("&amp;", "&") });
+
+        }
+
+        public ActionResult M303MakeChangesConfirm(List<AEgridModel> accountingInfoList)
+        {
+            var helper = Session[SessionKey.Helper] as ChangeButton;
+            var exception = TempData.Peek("exception") as EXCEPTION;
+            var total = 0M;
+
+
+            if (accountingInfoList != null)
+            {
+                TempData["M303AccountingList"] = accountingInfoList;
+                accountingInfoList.ForEach(x => total += x.mdlamount ?? 0);
+            }
+            else
+            {
+                accountingInfoList = TempData.Peek("M303AccountingList") as List<AEgridModel>;
+                accountingInfoList.ForEach(x => total += x.mdlamount ?? 0);
+            }
+
+            if (exception.ERR_CODE == "M303")
+            {
+                foreach (var item in accountingInfoList)
+                {
+                    if (item.mdlamount > item.aeamount)
+                    {
+                        ViewBag.Message = "Line " + item.refd_lnum + " cannot be more than available amount on the AE " + item.origamt + ". Try again or request correction";
+                        return View("ViewErrorMessage");
+                    }
+                }
+            }
+            if (exception.ERR_CODE == "M224")
+            {
+                foreach (var item in accountingInfoList)
+                {
+                    if (item.mdlamount > item.poavail)
+                    {
+                        ViewBag.Message = "Line " + item.refd_lnum + " cannot be more than available amount on the PO " + item.poavail + ". Try again or request Mod.";
+                        return View("ViewErrorMessage");
+                    }
+                }
+            }
+
+
+            var vmConfirm = new MessageDisplay()
+            {
+                Title = "Clear",
+                Question = "Are you sure that you want to change Accrual amount to " + total + "?",
+                ReturnAction = "M303MakeChanges",
+                ReturnController = "Exceptions",
+                ExId = exception.EX_ID,
+                ErrCode = exception.ERR_CODE,
+            };
+
+            return View("ConfirmYesNo", vmConfirm);
+        }
+
+        public ActionResult M303MakeChanges(List<AEgridModel> accountingInfoList)
+        {
+            var exception = TempData.Peek("exception") as EXCEPTION;
+
+
+            var AEGridList = TempData.Peek("M303AccountingList") as List<AEgridModel>;
+            try
+            {
+                if (exception.ERR_CODE == "M303")
+                    new M303manager().MakeChanges(AEGridList, exception.PDOCNO, exception.AE_ID, exception.ACT, PrepCode);
+                else
+                    new M224Manager().MakeChanges(AEGridList, exception.PDOCNO, exception.AE_ID, exception.ACT, PrepCode);
+            }
+            catch (System.Exception ex)
+            {
+                return LogErrorAndReturnView(ex, "ReturnViewResult");
+            }
+
+            return RedirectToAction(ControllerAction.Exception.DisplayException, "Exceptions", new { exCode = exception.ERR_CODE, exId = exception.EX_ID.Replace("&amp;", "&") });
+        }
+
+
+
+        public ActionResult ProcessedinPegClient(ExceptionO305Model model)
+        {
+
+            var exception = TempData.Peek("exception") as EXCEPTION;
+
+            var errorMsg = new O305Manager().ProcessedinPegClient(model);
+
+            if (!string.IsNullOrEmpty(errorMsg))
+            {
+                ViewBag.Message = errorMsg;
+                return View("ViewErrorMessage");
+            }
+            else
+            {
+                var fieldsToUpdate = new List<string>
+                {
+                    "ERR_RESPONSE",
+                    "ALLPROCESS",
+                    "PREPCODE",
+                    "CLEARED_DATE",
+                    "ALLPROCESS",
+                    "OUT",
+                    "ADDPC",
+                    "RESPONSENOTES",
+                };
+                exception.ERR_RESPONSE = "A";
+                exception.ALLPROCESS = " ";
+                exception.PREPCODE = PrepCode;
+                exception.CLEARED_DATE = DateTime.Now;
+                exception.ALLPROCESS = "OUTBOX";
+                exception.OUT = "F";
+                exception.ADDPC = PrepCode;
+                exception.RESPONSENOTES = model.Notes;
+
+                // Restore updated exception in TempData
+                TempData["exception"] = exception;
+
+                var mgr = new ExceptionsManager();
+                mgr.UpdateException(exception, fieldsToUpdate);
+
+                var PegPOFieldstoUpdate = new List<string>
+                {
+                    "PO_STATUS",
+                    "ERR_CODE"
+                };
+
+                new PegasysPO_FrmManager().UpdatePegasysPOFrm(new PEGASYSPO_FRM { PO_STATUS = "KEYED", ERR_CODE = null }, PegPOFieldstoUpdate);
+            }
+
+            return RedirectToAction(ControllerAction.Exception.DisplayException, "Exceptions", new { exCode = exception.ERR_CODE, exId = exception.EX_ID.Replace("&amp;", "&") });
+
+        }
+        public ActionResult AcceptO305(ExceptionO305Model model)
+        {
+
+            var exception = TempData.Peek("exception") as EXCEPTION;
+
+            var errorMsg = new O305Manager().Accept(model);
+
+            if (!string.IsNullOrEmpty(errorMsg))
+            {
+                ViewBag.Message = errorMsg;
+                return View("ViewErrorMessage");
+            }
+            else
+            {
+
+                var fieldsToUpdate = new List<string>
+                {
+                    "ERR_RESPONSE",
+                    "ALLPROCESS",
+                    "PDOCNO",
+                    "PREPCODE",
+                    "CLEARED_DATE",
+                    "ALLPROCESS",
+                    "OUT",
+                    "ADDPC",
+                    "RESPONSENOTES",
+                };
+                exception.ERR_RESPONSE = "A";
+                exception.PDOCNO = model.PDOCNO;
+                exception.PREPCODE = PrepCode;
+                exception.CLEARED_DATE = DateTime.Now;
+                exception.ALLPROCESS = "OUTBOX";
+                exception.OUT = "F";
+                exception.ADDPC = PrepCode;
+                exception.RESPONSENOTES = model.Notes;
+
+                // Restore updated exception in TempData
+                TempData["exception"] = exception;
+
+                var mgr = new ExceptionsManager();
+                mgr.UpdateException(new EXCEPTION() { VENDNAME = model.VendorName, PDOCNO = model.PDOCNO }, new List<string>() { "VENDNAME", "PDOCNO" });
+                mgr.UpdateException(exception, fieldsToUpdate);
+
+                var PegPOFieldstoUpdate = new List<string>
+                {
+                    "PO_STATUS",
+                    "ERR_CODE"
+                };
+
+                new PegasysPO_FrmManager().UpdatePegasysPOFrm(new PEGASYSPO_FRM { PO_STATUS = "PEAREADY", ERR_CODE = null }, PegPOFieldstoUpdate);
+            }
+
+            return RedirectToAction(ControllerAction.Exception.DisplayException, "Exceptions", new { exCode = exception.ERR_CODE, exId = exception.EX_ID.Replace("&amp;", "&") });
+
+        }
+
+
+        public ActionResult RejectO305(ExceptionO305Model model)
+{
+    var exception = TempData.Peek("exception") as EXCEPTION;
+
+    var PegPOFieldstoUpdate = new List<string>
+                {
+                    "PO_STATUS",
+                    "ERR_CODE"
+                };
+
+    new PegasysPO_FrmManager().UpdatePegasysPOFrm(new PEGASYSPO_FRM { PO_STATUS = "REJECT", ERR_CODE = null }, PegPOFieldstoUpdate);
+
+    var fieldsToUpdate = new List<string>
+                {
+                    "ERR_RESPONSE",
+                    "ALLPROCESS",
+                    "PDOCNO",
+                    "PREPCODE",
+                    "CLEARED_DATE",
+                    "ALLPROCESS",
+                    "OUT",
+                    "ADDPC",
+                    "RESPONSENOTES",
+                };
+    exception.ERR_RESPONSE = "X";
+    exception.PREPCODE = PrepCode;
+    exception.CLEARED_DATE = DateTime.Now;
+    exception.ALLPROCESS = "REJECT";
+    exception.OUT = "F";
+    exception.ADDPC = PrepCode;
+    exception.RESPONSENOTES = model.Notes;
+
+    // Restore updated exception in TempData
+    TempData["exception"] = exception;
+
+    var mgr = new ExceptionsManager();
+    mgr.UpdateException(exception, fieldsToUpdate);
+
+    return RedirectToAction(ControllerAction.Exception.DisplayException, "Exceptions", new { exCode = exception.ERR_CODE, exId = exception.EX_ID.Replace("&amp;", "&") });
+
+}
+[HttpPost]
+public ActionResult A224ChangeLnum(A224MainTabModel mainModel)
+{
+    mainModel.MainTabGrid = JsonConvert.DeserializeObject<List<Maketmp>>(mainModel.ChangeLnumJson);
+    var exception = TempData.Peek("exception") as EXCEPTION;
+    Session["temp224"] = mainModel.MainTabGrid;
+    var vmConfirm = new MessageDisplay()
+    {
+        Title = "",
+        Question = "Are you sure that you want to change the line numbers on the RR?",
+        Origin = ControllerAction.Exception.A224ChangeLnum,
+        Controller = "Exceptions",
+        ReturnAction = ControllerAction.Exception.UpdateLineNums,
+        ReturnController = "Exceptions",
+        ExId = exception.EX_ID,
+        ErrCode = exception.ERR_CODE,
+    };
+
+    return View("ConfirmYesNo", vmConfirm);
+}
+
+[HttpPost]
+public ActionResult A226ChangeLnum(A226MainTabModel mainModel)
+{
+    mainModel.MainTabGrid = JsonConvert.DeserializeObject<List<Maketmp>>(mainModel.ChangeLnumJson);
+    var exception = TempData.Peek("exception") as EXCEPTION;
+    Session["temp226"] = mainModel.MainTabGrid;
+    var vmConfirm = new MessageDisplay()
+    {
+        Title = "",
+        Question = "Are you sure that you want to change the line numbers on the RR?",
+        Origin = ControllerAction.Exception.A226ChangeLnum,
+        Controller = "Exceptions",
+        ReturnAction = ControllerAction.Exception.UpdateLineNums,
+        ReturnController = "Exceptions",
+        ExId = exception.EX_ID,
+        ErrCode = exception.ERR_CODE,
+    };
+
+    return View("ConfirmYesNo", vmConfirm);
+}
+
+public ActionResult UpdateLineNums(MessageDisplay vmConfirm)
+{
+    var exception = TempData.Peek("exception") as EXCEPTION;
+
+
+    if (vmConfirm.Response == true)
+    {
+        if (Session["temp224"] != null)
+        {
+            var mgrA224 = new A224Manager();
+            var data = Session["temp224"] as List<Maketmp>;
+            var prepcode = Session[SessionKey.PrepCode].ToString();
+
+            mgrA224.ChangeLnums(data, prepcode, exception.ACT, exception.PDOCNO, exception.RR_ID);
+        }
+
+        if (Session["temp226"] != null)
+        {
+            var mgrA226 = new A226Manager();
+            var data = Session["temp226"] as List<Maketmp>;
+            var prepcode = Session[SessionKey.PrepCode].ToString();
+
+            mgrA226.ChangeLnums(data, prepcode, exception.ACT, exception.PDOCNO, exception.RR_ID);
+        }
+
+        return RedirectToAction("DisplayException", new { exCode = exception.ERR_CODE, exId = exception.EX_ID });
+    }
+    Session.Remove("temp224");
+    Session.Remove("temp226");
+    return RedirectToAction("DisplayException", new { exCode = exception.ERR_CODE, exId = exception.EX_ID });
+}
+
+
+//EARequest button
+public ActionResult EARequestConfirm()
+{
+    var exception = TempData.Peek("exception") as EXCEPTION;            
+           
+    var vmConfirm = new MessageDisplay()
+    {
+        Title = "Hold?",
+        Question = "There is an Expense Accrual Correction(" + exception.RR_ID + ") being Processed in VITAP. Do you still want to Request an Expense Accrual?",
+        Origin = ControllerAction.Exception.DisplayException,
+        Controller = "Exceptions",
+        ReturnAction = ControllerAction.Exception.EARequest,
+        ReturnController = "Exceptions",
+        ExId = exception.EX_ID,
+        ErrCode = exception.ERR_CODE,
+    };
+
+    return View("ConfirmYesNo", vmConfirm);
+}
+
+public ActionResult EARequest(MessageDisplay vmConfirm)
+{
+            var exception = TempData.Peek("exception") as EXCEPTION;
+
+            if (vmConfirm.Response)
+            {
+
+                var helper = new EARequestButton();
+                var roles = Session[SessionKey.RoleModel] as RoleListModel;
+                var Continue = helper.Initialize(exception, roles.PREPCODE);
+
+                if (Continue == true)
+                {
+                    Session[SessionKey.Helper] = helper;
+
+                    String dailyInterestAmount = "";
+                    if (Session[SessionKey.DailyInterestAmount] != null)
+                    {
+                        dailyInterestAmount = Session[SessionKey.DailyInterestAmount].ToString();
+                    }
+
+                    var vmNotes = new NotesViewModel(exception, exception.ERR_CODE, exception.ACT, exception.EX_ID, exception.PDOCNO,
+                        ControllerAction.Exception.EARequest, ControllerAction.Exception.EARequestNotes, "Exceptions", dailyInterestAmount);
+
+                    return View("other/notes", vmNotes);
+                }
+                Session.Remove("temp226");
+            }
+    return RedirectToAction("DisplayException", new { exCode = exception.ERR_CODE, exId = exception.EX_ID });
+  
+}
+
+        [ValidateInput(false)]
+        public ActionResult EARequestNotes(NotesViewModel vmNotes)
+{
+    //If Finish button was not pushed, exit now
+    if (vmNotes.returnVal1 != "FINISH") { return RedirectToAction("Index", Session[SessionKey.ExceptionsListModel] as ExceptionListModel); }
+
+    var helper = Session[SessionKey.Helper] as EARequestButton;
+    var roles = Session[SessionKey.RoleModel] as RoleListModel;
+
+    helper.SetNotes(vmNotes);
+    //helper.FinishCode(roles.PREPCODE);
+    helper.FinishCode(PrepCode);
+
+    var request = Session[SessionKey.MainRequest] as DataSourceRequest;
+    var search = Session[SessionKey.MainSearch] as ExceptionListModel;
+    return RedirectToAction("Index", new { request, search });
+}
+
+
+
     }
 }

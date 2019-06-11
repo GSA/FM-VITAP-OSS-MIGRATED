@@ -97,7 +97,7 @@ function ConfigureKendoGridPaginationControlsFor508(gridId) {
 }
 
 function ConfigureFirstPageControl(gridId) {
-    $("#" + gridId + " .k-grid-pager .k-pager-nav span.k-i-seek-w")
+    $("#" + gridId + " .k-grid-pager .k-pager-nav span.k-i-arrow-end-left")
         .removeClass("k-icon")
         .text("First Page")
         .parent().css({
@@ -108,7 +108,7 @@ function ConfigureFirstPageControl(gridId) {
 }
 
 function ConfigureLastPageControl(gridId) {
-    $("#" + gridId + " .k-grid-pager .k-pager-nav span.k-i-seek-e")
+    $("#" + gridId + " .k-grid-pager .k-pager-nav span.k-i-arrow-end-right")
         .removeClass("k-icon")
         .text("Last Page")
         .parent().css({
@@ -119,7 +119,7 @@ function ConfigureLastPageControl(gridId) {
 }
 
 function ConfigurePrevPageControl(gridId) {
-    $("#" + gridId + " .k-grid-pager .k-pager-nav span.k-i-arrow-w")
+    $("#" + gridId + " .k-grid-pager .k-pager-nav span.k-i-arrow-60-left")
         .removeClass("k-icon")
         .text("Prev Page")
         .parent().css({
@@ -130,7 +130,7 @@ function ConfigurePrevPageControl(gridId) {
 }
 
 function ConfigureNextPageControl(gridId) {
-    $("#" + gridId + " .k-grid-pager .k-pager-nav span.k-i-arrow-e")
+    $("#" + gridId + " .k-grid-pager .k-pager-nav span.k-i-arrow-60-right")
         .removeClass("k-icon")
         .text("Next Page")
         .parent().css({

@@ -142,18 +142,20 @@
                 </div>
             </div>
             <div class="row">
-            <!-- Only Construction invoices show Stamp Date -->
-                @if (ViewBag.InvoiceType != null && ViewBag.InvoiceType.Equals(DataEntry.TypeConst))
-                {
+           
                 <div class="col-md-12">
                     <label class="control-label">Fin Stamp Date</label>
                     @Html.TextBoxFor(m => m.STAMPDATE, "{0:MM/dd/yyyy}", new { @class = "form-control dark-text", @disabled = "disabled" })
                 </div>
-                }
+                
+                 <!-- Only Construction invoices show Stamp Date -->
+                @if (ViewBag.InvoiceType != null && ViewBag.InvoiceType.Equals(DataEntry.TypeConst))
+                {
                 <div class="col-md-12">
                     <label class="control-label">FO Stamp Date</label>
                     @Html.TextBoxFor(m => m.INVRECDATE, "{0:MM/dd/yyyy}", new { @class = "form-control dark-text", @disabled = "disabled" })
                 </div>
+                }
             </div>
             <div class="row">
                 <div class="form-group">

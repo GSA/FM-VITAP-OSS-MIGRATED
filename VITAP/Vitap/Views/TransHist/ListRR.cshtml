@@ -28,8 +28,8 @@
             columns.Bound(v => v.ACT).Width(70);
             columns.Bound(v => v.RR_ID).Width(120);
             columns.Bound(v => v.INVOICE).Title("Invoice").Width(150);
-            columns.Bound(v => v.AMOUNT_CLEARED).Title("Outstanding Balance").Format("{0:n2}").Width(110);
-            columns.Bound(v => v.MAXAPPR).Title("MaxAppr").Format("{0:n2}").Width(110);
+            columns.Bound(v => v.AMOUNT_CLEARED).Title("Outstanding Balance").Format("{0:c2}").Width(110);
+            columns.Bound(v => v.MAXAPPR).Title("MaxAppr").Format("{0:c2}").Width(110);
             columns.Bound(v => v.DLVR_DT).Title("Receive Date").Width(128).ClientTemplate("#=kendo.toString(DLVR_DT,'yyyy-MM-dd')#");
             columns.Bound(v => v.ACCD_DT).Title("Accept Date").Width(120).ClientTemplate("#=kendo.toString(ACCD_DT,'yyyy-MM-dd')#");
             columns.Bound(v => v.RR_STATUS).Title("Status").Width(128);

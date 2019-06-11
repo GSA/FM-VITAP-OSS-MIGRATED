@@ -41,9 +41,16 @@
 	        window.itemClicked = 'YES';
 	        @{ Model.Response = true; }
 	        var exId = "@Model.ExId".encodeUriComponent();
-	        var url = '@Url.Action("Message", "Exceptions")';
-            url = url + "?ReturnAction=" + "@Model.ReturnAction" + "&ReturnController=" + "@Model.ReturnController" + "&ExId=" + exId + "&ErrCode=" + "@Model.ErrCode" + "&Response=true&"
-	        window.location = url;
+            var errcode="@Model.ErrCode"
+	        @*if(errcode=='A226')
+	        {
+	            window.location = '@Url.Action("EARequest", "Exceptions")';
+	        }
+	        else{*@
+	            var url = '@Url.Action("Message", "Exceptions")';
+	            url = url + "?ReturnAction=" + "@Model.ReturnAction" + "&ReturnController=" + "@Model.ReturnController" + "&ExId=" + exId + "&ErrCode=" + "@Model.ErrCode" + "&Response=true&"
+	            window.location = url;
+	        //}
 	    });
 	});
 

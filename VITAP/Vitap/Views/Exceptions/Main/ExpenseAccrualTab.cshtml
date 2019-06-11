@@ -143,12 +143,12 @@
     });
 
     $("#btnViewAE").on("click", function () {
-        var url = '@Url.Action("ViewEstimatedAccrual", "TransHist", new { id = Model.BtnAE.Id })';
+        var url = '@Url.Action("ViewEstimatedAccrual", "TransHist", new { ae_Id = Model.BtnAE.Id })';
         window.location = url;
     });
 
     $("#btnViewRefAE").on("click", function () {
-        var url = '@Url.Action("ViewEstimatedAccrual", "TransHist", new { docId = Model.BtnRefAE.Id })';
+        var url = '@Url.Action("ViewEstimatedAccrual", "TransHist", new { ae_Id = Model.BtnRefAE.Id })';
         window.location = url;
     });
 </script>

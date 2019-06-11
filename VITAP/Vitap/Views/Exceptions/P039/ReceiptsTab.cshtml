@@ -5,7 +5,7 @@
             <h1>Multiple RR Exception</h1>
         </div>
         <div class="row panel-body">
-            <div class="col-md-6" style="box-sizing:border-box">
+            <div class="col-md-5" style="box-sizing:border-box">
                 <div class="row">
                     <div class="col-md-6">
                         <br />
@@ -27,7 +27,7 @@
                             c.Bound(x => x.Dates);
                             c.Bound(x => x.XSYS_DOC_NUM);
                             c.Bound(x => x.DOC_NUM);
-                            c.Bound(x => x.ROUNDED_AMT);
+                            c.Bound(x => x.ROUNDED_AMT).Format("{0:c2}");
                         })
                         .Name("grid1")
                         .DataSource(dataSource => dataSource
@@ -36,8 +36,8 @@
                                 .Action("GetP039NoRRArray", "Exceptions", new { pdocno = Model.PDocNo, act = Model.Act})
                             )
                         )
-                        .Events(x => x.DataBound("RowDataBound"))
                         .Selectable()
+                        .Events(x => x.DataBound("RowDataBound"))
                         .Render();
                     }
                 </div>
@@ -58,7 +58,19 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6" style="box-sizing:border-box">
+            <div class="col-md-2" style="box-sizing:border-box">
+                <div class="row">
+                    <button type="button" onclick="MoveSelectedRowsLeftToRight()" class="btn btn-info" style="margin-left:auto;margin-right:auto;display:block;margin-bottom:15px;margin-top:125px;">
+                        Add to Payment <span class="glyphicon glyphicon-arrow-right" style="margin-left:5px;"></span>
+                    </button>
+                </div>
+                <div class="row">
+                    <button type="button" onclick="MoveSelectedRowsRightToLeft()" class="btn btn-info"  style="margin-left:auto;margin-right:auto;display:block;">
+                        <span class="glyphicon glyphicon-arrow-left" style="margin-right:5px;"></span>Remove from Payment
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-5" style="box-sizing:border-box">
                 <div class="row">
                     <div class="col-md-6">
                         <br />
@@ -80,7 +92,7 @@
                             c.Bound(x => x.Dates);
                             c.Bound(x => x.XSYS_DOC_NUM);
                             c.Bound(x => x.DOC_NUM);
-                            c.Bound(x => x.ROUNDED_AMT);
+                            c.Bound(x => x.ROUNDED_AMT).Format("{0:c2}");
                         })
                         .DataSource(dataSource => dataSource
                                 .Server()
@@ -116,54 +128,9 @@
 
 
     <script>
-      $(document).ready(function () {
-        $("input").attr('disabled', true);
-        $('textarea').attr('disabled', true);
-
-        var grid1 = $("#grid1").data("kendoGrid");
-        var grid2 = $("#grid2").data("kendoGrid");
-        var dataSource1 = grid1.dataSource;
-        var dataSource2 = grid2.dataSource;
-
-
-        $(grid1.element).kendoDraggable({
-          filter: "tr",
-          hint: function (e) {
-            var item = $('<div class="k-grid k-widget" style="background-color: DarkOrange; color: black;"><table><tbody><tr>' + e.html() + '</tr></tbody></table></div>');
-              return item;
-          },
-          group: "gridGroup1",
-        });
-
-        $(grid2.element).kendoDraggable({
-          filter: "tr",
-          hint: function (e) {
-            var item = $('<div class="k-grid k-widget" style="background-color: MediumVioletRed; color: black;"><table><tbody><tr>' + e.html() + '</tr></tbody></table></div>');
-              return item;
-          },
-          group: "gridGroup2",
-        });
-
-
-        grid1.table.kendoDropTarget({
-            drop: function (e) {
-                var dataItem = dataSource2.getByUid(e.draggable.currentTarget.data("uid"));
-                dataSource2.remove(dataItem);
-                dataSource1.add(dataItem);
-                calcSums();
-            },
-            group: "gridGroup2",
-        });
-
-        grid2.table.kendoDropTarget({
-            drop: function (e) {
-                var dataItem = dataSource1.getByUid(e.draggable.currentTarget.data("uid"));
-                dataSource1.remove(dataItem);
-                dataSource2.add(dataItem);
-                calcSums()
-            },
-                group: "gridGroup1",
-            });
+        $(document).ready(function () {
+            $("input").attr('disabled', true);
+            $('textarea').attr('disabled', true);
         });
 
       function viewYesRr() {
@@ -201,14 +168,14 @@
                 sum += rec.ROUNDED_AMT;
             })
             var total1 = numberWithCommas(parseFloat(Math.round(sum * 100) / 100).toFixed(2));
-            $(".total1").val(total1);
+            $(".total1").val('$' + total1);
 
             sum = 0;
             $.each(dataSource2.data(), function (index, rec) {
                 sum += rec.ROUNDED_AMT;
             })
             var total2 = numberWithCommas(parseFloat(Math.round(sum * 100) / 100).toFixed(2));
-            $(".total2").val(total2);
+            $(".total2").val('$' + total2);
         }
 
         function numberWithCommas(x) {
@@ -225,6 +192,48 @@
 
         function NoRRGridSelectRow(e) {
             SelectGridRow(e, "#grid1 table tr")
+        }
+
+        function MoveSelectedRowsLeftToRight()
+        {
+            var grid1 = $("#grid1").data("kendoGrid");
+            var grid2 = $("#grid2").data("kendoGrid");
+            var dataSource1 = grid1.dataSource;
+            var dataSource2 = grid2.dataSource;
+
+            if (grid1.dataSource._data.length > 0) {
+                var row = grid1.select();
+                var dataItem = grid1.dataItem(row);
+
+                if (dataItem) {
+                    dataSource1.remove(dataItem);
+                    dataSource2.add(dataItem);
+                }
+            }
+
+            calcSums();
+            SetAcceptButtonState();
+        }
+
+        function MoveSelectedRowsRightToLeft()
+        {
+            var grid1 = $("#grid1").data("kendoGrid");
+            var grid2 = $("#grid2").data("kendoGrid");
+            var dataSource1 = grid1.dataSource;
+            var dataSource2 = grid2.dataSource;
+
+            if (grid2.dataSource._data.length > 0) {
+                var row = grid2.select();
+                var dataItem = grid2.dataItem(row);
+
+                if (dataItem) {
+                    dataSource2.remove(dataItem);
+                    dataSource1.add(dataItem);
+                }
+            }
+
+            calcSums();
+            SetAcceptButtonState();
         }
 
         function SelectGridRow(e, selector)

@@ -18,7 +18,7 @@
 
     <div class="container">
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-4 padding-zero">
                 <div class="row">
                     <div class="col-md-12">
                         <label>
@@ -40,21 +40,21 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4 padding-zero">
                 <div class="row">
                     <div class="col-md-12">
-                        <lable>
+                        <label>
                             PO ID <br />
                             @Html.TextBoxFor(x => x.POID, new Dictionary<string, object> { { "class", "text-primary" } })
-                        </lable>
+                        </label>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <lable>
+                        <label>
                             PO Number <br />
                             @Html.TextBoxFor(x => x.PONum, new Dictionary<string, object> { { "class", "text-primary" } })
-                        </lable>
+                        </label>
                     </div>
                 </div>
                 <div class="row">
@@ -86,9 +86,9 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4 padding-zero">
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-md-12 padding-zero">
                         <label>
                             ACT Number <br />
                             @Html.TextBoxFor(x => x.ActNumber, new Dictionary<string, object> { { "class", "text-primary" } })
@@ -103,8 +103,8 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div>Period of Performance</div>
                         <div class="col-md-6">
+                            <label>Period of Performance</label>
                             <label>
                                 Start <br />
                                 @Html.TextBoxFor(x => x.PeriodOfPerformanceStart, new Dictionary<string, object> { { "class", "text-primary" } })
@@ -119,11 +119,9 @@
                     </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-4 col-md-offset-8">
-                <button onclick="viewPo()" type="button" class="btn btn-info">View PO</button>
-            </div>
-        </div>
+    </div>
+    <div class="col-md-2" style="float:right">
+        <button onclick="viewPo()" type="button" class="btn btn-info">View PO</button>
     </div>
 </div>
 

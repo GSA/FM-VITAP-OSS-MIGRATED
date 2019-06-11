@@ -30,6 +30,8 @@
 
 }
 
+@Html.HiddenFor(x => Model.PegInv.IMAGEID)
+
 <div class="controls" style="width: 58%; float: left;">
     <br />
     <h1 style="font-weight: bold">@string.Format("{0} | Pegasys Exception ({1}) - {2}", Model.InvKeyId, Model.ErrorCode, Model.Memo)</h1>
@@ -39,7 +41,6 @@
             <div class="col-md-12" style="vertical-align:bottom">
                 <label for="txtSearchFor">Search For:</label>
                 <input type="text" id="txtSearchFor" />
-                @*@Html.TextBoxFor(m => m.PegPODocNum, new { id = "txtSearchFor" })*@
                 <label for="ddlSearchIn">In:</label>
                 @Html.DropDownList("txtSearchIn", ddlSearchIn, new { width = "80px", id = "ddlSearchIn" })
                 <button type="button" class="btn btn-info" style="margin-bottom:20px" onclick="R200SearchList()">Search</button>
@@ -55,13 +56,13 @@
                     .DataSource(dataSource => dataSource
                         .Ajax()
                         .PageSize(10)
-                        //.Sort(sort => sort.Add("START_DT").Ascending())
                         .Model(model => model.Id(o => o.PDOCNO))
                         .Read(r => r
                             .Action("R200Search", "Exceptions")
                             .Data("GetR200SearchParameters")
                         )
                     )
+                    .AutoBind(false)
                     .Selectable(s => s.Mode(GridSelectionMode.Single))
                     .Sortable()
                     .Pageable(pageable => pageable
@@ -81,8 +82,8 @@
                         column.Bound(x => x.ACT).Width(110).HeaderHtmlAttributes(headerAttr);
                         column.Bound(x => x.PDOCNO).Width(125).HeaderHtmlAttributes(headerAttr).Title("PDOCNO");
                         column.Bound(x => x.START_DT).Width(110).HeaderHtmlAttributes(headerAttr).Format("{0:d}");
-                        column.Bound(x => x.AMOUNT).Format("{0:n2}").Width(110).HeaderHtmlAttributes(headerAttr).HtmlAttributes(textAttrAlignRight);
-                        column.Bound(x => x.CLSD_AMT).Format("{0:n2}").Width(110).HeaderHtmlAttributes(headerAttr).HtmlAttributes(textAttrAlignRight);
+                        column.Bound(x => x.AMOUNT).Format("{0:c2}").Width(110).HeaderHtmlAttributes(headerAttr).HtmlAttributes(textAttrAlignRight);
+                        column.Bound(x => x.CLSD_AMT).Format("{0:c2}").Width(110).HeaderHtmlAttributes(headerAttr).HtmlAttributes(textAttrAlignRight);
                         column.Bound(x => x.VENDNAME).Width(300).HeaderHtmlAttributes(headerAttr);
                         column.Bound(x => x.ADDR_L1).Width(250).HeaderHtmlAttributes(headerAttr);
                         column.Bound(x => x.ADDR_L2).Width(250).HeaderHtmlAttributes(headerAttr);
@@ -243,7 +244,6 @@
                 </div>
             </div>
         </div>
-    @*</div>*@
 </div>
 
 <script type="text/javascript">
@@ -331,8 +331,8 @@
     function ViewImage() {
         if ('@Model.PegInv.EDI_IND' != "T") {
             var url = '@Url.Action("ViewImageByImageID", "Exceptions")';
-            var docId = "@Model.PegInv.IMAGEID";
-            if (docId == null) {
+            var docId = $("#PegInv_IMAGEID").val();
+            if (docId == null || docId.trim().length == 0) {
                 alert("No image was found!");
                 return;
             }
@@ -390,7 +390,10 @@
     function POMatch() {
         var url = '@Url.Action("POMatch", "Exceptions")';
         var Pdocno = "@Model.PegInv.PDOCNOPO";
-        var newAct = $("#txtAct").val();
+
+        var row = GetSelectedRow();
+
+        var newAct = $.trim(row.TITL);
         var newPdocno = $("#txtPdocno").val();
         if (newPdocno == "") {
             alert("You must select a record from the grid");
@@ -473,7 +476,7 @@
     }
 
     function GetFormattedAmount(amt) {
-        return amt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return "$" + amt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
     }
 

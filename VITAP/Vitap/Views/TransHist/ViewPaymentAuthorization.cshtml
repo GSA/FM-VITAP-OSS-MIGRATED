@@ -6,6 +6,8 @@
 }
 @using (Html.BeginForm())
 {
+    @Html.HiddenFor(x => Model.ImageId)
+
     <script type="text/javascript">
         $(document).ready(function () {
 
@@ -13,7 +15,7 @@
                 var command = $(this).attr('command');
 
                 if (command == "viewImage") {
-                    var url = '@Url.Action("ViewImageByImageID", "Exceptions", new { docId = Model.ImageId })';
+                    var url = '@Url.Action("ViewImageByImageID", "Exceptions")' + '?docId=' + $("#ImageId").val();
                     window.location.href = url;
                     return false;
                 }

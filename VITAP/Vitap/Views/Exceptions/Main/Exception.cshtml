@@ -18,7 +18,7 @@
 
 <div id="tabMainEx" class="container peg-main-ex">
     <br />
-    <h1 style="font-weight: bold">@string.Format("{0} | Pegasys Exception ({1}) - {2}", Model.InvKeyId, Model.ErrorCode, Model.Memo)</h1>
+    <h1 style="font-weight: bold">@string.Format("{0} | Pegasys Exception ({1}) - {2}", (!String.IsNullOrEmpty(Model.InvKeyId) ? Model.InvKeyId : Model.RR_ID), Model.ErrorCode, Model.Memo)</h1>
     <br />
 
     <div class="row">
@@ -83,7 +83,7 @@
 
                         items.Add().Text("Expense Accrual").HtmlAttributes(attrHeader)
                             .Content(Html.Partial("Main/ExpenseAccrualTab", Model.TabExpenseAccrual).ToHtmlString())
-                            .Enabled(Model.TabExpenseAccrual.HasData || true);
+                            .Enabled(Model.TabExpenseAccrual.HasData);
 
                         // This might be needed...
                         //items.Add().Text("Payment Auth").HtmlAttributes(attrHeader)
@@ -108,7 +108,7 @@
                 Change
             </button>
             <button id="btnReject" type="button" 
-                    class="btn btn-main btn-p001 btn-p002 btn-p004 btn-p024 btn-p060 btn-p201 btn-p230 btn-p231 btn-p232 btn-p234" 
+                    class="btn btn-main btn-a230 btn-m230 btn-p001 btn-p002 btn-p004 btn-p024 btn-p060 btn-p201 btn-p230 btn-p231 btn-p232 btn-p234" 
                     style="min-width:140px;">
                 Reject
             </button>
@@ -133,7 +133,7 @@
                 Reprocess
             </button>
             <button id="btnSkip" type="button" 
-                    class="btn btn-main btn-p001 btn-p002 btn-p004 btn-p023 btn-p024 btn-p060 btn-p061 btn-p201 btn-p230 btn-p231 btn-p232 btn-p234" 
+                    class="btn btn-main btn-a230 btn-m230 btn-p001 btn-p002 btn-p004 btn-p023 btn-p024 btn-p060 btn-p061 btn-p201 btn-p230 btn-p231 btn-p232 btn-p234" 
                     style="min-width:140px;">
                 Skip
             </button>
@@ -143,7 +143,7 @@
                 Correct D/E
             </button>
             <button id="btnProcessed" type="button"
-                    class="btn btn-main btn-p230 btn-p232 btn-p234"
+                    class="btn btn-main btn-a230 btn-m230 btn-p230 btn-p232 btn-p234"
                     style="min-width:140px;">
                 Processed
             </button>
@@ -220,15 +220,16 @@
             window.location = url;
         });
 
-        $("#btnPoModRequest").on("click", function () {
+        $("#btnPoModRequest").on("click", function () {            
+            
             var url = '@Html.Raw(Url.Action("POMod", "Exceptions", new
-                  {
-                      Invoice = Model.TabInvoice.InvoiceNumber,
-                      InvAmount = Model.TabMain.NetOrder,
-                      POAmount = Model.TabPO.UnaccruedBalance, //Not sure about this
-                      VendName = Model.TabInvoice.VendorName
-                  }))';
-            window.location = url;
+                {
+                    Invoice = Model.TabInvoice.InvoiceNumber,
+                    InvAmount = Decimal.Parse(Model.TabMain.NetOrder ?? "0", System.Globalization.NumberStyles.AllowCurrencySymbol | System.Globalization.NumberStyles.AllowDecimalPoint | System.Globalization.NumberStyles.AllowThousands, new System.Globalization.CultureInfo("en-US")),
+                    POAmount = Model.TabPO.UnaccruedBalance, //Not sure about this
+                    VendName = Model.TabInvoice.VendorName
+                }))';
+            window.location = url;            
         });
 
         $("#btnRrRequest").on("click", function () {

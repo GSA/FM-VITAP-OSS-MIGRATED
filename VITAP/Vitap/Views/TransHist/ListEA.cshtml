@@ -81,6 +81,7 @@
 @{
     <div id="Buttons" style="float: left;min-width: 55%;">
         <br />
+        <button type="button" @(ViewBag.CombinedAccrualsButtonStatus) class="btn btn-info" style="margin-left: 5px; margin-right: 5px" onclick="CombinedAccrualsClick()">Combined Accruals</button>
         <button type="button" @(ViewBag.TransHistButtonStatus) class="btn btn-info" style="margin-left: 5px; margin-right: 5px" onclick="TransHistClick()">View TransHist</button>
         <button type="button" @(ViewBag.ViewEAButtonStatus) class="btn btn-info" style="margin-left: 5px; margin-right: 5px" onclick="ViewEAClick()">View EA</button>
     </div>
@@ -103,6 +104,19 @@
                 
     });
 
+    function CombinedAccrualsClick() {
+        var act = GetSelectedAct();
+        if (act != null)
+        {
+            window.location = '@Url.Action("GetAccrualsTocombine", "Transhist")' +
+            '?act=' + act + '&pdocno=' + '@(ViewBag.pdocno)';
+        }
+        else
+        {
+            alert("Select a line in the grid before clicking on Combine Accruals button.");
+        }
+    }
+
     function TransHistClick(){
         var selectedAC_ID = GetSelectedEAID();
         window.open("@Url.Action("OraTwo")" + "?searchFor=" + selectedAC_ID.encodeUriComponent() + "&searchIn=AE_ID", '_blank');
@@ -112,13 +126,27 @@
 
         if (selectedAC_ID != null)
         {
-            location = '@Url.Action("ViewEstimatedAccrual", "Transhist")' +
+            window.location = '@Url.Action("ViewEstimatedAccrual", "Transhist")' +
            '?ae_Id=' + selectedAC_ID;
         }
         else
         {
-            alter("Select a line in the grid before clicking on View EA button.");
+            alert("Select a line in the grid before clicking on View EA button.");
         }
+    }
+
+    // Return the selected row's ACT
+    function GetSelectedAct()
+    {
+        var grid = $('#gridExpenseAccrual').data('kendoGrid');
+        var selectedRows = grid.select();
+        var act = "";
+
+        var selected = $.map(selectedRows, function (item) {
+            act = $(item).find(':nth-child(2)').text();
+        });
+
+        return act;
     }
 
     function GetSelectedEAID()

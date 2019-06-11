@@ -20,7 +20,7 @@ namespace VITAP.SharedLogic.Buttons
             SetNotesValues(notes);
         }
 
-        public void FinishCode(List<MF_IC> TheQueue, List<RRCHOICE> RRChoice)
+        public void FinishCode(List<NoRRArray> TheQueue, List<RRCHOICE> RRChoice)
         {
             NewNotes();
 

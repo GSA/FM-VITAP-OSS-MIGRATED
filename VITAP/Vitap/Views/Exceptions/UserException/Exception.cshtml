@@ -32,16 +32,14 @@
 
 <div class="container-fluid">
     <br />
-    <h1 style="font-weight: bold">@string.Format("{0} | Pegasys Exception ({1}) - {2}", Model.InvKeyId, Model.ErrorCode, Model.Memo)</h1>
+    <h1 style="font-weight: bold">@string.Format("{0} | Pegasys Exception ({1}) - {2}", Model.Id, Model.ErrorCode, Model.Memo)</h1>
     <br />
     <div class="border-container">
         <div class="row">
             <div class="col-md-2">
                 <form class="form-horizontal">
-                    <div class="form-group">
-                        <div class="col-sm-2">
-
-                        </div>
+                    <div class="form-group"> 
+                        <label for="ErrorCode" style="display:none">ErrorCode:</label>                     
                         <div class="col-sm-10">
                             @Html.TextBoxFor(x => x.ErrorCode, new { @class = "form-control fat" })
                         </div>
@@ -53,7 +51,7 @@
                         </div>
                     </div>
                     <div class="form-group ">
-                        <label for="inputEmail3" class="col-sm-2 control-label">ID</label>
+                        <label for="Id" class="col-sm-2 control-label">ID</label>
                         <div class="col-sm-10">
                             @Html.TextBoxFor(x => x.Id, new { @class = "form-control" })
                         </div>
@@ -173,11 +171,13 @@
             <div class="col-sm-10">
                 <div class="row">
                     <div class="col-sm-12">
+                        <label for="Memo" style="display:none">Memo: </label>
                         @Html.TextAreaFor(x => x.Memo, new { @class = "fill" })
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-sm-12">
+                        <label for="Memo2" style="display:none">Memo2: </label>
                         @Html.TextAreaFor(x => x.Memo2, new { @class = "fill" })
                     </div>
                 </div>
@@ -235,9 +235,19 @@
                         CorrectDe1Text = "Change";
                     }
                 }
-                <button type="button" data-toggle="tooltip" title="@Model.CorrectDe1Tip" class="btn  btn-fixed-width" onclick="invEdit('@Model.ErrorCode')"
+                <button type="button" data-toggle="tooltip" title="@Model.CorrectDe1Tip" class="btn  btn-fixed-width" 
+                        @if(Model.InvExists==true)
+                        {
+                           @:onclick = "invEdit('@Model.ErrorCode')"
+                        }
+
+                         @if(Model.RRExists==true)
+                        {
+                           @:onclick = "RREdit('@Model.ErrorCode')"
+                        }
+                     
                     @{ if (Model.ErrorCode == "E052" || (Model.PoExists == false && Model.RRExists == false && Model.InvExists == false))
-                        { @:disabled="disabled"
+                            { @:disabled="disabled"
                     } }
                     >@CorrectDe1Text
                 </button>
@@ -274,6 +284,10 @@
         {
             window.location = "@Url.Action("InvEdit")";
         }
+    }
+
+    function RREdit(exceptionCode) {      
+            window.location = "@Url.Action("RREdit")";
     }
 
     function Notes() {
@@ -336,7 +350,7 @@
     })
 
     $('#btnAccept').click(function () {
-        var url = '@Url.Action("Accept", "Exceptions")';
+        var url = '@Url.Action("AcceptMain", "Exceptions", new { pDocNo = @Model.PDocNo })';
         window.location = url;
     });
 
@@ -356,7 +370,7 @@
     $("#btnTransHist").click(function () {
 
         var url = '';
-        
+
         if ('@Model.Act')
         {
             url = '@Html.Raw(Url.Action("Index", "TransHist", new { searchFor = Model.Act, searchIn = "Act", searchShow = "All", searchFY = "All" }, null))'

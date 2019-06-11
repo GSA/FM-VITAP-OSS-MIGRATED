@@ -47,7 +47,22 @@ namespace VITAP.SharedLogic.Buttons
             //Update Exception to "S"
             var responseNotes = exception.RESPONSENOTES.ReplaceNull("") + "\r\n" + DateTime.Now.ToString() + " " + prepCode + " " + 
                 notes.returnVal2.ReplaceNull("") + "/" + notes.returnVal3.ReplaceNull("").ReplaceApostrophes();
-            UpdateExceptionForSkip(exception, "S", notes.returnVal7.ReplaceNull("").ReplaceApostrophes(), notes.returnVal3 + exception.EX_MEMO2, responseNotes, exception.ALLPROCESS);
+
+            var trimmedNotes = "";
+            var combinedNote = notes.returnVal3 + exception.EX_MEMO2;
+            if (!String.IsNullOrWhiteSpace(combinedNote))
+            {
+                if (combinedNote.Length < 500)
+                {
+                    trimmedNotes = combinedNote;
+                }
+                else
+                {
+                    trimmedNotes = combinedNote.Substring(0, 500);
+                }
+            }
+
+            UpdateExceptionForSkip(exception, "S", notes.returnVal7.ReplaceNull("").ReplaceApostrophes(), trimmedNotes, responseNotes, exception.ALLPROCESS);
 
             //Add notification
             switch (exception.ERR_CODE)

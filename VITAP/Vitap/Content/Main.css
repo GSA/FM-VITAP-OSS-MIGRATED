@@ -569,3 +569,21 @@ fieldset[disabled] .btn-info.active {
   background-color: #eee;
   border-color: #7bd2f6;
 }
+
+/*Kendo paging buttons 508 hack*/
+.k-i-arrow-end-left::before,
+.k-i-arrow-end-right::before,
+.k-i-arrow-60-left::before,
+.k-i-arrow-60-right::before{
+    display: none;
+}
+
+/*Make our disabled tabs grey for 508*/
+.k-dropzone em, .k-other-month, .k-other-month .k-link, .k-slider .k-draghandle, .k-state-disabled, .k-state-disabled .k-link, .k-tile-empty strong {
+    color: #636262;
+}
+
+.padding-zero {
+    padding-left: 0px;
+    padding-right: 0px;
+}

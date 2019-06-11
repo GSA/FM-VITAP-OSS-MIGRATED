@@ -7,6 +7,7 @@ using VITAP.Data.PegasysEntities;
 using VITAP.Data.Models;
 using VITAP.Data.Managers.Buttons;
 using VITAP.Data.Managers;
+using System.Data.Entity;
 
 namespace VITAP.Data.Managers
 {
@@ -267,6 +268,12 @@ namespace VITAP.Data.Managers
                 updstatus = "F";
             }
 
+            // Get pdocno from po_id if available.
+            if (String.IsNullOrWhiteSpace(pdocnopo) && !String.IsNullOrWhiteSpace(po_id))
+            {
+                pdocnopo = po_id;
+            }
+
             //pull imagebatch, vendname and pdocnopo from invoice if inv_key_id
             if (inv_key_id != String.Empty)
             {
@@ -294,8 +301,6 @@ namespace VITAP.Data.Managers
             {
                 pdocnopo = pdocnopo.Substring(0, pdocnopo.IndexOf("&") + 1);
             }
-            //add orgcode and BA information to the exception record
-            //????
 
             using (var contextVitap = new OracleVitapContext())
             {
@@ -303,6 +308,55 @@ namespace VITAP.Data.Managers
 
                 using (var contextPeg = new PegasysEntities.OraclePegasysContext())
                 {
+                    //add fund, orgcode and BA information to the exception record
+                    if (String.IsNullOrEmpty(orgcode) && !String.IsNullOrEmpty(pdocnopo))
+                    {
+                        bool inKeys = false;        // Are values stored in keys?
+
+                        // Start with PEGASYSPOACCT_FRM
+                        var poAcctRows = contextVitap.PEGASYSPOACCT_FRM.Where(x => x.PO_ID.Contains(pdocnopo))
+                                         .Select(x => new { Fund = x.FUND, OrgCode = x.ORGCODE, Ba = x.BA_PROG, Lnum = x.LNUM }).OrderBy(x => x.Lnum).ToList();
+
+                        // Check MF_IO_HDAL with pdocnopo.
+                        if (poAcctRows == null || poAcctRows.Count() == 0) {
+                            string pdocLookup = "&1423&1609&" + pdocnopo.Left(2) + '&' + pdocnopo + '&';
+                            poAcctRows = contextPeg.MF_IO_HDAL.Where(x => x.PARN_OF_LINE_ID.Contains(pdocLookup))
+                                             .Select(x => new { Fund = x.FUND_ID, OrgCode = x.ORGN_ID, Ba = x.PROG_ID, Lnum = x.LNUM }).OrderBy(x => x.Lnum).ToList();
+                            inKeys = poAcctRows != null;
+                        }
+
+                        // Check MF_IO_HDAL with act.
+                        if ((poAcctRows == null || poAcctRows.Count() == 0) && !String.IsNullOrEmpty(act))
+                        {
+                            var actTrim = act.Trim();
+                            var actLookup = contextPeg.MF_IO.Where(y => y.DTYP_ID != "&1609&4B" && y.XSYS_DOC_NUM == actTrim && y.DOC_STUS != "CANCELLED").FirstOrDefault().UIDY;
+
+                            if (!string.IsNullOrEmpty(actLookup)) {
+                                poAcctRows = contextPeg.MF_IO_HDAL.Where(x => x.PARN_OF_LINE_ID.Contains(actLookup))
+                                                 .Select(x => new { Fund = x.FUND_ID, OrgCode = x.ORGN_ID, Ba = x.PROG_ID, Lnum = x.LNUM }).OrderBy(x => x.Lnum).ToList();
+                                inKeys = poAcctRows != null;
+                            }
+                        }
+
+                        if (poAcctRows != null && poAcctRows.Count() > 0) {
+                            var poAcctRow = poAcctRows.FirstOrDefault();
+
+                            // Pull values out of keys.
+                            if (inKeys) {
+                                poAcctRow = new { Fund = poAcctRow.Fund.GetPegIdPart(2), OrgCode = poAcctRow.OrgCode.GetPegIdPart(2), Ba = poAcctRow.Ba.GetPegIdPart(2), Lnum = poAcctRow.Lnum };
+                            }
+
+                            orgcode = poAcctRow.OrgCode == null ? "" : poAcctRow.OrgCode.Trim();
+                            ba = poAcctRow.Ba == null ? "" : poAcctRow.Ba.Trim().Length >= 2 ? poAcctRow.Ba.Trim().Right(2) : poAcctRow.Ba.Trim();
+                            if (String.IsNullOrEmpty(ex_fund)) {
+                                var fund442 = poAcctRows.Where(x => x.Fund.Contains("442")).FirstOrDefault();
+                                if (fund442 != null) {
+                                    ex_fund = fund442.Fund == null ? "" : fund442.Fund.Trim();
+                                }
+                            }
+                        }
+                    }
+
                     //ex_fund
                     if (String.IsNullOrWhiteSpace(ex_fund))
                     {
@@ -340,7 +394,6 @@ namespace VITAP.Data.Managers
                                                 on actg.PARN_OF_LINE_ID equals itmz.UIDY
                                              where itmz.PARN_OF_LINE_ID == "&1423&1609&" + pdocnopo.Substring(0, 2) + "&" + pdocnopo + "&"
                                              select actg.FUND_ID).ToList();
-
                             }
                             if (rtnPOFund.Count > 0)
                             {
@@ -533,6 +586,24 @@ namespace VITAP.Data.Managers
 
                             UpdatePegasysInvoice(rtnInv, fieldsToUpdate);
                         }                    
+                    }
+                    if (updrrstatus == "T" && Rr_id != String.Empty)
+                    {
+                        var fieldsToUpdate = new List<string>
+                        {
+                            "RR_STATUS",
+                            "ERR_CODE"
+                        };
+
+                        var rtnrr = GetPegasysRRByKey(Rr_id);
+
+                        if (rtnrr != null)
+                        {
+                            rtnrr.RR_STATUS = "EXCEPTION";
+                            rtnrr.ERR_CODE = err_code;
+
+                          UpdatePegasysRR(rtnrr, fieldsToUpdate);
+                        }
                     }
                     return true;
                 }

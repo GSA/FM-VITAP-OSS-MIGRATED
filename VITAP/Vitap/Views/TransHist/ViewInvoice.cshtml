@@ -9,6 +9,8 @@
 {
     @Html.Partial("ConfirmYesNoModal")
 
+    @Html.HiddenFor(x => Model.ImageId)
+
     <script type="text/javascript">
 
         var model = @Html.Raw(Json.Encode(@Model));
@@ -65,7 +67,7 @@
                 return false;
             });
             $('.viewImage').click(function () {
-                var url = '@Url.Action("ViewImageByImageID", "Exceptions", new { docId = @Model.ImageId })';
+                var url = '@Url.Action("ViewImageByImageID", "Exceptions")' + '?docId=' + $("#ImageId").val();
                 window.location = url;
 
                 return false;
@@ -199,7 +201,9 @@
         <br />
         <h1 class="bold padBottom20">@Html.DisplayFor(x => x.MemoCaption)</h1>
         <div class="row padBottom20">
-            @Html.DisplayFor(x => x.ModelStatus)
+            <div class="col-sm-12" style="font-weight:bold; font-size:1.5em;">
+                @Html.DisplayFor(x => x.ModelStatus)
+            </div>
         </div>
         <div class="row padBottom20">
             <div class="col-sm-9">

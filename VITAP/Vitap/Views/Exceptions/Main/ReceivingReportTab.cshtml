@@ -8,6 +8,8 @@
 
 @Html.AntiForgeryToken()
 
+@Html.HiddenFor(x => Model.BtnRRImage.Id)
+
 <div id="tabRR" class="container-fluid peg-main-ex">
     <div class="row no-buffer">
         <div class="col-xs-2 no-buffer">
@@ -133,7 +135,7 @@
     });
 
     $("#btnViewImage").on("click", function () {
-        var url = '@Url.Action("ViewImageByImageID", "Exceptions", new { docId = Model.BtnRRImage.Id })';
+        var url = '@Url.Action("ViewImageByImageID", "Exceptions")' + '?docId=' + $("#BtnRRImage_Id").val();
         window.location = url;
     });
 </script>

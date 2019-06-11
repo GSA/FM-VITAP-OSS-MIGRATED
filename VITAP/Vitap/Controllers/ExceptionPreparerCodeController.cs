@@ -60,30 +60,11 @@ namespace VITAP.Controllers
                 case "CorSymbol":
                     searchIn = "corsymb";
                     break;
-                //default:
-                //    searchIn = "";
-                //    break;
             }
 
 
-            //switch (model.Sort)
-            //{
-            //    case "Name":
-                    sortBy = " pcname ASC ";
-            /*        break;
-                case "PrepCode":
-                    sortBy = " prepcode ASC ";
-                    break;
-                case "WGTScore":
-                    sortBy = " wgtscore DESC ";
-                    break;
-                case "CorSymbol":
-                    sortBy = " corsymb ASC ";
-                    break;
-                //default:
-                //    sortBy = "";
-                //    break;
-            }*/
+            
+            sortBy = " pcname ASC ";
 
             model.ExceptPC = GetExceptionPrepCode(clearDate, searchIn, (String.IsNullOrEmpty(model.SearchValue) ? "" : model.SearchValue), sortBy);
 
@@ -94,7 +75,7 @@ namespace VITAP.Controllers
         {
             var mgr = new ExceptionsManager();
             List<ExceptionPreparerCode> model = new List<ExceptionPreparerCode>();
-            model = mgr.GetExceptPrepCode(AssignSrv, strClearDate, strSearchIn, strPrepCode, strSortBy);
+            model = mgr.GetExceptPrepCode(strClearDate, strSearchIn, strPrepCode, strSortBy);
             return model;
         }
     }

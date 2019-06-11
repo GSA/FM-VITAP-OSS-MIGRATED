@@ -150,29 +150,32 @@ namespace VITAP.SharedLogic.Buttons
             string X200IO = "", X200RO = "";
             var X200 = new List<X200Model>();
 
-            //using (var contextPeg = new OraclePegasysContext())
-            //{
-                X200IO = mgr.MFIO_P200_Query(Act, Pdocno, Addr_nm, Ctrc_num, Dlvr_Ordr_Num, Amount, Titl, 1);
-            //var rtnX200IO = contextPeg.Database.SqlQuery<X200Model>(X200IO).ToList();
-            var rtnX200IO = mgr.RunAdoPegQuery(X200IO).ToList();
-            if (rtnX200IO.Count() == 0)
-                {
-                    X200IO = mgr.MFIO_P200_Query(Act, Pdocno, Addr_nm, Ctrc_num, Dlvr_Ordr_Num, Amount, Titl, 2);
-                //rtnX200IO = contextPeg.Database.SqlQuery<X200Model>(X200IO).ToList();
+            IEnumerable<X200Model> rtnX200IO = new List<X200Model>();
+            X200IO = mgr.MFIO_P200_Query(Act, Pdocno, Addr_nm, Ctrc_num, Dlvr_Ordr_Num, Amount, Titl, 1);
+            if (X200IO.Length > 0) {
                 rtnX200IO = mgr.RunAdoPegQuery(X200IO).ToList();
             }
-                X200RO = mgr.MFIO_P200_RO_Query(Act, Pdocno, Addr_nm, Ctrc_num, Dlvr_Ordr_Num, Amount, Titl, 1);
-            //var rtnX200RO = contextPeg.Database.SqlQuery<X200Model>(X200RO).ToList();
+
+            // Only run 2nd query for PDOCNO searches.
+            if (rtnX200IO.Count() == 0 && Pdocno.Length > 0)
+            {
+                X200IO = mgr.MFIO_P200_Query(Act, Pdocno, Addr_nm, Ctrc_num, Dlvr_Ordr_Num, Amount, Titl, 2);
+                if (X200IO.Length > 0)
+                {
+                    rtnX200IO = mgr.RunAdoPegQuery(X200IO).ToList();
+                }
+            }
+                
+            X200RO = mgr.MFIO_P200_RO_Query(Act, Pdocno, Addr_nm, Ctrc_num, Dlvr_Ordr_Num, Amount, Titl, 1);
             var rtnX200RO = mgr.RunAdoPegQuery(X200RO).ToList();
             if (rtnX200RO.Count() == 0)
-                {
-                    X200RO = mgr.MFIO_P200_RO_Query(Act, Pdocno, Addr_nm, Ctrc_num, Dlvr_Ordr_Num, Amount, Titl, 2);
-                //rtnX200RO = contextPeg.Database.SqlQuery<X200Model>(X200RO).ToList();
+            {
+                X200RO = mgr.MFIO_P200_RO_Query(Act, Pdocno, Addr_nm, Ctrc_num, Dlvr_Ordr_Num, Amount, Titl, 2);
                 rtnX200RO = mgr.RunAdoPegQuery(X200RO).ToList();
             }
-                X200 = rtnX200IO.Concat(rtnX200RO).ToList();
-            //}
-            //var X200 = mgr.RunPegQuery(X200IO, X200RO);
+                
+            X200 = rtnX200IO.Concat(rtnX200RO).ToList();
+
             if (X200.Count == 0)
             {
                 X200 = mgr.VitapR200_Query(Act, Pdocno, Addr_nm, Ctrc_num, Dlvr_Ordr_Num, Amount, Titl, poId);
@@ -180,7 +183,7 @@ namespace VITAP.SharedLogic.Buttons
 
             foreach (var row in X200)
             {
-                if (row.ACT.ReplaceNull("  ").Substring(0, 2) == "1B")
+                if (row.ACT != null && row.ACT.Length >= 2 && row.ACT.Substring(0, 2) == "1B")
                 {
                     row.ACT = row.ACT.Substring(1);
                 }

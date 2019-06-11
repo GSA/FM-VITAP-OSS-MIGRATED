@@ -103,8 +103,17 @@ namespace VITAP.SharedLogic.Buttons
             }
             NewNote = NewNote.Trim().ReplaceApostrophes();
 
-            //For Novations - update exception info to allprocess field - exception.FAXNOTES comes from ReturnVal7 
-            string responseNotes = exception.RESPONSENOTES + "\r" + NewNote + "\r" + VendorID;
+            if (exception.ERR_CODE == "M224")
+            {
+               var rtnAE = GetPegasysAEByKey(exception.AE_ID);
+                if (rtnAE != null)
+                {
+                    UpdatePegasysAEToAccept(rtnAE);
+                }
+            }
+
+                //For Novations - update exception info to allprocess field - exception.FAXNOTES comes from ReturnVal7 
+                string responseNotes = exception.RESPONSENOTES + "\r" + NewNote + "\r" + VendorID;
             if (exception.ERR_CODE == "V216")
             {
                 UpdateException(exception, "A", notes.returnVal7, notes.returnVal3, responseNotes, notes.returnVal2);
@@ -323,12 +332,12 @@ namespace VITAP.SharedLogic.Buttons
                             InsertNotification();
                         }
                     }
-
-                    //update status code
-                    //Used exception.INV_KEY_ID before
-                    UpdatePegasysInvoiceToMatchReady();
-                    UpdateExceptionAmount();
                 }
+
+                //update status code
+                //Used exception.INV_KEY_ID before
+                UpdatePegasysInvoiceToMatchReady();
+                UpdateExceptionAmount();
             }
 
             #region BackendP002
@@ -821,7 +830,7 @@ namespace VITAP.SharedLogic.Buttons
 
             var fieldsToUpdate = new List<string>
             {
-                "AMOUNT"
+                "PAY_AMOUNT"
             };
 
             exception.PAY_AMOUNT = Amount;
@@ -907,10 +916,10 @@ namespace VITAP.SharedLogic.Buttons
         public void ExceptionU044()
         {
             //RRExists is not set and needs to be addressed
-            if (RRExists)
+            if (exception.RR_ID != null)
             {
-                UpdatePegasysRRByAct();
-               
+                UpdatePegasysRRToKeyed(exception.RR_ID);
+
                 //Appears to need to generate transaction history record, but doesn't
                 var CuffMemo = "";
                 if (exception.ERR_CODE == "U044")
@@ -1399,6 +1408,60 @@ namespace VITAP.SharedLogic.Buttons
                 }
             }
 
+        }
+
+        /// <summary>
+        /// Sets the PegasysAEFrm.AE_STATUS = "REJECT"
+        /// </summary>
+        /// <param name="rtnAE"></param>
+        private void UpdatePegasysAEToAccept(PEGASYSAE_FRM rtnAE)
+        {
+            var fieldsToUpdate = new List<string>
+                {
+                    "AE_STATUS",
+                    "ERR_CODE",
+                    "PREVALIDATION_FL"
+                };
+            rtnAE.AE_STATUS = "KEYED";
+            rtnAE.ERR_CODE = null;
+            rtnAE.PREVALIDATION_FL = "F";
+
+            UpdatePegasysAE(rtnAE, fieldsToUpdate);
+        }
+
+        public void ExceptionA224()
+        {
+            var rrFrm = GetPegasysRRByKey(exception.RR_ID);
+            var fieldsToUpdate = new List<string>
+            {
+                "RR_STATUS",
+                "ERR_CODE",
+                "PREVALIDATION_FL"
+            };
+
+                rrFrm.RR_STATUS = "KEYED";
+                rrFrm.ERR_CODE = null;
+                rrFrm.PREVALIDATION_FL = "F";
+
+                UpdatePegasysRR(rrFrm, fieldsToUpdate);
+           
+        }
+
+        public void ExceptionA226()
+        {
+            var rrFrm = GetPegasysRRByKey(exception.RR_ID);
+            var fieldsToUpdate = new List<string>
+            {
+                "RR_STATUS",
+                "ERR_CODE",
+                "PREVALIDATION_FL"
+            };
+
+            rrFrm.RR_STATUS = "KEYED";
+            rrFrm.ERR_CODE = null;
+            rrFrm.PREVALIDATION_FL = "F";
+
+            UpdatePegasysRR(rrFrm, fieldsToUpdate);
         }
 
         public List<Data.PegasysEntities.MF_ADDR_LEVL_VEND> DunsList(string DunsValue)
