@@ -1,3 +1,5 @@
+THIS REPOSITORY HAS BEEN MIGRATED TO FCS AND IS NOW LOCATED HERE: https://github.helix.gsa.gov/GSA-ICTA/FM-VITAP-OSS/
+
 # VITAP
 The Visual Invoice Tracking and Payment (VITAP) application is a front end accounts payable matching system that provides a variety of functionality for GSA Federal Acquisition Service and Public Building Service business lines. VITAP provides data for three of GSA OCFO Web applications: Web Vendors, Invoice Search, and PO Search. It also provides interfaces for the UPPS to flow into Pegasys. 
 
